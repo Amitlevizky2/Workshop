@@ -11,3 +11,7 @@ class TestInventory(unittest.TestCase):
 
     def test_getx(self):
         self.assertEqual(self.inv.getx(), 1)
+
+        
+if __name__ == '__main__':
+    unittest.main()
