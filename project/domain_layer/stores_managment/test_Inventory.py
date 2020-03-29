@@ -1,4 +1,4 @@
-from project.domain_layer.stores_managment.Inventory import Inventory
+from Inventory import Inventory
 import unittest
 
 
@@ -11,7 +11,6 @@ class TestInventory(unittest.TestCase):
 
     def test_getx(self):
         self.assertEqual(self.inv.getx(), 1)
-
         
 if __name__ == '__main__':
     unittest.main()
