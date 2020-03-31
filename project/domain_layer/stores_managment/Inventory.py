@@ -7,4 +7,12 @@ class Inventory:
         self.products = {}
 
     def add_product(self, product_name, product: Product, amount=0, price=0):
+        """
+
+        Args:
+            product_name:
+            product:
+            amount:
+            price:
+        """
         self.products[product_name] = (product, amount, price)

@@ -3,9 +3,10 @@ from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.users_managment import User
 
 
+
 class Store():
-    def __init__(self, store_id, name, store_owner):
-        self.id = store_id
+    def __init__(self,id,name,store_owner):
+        self.id = id
         self.name = name
         self.inventory = Inventory()
         self.sale_policy = None
