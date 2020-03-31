@@ -1,6 +1,5 @@
 class Inventory:
     def __init__(self):
-        self.x = 1
-
-    def getx(self):
-        return self.x
+        #products = {"product name",(Product,amount,price,?discount?)}
+        self.products = {}
+        
