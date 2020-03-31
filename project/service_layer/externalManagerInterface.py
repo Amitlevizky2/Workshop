@@ -1,0 +1,2 @@
+class externalManagerInterface:
+    pass

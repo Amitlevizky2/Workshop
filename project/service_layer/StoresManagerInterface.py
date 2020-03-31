@@ -1,0 +1,2 @@
+class StoresManagerInterface:
+    pass
