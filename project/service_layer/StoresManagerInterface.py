@@ -1,11 +1,13 @@
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
+from spellchecker import SpellChecker
 
 
 class StoresManagerInterface:
     def __init__(self):
         self.stores_manager = StoresManager()
+        self.spell_checker = SpellChecker()
 
     def search_product(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) \
             -> {Store: [Product]}:
@@ -19,4 +21,6 @@ class StoresManagerInterface:
         Returns:
 
         """
-        return self.stores_manager.search(search_term, categories, key_words)
+        return self.stores_manager.search(self.spell_checker.correction(search_term),
+                                          [self.spell_checker.correction(word) for word in categories],
+                                          [self.spell_checker.correction(word) for word in key_words])
