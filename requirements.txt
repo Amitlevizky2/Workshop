@@ -1,2 +1,2 @@
 pyspellchecker==0.5.4
-spellchecker==0.4
+
