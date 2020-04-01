@@ -1,8 +1,9 @@
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
+from project.domain_layer.users_managment import User
 
 
-class StoreManager:
+class StoresManager:
     def __init__(self):
         self.stores = {int: Store}
         self.stores_idx = 0
@@ -24,3 +25,21 @@ class StoreManager:
             if search_in_store is not None:
                 search_result[self.stores.get(store_id)] = search_in_store
         return search_result
+
+    def add_product_to_store(self, store_id: int, user: User, product_name: str, product_price: int,
+                             product_categories: [str],
+                             key_words: [str]) -> bool:
+        """
+
+        Args:
+            store_id:
+            user:
+            product_name:
+            product_price:
+            product_categories:
+            key_words:
+
+        Returns:
+
+        """
+        return self.stores.get(store_id).add_product(user, product_name, product_price, product_categories, key_words)

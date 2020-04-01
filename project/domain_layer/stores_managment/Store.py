@@ -3,7 +3,7 @@ from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.users_managment import User
 
 
-class Store():
+class Store:
     def __init__(self, store_id, name, store_owner):
         self.id = store_id
         self.name = name
