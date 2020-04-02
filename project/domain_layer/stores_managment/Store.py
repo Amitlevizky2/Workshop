@@ -1,6 +1,6 @@
 from project.domain_layer.stores_managment.Inventory import Inventory
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.users_managment import User
+from project.domain_layer.users_managment import User, Basket
 
 
 class Store:
@@ -11,6 +11,7 @@ class Store:
         self.sale_policy = None
         self.discount_policy = None
         self.store_owners = [store_owner]
+        self.sales = []
         self.rate = 0
 
     def add_product(self, user: User, product_name: str, product_price: int, product_category,
@@ -59,3 +60,19 @@ class Store:
                     if word not in product.key_words:
                         result.remove(product)
         return result
+
+    def get_sales_history(self) -> [(str, Basket)]:
+        return self.sales
+
+    def add_new_sale(self, user_id, basket) -> bool:
+        """
+
+         Args:
+             user_id: The user who made the purchase
+             basket: Holds the store products bought by the user
+         Returns:
+                 True if @new_sale was added to @self.sales list, else false
+         """
+        if self.sales.append((user_id, basket)) is None:
+            return True
+        return False
