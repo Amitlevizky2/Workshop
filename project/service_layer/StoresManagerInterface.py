@@ -9,6 +9,13 @@ class StoresManagerInterface:
         self.stores_manager = StoresManager()
         self.spell_checker = SpellChecker()
 
+    def get_store(self, store_id: int) -> Store:
+        try:
+            return self.stores_manager.get_store(store_id)
+        except ValueError as e:
+            print(e.args)
+
+
     def search_product(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) \
             -> {Store: [Product]}:
         """
