@@ -26,6 +26,12 @@ class StoresManager:
                 search_result[self.stores.get(store_id)] = search_in_store
         return search_result
 
+    def get_store(self, store_id: int) -> Store:
+        if store_id in self.stores.keys():
+            return self.stores.get(store_id)
+        else:
+            raise ValueError("wrong store id", store_id)
+
     def add_product_to_store(self, store_id: int, user: User, product_name: str, product_price: int,
                              product_categories: [str],
                              key_words: [str]) -> bool:
