@@ -11,6 +11,7 @@ class TestInventory(unittest.TestCase):
         self.inv.products = {}
 
     def test_add_product(self):
+
         apple = Product("apple", 1, "food", None)
         self.inv.add_product(apple.name, Product("apple", 1, "food", None))
         inv_apple = self.inv.products.get(apple.name)[0]

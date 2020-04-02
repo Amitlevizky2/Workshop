@@ -10,7 +10,8 @@ class TestStore(unittest.TestCase):
 
     def test_add_product(self):
         self.store.add_product("test owner", "apple", 1, ["food", "fruit"], ["green"])
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"])==self.store.inventory.products.get("apple")[0])
+        self.assertTrue(
+            Product("apple", 1, ["food", "fruit"], ["green"]) == self.store.inventory.products.get("apple")[0])
 
     def test_search(self):
         self.test_add_product()
@@ -20,3 +21,27 @@ class TestStore(unittest.TestCase):
         self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"]) == ap[0])
         ap = self.store.search(key_words=["green"])
         self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"]) == ap[0])
+
+    def test_appoint_owner(self):
+        self.assertFalse(self.store.appoint_owner("not test owner", "moshe"))
+        self.assertTrue(self.store.appoint_owner("test owner", "moshe"))
+
+    def test_add_permission_to_manager(self):
+        self.store.appoint_manager("test owner", "michael")
+        self.assertFalse(self.store.check_permission("michael", Store.add_product))
+        self.store.add_permission_to_manager("test owner", "michael","add_product")
+        ans = self.store.check_permission("michael", Store.add_product)
+        self.assertTrue(ans)
+
+    def test_appoint_manager(self):
+        self.assertFalse(self.store.appoint_owner("not test owner", "michael"))
+        self.assertTrue(self.store.appoint_owner("test owner", "michael"))
+
+    def test_get_sales_history(self):
+        pass
+
+    def test_add_new_sale(self):
+        pass
+
+    def test_check_permission(self):
+        pass
