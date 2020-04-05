@@ -29,7 +29,7 @@ class TestStore(unittest.TestCase):
     def test_add_permission_to_manager(self):
         self.store.appoint_manager("test owner", "michael")
         self.assertFalse(self.store.check_permission("michael", Store.add_product))
-        self.store.add_permission_to_manager("test owner", "michael","add_product")
+        self.store.add_permission_to_manager("test owner", "michael", "add_product")
         ans = self.store.check_permission("michael", Store.add_product)
         self.assertTrue(ans)
 
@@ -45,3 +45,23 @@ class TestStore(unittest.TestCase):
 
     def test_check_permission(self):
         pass
+
+    def test_remove_owner(self):
+        self.store.appoint_owner("test owner", "moshe")
+        self.assertFalse(self.store.remove_owner("moshe", "test owner"))
+        self.assertTrue(self.store.remove_owner("test owner", "moshe"))
+
+    def test_remove_manager(self):
+        self.store.appoint_manager("test owner", "moshe")
+        self.assertFalse(self.store.remove_manager("moshe", "test owner"))
+        self.assertTrue(self.store.remove_manager("test owner", "moshe"))
+
+    def test_remove_permission_from_manager(self):
+        self.store.appoint_manager("test owner", "moshe")
+        self.assertFalse(self.store.check_permission("moshe", Store.add_product))
+        self.store.add_permission_to_manager("test owner", "moshe", "add_product")
+        ans = self.store.check_permission("moshe", Store.add_product)
+        self.assertTrue(ans)
+        self.store.remove_permission_from_manager("test owner", "moshe", "add_product")
+        ans = self.store.check_permission("moshe", Store.add_product)
+        self.assertFalse(ans)
