@@ -49,3 +49,29 @@ class StoresManager:
 
         """
         return self.stores.get(store_id).add_product(user, product_name, product_price, product_categories, key_words)
+
+    def appoint_manager_to_store(self, store_id, owner, to_appoint):
+        """
+
+        Args:
+            store_id:
+            owner:
+            to_appoint:
+        """
+        self.stores.get(store_id).appoint_manager(owner, to_appoint)
+
+    def appoint_owner_to_store(self, store_id, owner, to_appoint):
+        """
+
+        Args:
+            store_id:
+            owner:
+            to_appoint:
+        """
+        self.stores.get(store_id).appoint_owner(owner, to_appoint)
+
+    def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
+        self.stores.get(store_id).add_permission_to_manager(owner, manager, permission)
+
+    def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
+        self.stores.get(store_id).remove_permission_from_manager(owner, manager, permission)
