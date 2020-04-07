@@ -65,3 +65,7 @@ class TestStore(unittest.TestCase):
         self.store.remove_permission_from_manager("test owner", "moshe", "add_product")
         ans = self.store.check_permission("moshe", Store.add_product)
         self.assertFalse(ans)
+
+
+if __name__ == '__main__':
+    unittest.main()
