@@ -12,10 +12,10 @@ class Store:
         self.sale_policy = None
         self.discount_policy = None
         self.store_owners = [store_owner]
-        self.store_managers = {str: list}  # {manager_name:functions}
+        self.store_managers = {}  # {manager_name:functions}
         self.sales = []
         self.rate = 0
-        self.appointed_by = {str: list}
+        self.appointed_by = {}
 
     def appoint_owner(self, owner, to_appoint):
         """
@@ -227,8 +227,11 @@ class Store:
     def get_sales_history(self, user) -> [(str, Basket)]:
         if self.check_permission(user, self.get_sales_history):
             return self.sales
-    def update_product(self,product_name,attribute,updated):
-        self.inventory.update_product(product_name,attribute,updated)
+
+    def update_product(self, user, product_name, attribute, updated):
+        if self.check_permission(user, self.update_product):
+            self.inventory.update_product(product_name, attribute, updated)
+
     def add_new_sale(self, purchase: Purchase) -> bool:
         """
 
