@@ -9,18 +9,20 @@ class TestStore(unittest.TestCase):
         self.store = Store(0, "test store", "test owner")
 
     def test_add_product(self):
-        self.store.add_product("test owner", "apple", 1, ["food", "fruit"], ["green"])
+        self.store.add_product("test owner", "apple", 1, ["food", "fruit"], ["green"], 2)
         self.assertTrue(
-            Product("apple", 1, ["food", "fruit"], ["green"]) == self.store.inventory.products.get("apple")[0])
+            Product("apple", 1, ["food", "fruit"], ["green"], 2) == self.store.inventory.products.get("apple"))
+        pass
+
 
     def test_search(self):
         self.test_add_product()
         ap = self.store.search("apple")
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"]) == ap[0])
+        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
         ap = self.store.search(categories=["food"])
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"]) == ap[0])
+        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
         ap = self.store.search(key_words=["green"])
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"]) == ap[0])
+        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
 
     def test_appoint_owner(self):
         self.assertFalse(self.store.appoint_owner("not test owner", "moshe"))

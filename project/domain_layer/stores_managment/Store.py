@@ -176,7 +176,7 @@ class Store:
             return False
 
     def add_product(self, user: User, product_name: str, product_price: int, product_categories,
-                    key_words: [str]) -> bool:
+                    key_words: [str],amount) -> bool:
         """
 
         Args:
@@ -192,7 +192,7 @@ class Store:
         """
         if self.check_permission(user, self.add_product):
             self.inventory.add_product(product_name,
-                                       Product(product_name, product_price, product_categories, key_words))
+                                       Product(product_name, product_price, product_categories, key_words,amount))
             return True
         else:
             return False
@@ -210,7 +210,7 @@ class Store:
         result = []
         for product_name in self.inventory.products.keys():
             if search_term in product_name:
-                result.append(self.inventory.products.get(product_name)[0])
+                result.append(self.inventory.products.get(product_name))
         if categories is not None:
             for product in result:
                 for category in categories:
