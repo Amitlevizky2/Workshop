@@ -12,10 +12,10 @@ class Store:
         self.sale_policy = None
         self.discount_policy = None
         self.store_owners = [store_owner]
-        self.store_managers = {str: list}  # {manager_name:functions}
+        self.store_managers = {}  # {manager_name:functions}
         self.sales = []
         self.rate = 0
-        self.appointed_by = {str: list}
+        self.appointed_by = {}
 
     def appoint_owner(self, owner, to_appoint):
         """
@@ -176,7 +176,7 @@ class Store:
             return False
 
     def add_product(self, user: User, product_name: str, product_price: int, product_categories,
-                    key_words: [str]) -> bool:
+                    key_words: [str],amount) -> bool:
         """
 
         Args:
@@ -192,7 +192,7 @@ class Store:
         """
         if self.check_permission(user, self.add_product):
             self.inventory.add_product(product_name,
-                                       Product(product_name, product_price, product_categories, key_words))
+                                       Product(product_name, product_price, product_categories, key_words,amount))
             return True
         else:
             return False
@@ -210,7 +210,7 @@ class Store:
         result = []
         for product_name in self.inventory.products.keys():
             if search_term in product_name:
-                result.append(self.inventory.products.get(product_name)[0])
+                result.append(self.inventory.products.get(product_name))
         if categories is not None:
             for product in result:
                 for category in categories:
@@ -224,9 +224,13 @@ class Store:
                         result.remove(product)
         return result
 
-    def get_sales_history(self, user) -> [(str, Basket)]:
-        if self.check_permission(user, self.get_sales_history):
+    def get_sales_history(self, user, is_admin) -> [(str, Basket)]:
+        if self.check_permission(user, self.get_sales_history) or is_admin:
             return self.sales
+
+    def update_product(self, user, product_name, attribute, updated):
+        if self.check_permission(user, self.update_product):
+            self.inventory.update_product(product_name, attribute, updated)
 
     def add_new_sale(self, purchase: Purchase) -> bool:
         """

@@ -10,14 +10,14 @@ class Discount(object):
 
 
 class Product:
-    def __init__(self, name, price, categories, key_words):
+    def __init__(self, name, price, categories, key_words, amount):
         self.name = name
         self.price = price
         self.categories = categories
-        self.price = price
         self.key_words = key_words
         self.rate = 0
-        self.discount = [Discount]
+        self.amount = amount
+        self.discount = []
 
     def __eq__(self, other):
         return self.name == other.name and \

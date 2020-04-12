@@ -15,4 +15,16 @@ class Inventory:
             amount:
             price:
         """
-        self.products[product_name] = (product, amount, price)
+        self.products[product_name] = product
+
+    def remove_product(self, product_name):
+        self.products.pop(product_name)
+
+    def update_product(self, product_name, attribute, updated):
+        setattr(self.products.get(product_name), attribute, updated)
+
+    def buy_product(self, product_name, amount):
+        if amount > self.products.get(product_name):
+            raise Exception("buying way to many")
+        self.products.get(product_name).amount -= amount
+        return self.products.get(product_name).amount

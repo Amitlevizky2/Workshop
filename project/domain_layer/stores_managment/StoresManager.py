@@ -1,3 +1,4 @@
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
@@ -79,3 +80,7 @@ class StoresManager:
 
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         self.get_store(store_id).add_new_sale(purchase)
+
+    def open_store(self, owner: str, store_name):
+        self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
+        self.stores_idx += 1
