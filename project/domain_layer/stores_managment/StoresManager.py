@@ -75,3 +75,4 @@ class StoresManager:
 
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         self.stores.get(store_id).remove_permission_from_manager(owner, manager, permission)
+
