@@ -9,14 +9,9 @@ class RegisteredUser(User):
         self.purchase_history = []
         self.loggedin = False
 
-
-    def view_purchase_history(self):
-        return self.purchase_history
-
-    def loggout(self):
+    def logout(self):
         self.loggedin = False
 
     def login(self):
         self.loggedin = True
-
 

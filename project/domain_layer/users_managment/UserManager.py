@@ -1,4 +1,5 @@
 from project import service_layer
+from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
@@ -40,9 +41,7 @@ class UserManager:
         else:
             return False
 
-
     def login(self, username: str, login_username: str, password) -> bool:
-
         check = self.find_reg_user(login_username)
         if not (isinstance(check, NullUser)):
             if self.security.verify_password(login_username, password):
@@ -58,3 +57,12 @@ class UserManager:
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
+
+    #look up via usr id change user list to map of ids and user
+    def view_cart(self, username) -> Cart:
+        user = self.find_user(username)
+        return user.view_cart()
+
+    def logout(self, username):
+        user = self.find_reg_user(username)
+        return user.logout()
