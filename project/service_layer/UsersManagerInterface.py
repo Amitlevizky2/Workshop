@@ -26,4 +26,13 @@ class UsersManagerInterface:
 
     def view_purchases(self, username):
         return self.user_manager.view_purchases(username)
-        ##if view purchases of username
+
+    def add_product(self, username, store_id, product, quantity):
+
+        return self.user_manager.add_product(store_id, product, quantity)
+
+    def remove_product(self, username, store_id, product, quantity):
+        return self.user_manager.remove_product(store_id, product, quantity)
+
+    def get_cart(self, username):
+        return self.user_manager.get_cart()

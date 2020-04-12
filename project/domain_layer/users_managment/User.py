@@ -10,3 +10,12 @@ class User:
     def view_cart(self):
         self.cart.view()
 
+    def remove_product(self, store_id, product, quantity):
+        self.cart.remove_product(store_id, product, quantity)
+
+    def add_product(self, store_id, product, quantity):
+        self.cart.add_product(store_id, product, quantity)
+        return True
+
+    def get_cart(self):
+        return self.cart

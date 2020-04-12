@@ -70,3 +70,15 @@ class UserManager:
     def view_purchases(self,username):
         return self.find_user(username).purchase_history
         ##if view purchases of username
+
+    def add_product(self, username, store_id, product, quantity):
+        user = self.find_user(username)
+        return user.add_product(store_id, product, quantity)
+
+    def remove_product(self, username, store_id, product, quantity):
+        user = self.find_user(username)
+        return user.remove_product(store_id,product, quantity)
+    
+    def get_cart(self, username):
+        user = self.find_user(username)
+        return user.get_cart()
