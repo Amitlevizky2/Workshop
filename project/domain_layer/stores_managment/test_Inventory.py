@@ -12,7 +12,7 @@ class TestInventory(unittest.TestCase):
         self.inv.products = {}
 
     def test_add_product(self):
-        apple = Product("apple", 1, "food", None)
+        apple = Product("apple", 1, "food", None,2)
         self.inv.add_product(apple.name, Product("apple", 1, "food", None, 2))
         inv_apple = self.inv.products.get(apple.name)[0]
         self.assertTrue(apple == inv_apple)
