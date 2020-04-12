@@ -227,7 +227,8 @@ class Store:
     def get_sales_history(self, user) -> [(str, Basket)]:
         if self.check_permission(user, self.get_sales_history):
             return self.sales
-
+    def update_product(self,product_name,attribute,updated):
+        self.inventory.update_product(product_name,attribute,updated)
     def add_new_sale(self, purchase: Purchase) -> bool:
         """
 

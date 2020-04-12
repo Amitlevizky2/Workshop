@@ -23,8 +23,3 @@ class Inventory:
     def update_product(self, product_name, attribute, updated):
         setattr(self.products.get(product_name), attribute, updated)
 
-    def buy_product(self, product_name, amount):
-        if amount > self.products.get(product_name):
-            raise Exception("buying way to many")
-        self.products.get(product_name).amount -= amount
-        return self.products.get(product_name).amount
