@@ -224,8 +224,8 @@ class Store:
                         result.remove(product)
         return result
 
-    def get_sales_history(self, user) -> [(str, Basket)]:
-        if self.check_permission(user, self.get_sales_history):
+    def get_sales_history(self, user, is_admin) -> [(str, Basket)]:
+        if self.check_permission(user, self.get_sales_history) or is_admin:
             return self.sales
 
     def update_product(self, user, product_name, attribute, updated):
