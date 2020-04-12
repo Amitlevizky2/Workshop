@@ -4,11 +4,11 @@ from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from spellchecker import SpellChecker
 
-from project.service_layer.UsersManagerInterface import UsersManagerInterface
+
 
 
 class StoresManagerInterface:
-    def __init__(self, users_manager: UsersManagerInterface):
+    def __init__(self, users_manager):
         self.stores_manager = StoresManager()
         self.spell_checker = SpellChecker()
         self.users_manager = users_manager
