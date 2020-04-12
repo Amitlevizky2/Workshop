@@ -20,3 +20,6 @@ class UsersManagerInterface:
     # look up via usr id change user list to map of ids and user
     def view_cart(self, username) -> Cart:
         return self.user_manager.view_cart(username)
+
+    def logout(self, username):
+        return self.user_manager.logout(username)

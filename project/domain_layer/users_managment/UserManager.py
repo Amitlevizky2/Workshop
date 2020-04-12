@@ -63,3 +63,6 @@ class UserManager:
         user = self.find_user(username)
         return user.view_cart()
 
+    def logout(self, username):
+        user = self.find_reg_user(username)
+        return user.logout()

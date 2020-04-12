@@ -9,5 +9,9 @@ class RegisteredUser(User):
         self.purchase_history = []
         self.loggedin = False
 
+    def logout(self):
+        self.loggedin = False
 
+    def login(self):
+        self.loggedin = True
 
