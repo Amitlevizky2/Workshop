@@ -5,5 +5,5 @@ class PaymentSystem:
     def __init__(self):
         pass
 
-    def pay(self,payment_info)->Purchase:
+    def pay(self, payment_info) -> Purchase:
         return Purchase()
