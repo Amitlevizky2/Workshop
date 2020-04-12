@@ -40,7 +40,19 @@ class UserManager:
         else:
             return False
 
-        ##EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
+
+    def login(self, username: str, login_username: str, password) -> bool:
+
+        check = self.find_reg_user(login_username)
+        if not (isinstance(check, NullUser)):
+            if self.security.verify_password(login_username, password):
+                check.loggedin = True
+                self.guest_user_list.pop(username)
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def add_guest_user(self):
         user = User("guestUser" + str(self.incremental_id))
