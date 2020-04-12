@@ -28,11 +28,16 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
     def add_product(self, username, store_id, product, quantity):
-
-        return self.user_manager.add_product(store_id, product, quantity)
+        return self.user_manager.add_product(username,store_id, product, quantity)
 
     def remove_product(self, username, store_id, product, quantity):
-        return self.user_manager.remove_product(store_id, product, quantity)
+        return self.user_manager.remove_product(username,store_id, product, quantity)
 
     def get_cart(self, username):
-        return self.user_manager.get_cart()
+        return self.user_manager.get_cart(username)
+
+    def view_purchases_admin(self, username, admin):
+        return self.user_manager.view_purchases_admin(username, admin)
+
+    def is_admin(self,username):
+        return self.user_manager.is_admin(username)
