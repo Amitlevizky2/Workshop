@@ -1,3 +1,4 @@
+from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Inventory import Inventory
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.users_managment import User, Basket
@@ -227,16 +228,16 @@ class Store:
         if self.check_permission(user, self.get_sales_history):
             return self.sales
 
-    def add_new_sale(self, user_id, basket) -> bool:
+    def add_new_sale(self, purchase: Purchase) -> bool:
         """
 
          Args:
-             user_id: The user who made the purchase
-             basket: Holds the store products bought by the user
+
+             purchase: Holds the store products bought by the user
          Returns:
                  True if @new_sale was added to @self.sales list, else false
          """
-        if self.sales.append((user_id, basket)) is None:
+        if self.sales.append(purchase) is None:
             return True
         return False
 
