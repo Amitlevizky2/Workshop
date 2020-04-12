@@ -9,3 +9,4 @@ class User:
 
     def view_cart(self):
         self.cart.view()
+

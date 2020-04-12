@@ -9,7 +9,7 @@ class NullUser(RegisteredUser):
     def view_purchase_history(self):
         return None
 
-    def loggout(self):
+    def logout(self):
         return False
 
     def login(self):
