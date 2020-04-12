@@ -1,3 +1,4 @@
+from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import User
@@ -76,3 +77,5 @@ class StoresManager:
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         self.stores.get(store_id).remove_permission_from_manager(owner, manager, permission)
 
+    def add_purchase_to_store(self, store_id: int, purchase: Purchase):
+        self.get_store(store_id).add_new_sale(purchase)
