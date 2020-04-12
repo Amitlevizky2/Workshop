@@ -4,7 +4,7 @@ import unittest
 
 class test_StoresManagerInterface(unittest.TestCase):
     def setUp(self):
-        self.store_manager_interface = StoresManagerInterface()
+        self.store_manager_interface = StoresManagerInterface(None)
 
     def test_search_product(self):
         pass

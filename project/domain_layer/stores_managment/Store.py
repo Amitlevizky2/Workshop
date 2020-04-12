@@ -176,7 +176,7 @@ class Store:
             return False
 
     def add_product(self, user: User, product_name: str, product_price: int, product_categories,
-                    key_words: [str],amount) -> bool:
+                    key_words: [str], amount) -> bool:
         """
 
         Args:
@@ -192,7 +192,7 @@ class Store:
         """
         if self.check_permission(user, self.add_product):
             self.inventory.add_product(product_name,
-                                       Product(product_name, product_price, product_categories, key_words,amount))
+                                       Product(product_name, product_price, product_categories, key_words, amount))
             return True
         else:
             return False
@@ -223,6 +223,9 @@ class Store:
                     if word not in product.key_words:
                         result.remove(product)
         return result
+
+    def buy_product(self, product_name, amount):
+        self.inventory.buy_product(product_name, amount)
 
     def get_sales_history(self, user, is_admin) -> [(str, Basket)]:
         if self.check_permission(user, self.get_sales_history) or is_admin:

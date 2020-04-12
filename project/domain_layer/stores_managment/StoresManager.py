@@ -1,13 +1,13 @@
-
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import User
+from project.domain_layer.users_managment.Cart import Cart
 
 
 class StoresManager:
     def __init__(self):
-        self.stores = {int: Store}
+        self.stores = {}
         self.stores_idx = 0
 
     def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {Store: [Product]}:
@@ -84,3 +84,8 @@ class StoresManager:
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
         self.stores_idx += 1
+
+    def buy(self, cart: Cart):
+        for basket in cart.baskets.keys():
+            for product in basket.products.keys():
+                self.stores.get(basket.store_id).buy_product(product, basket.products.get(product))
