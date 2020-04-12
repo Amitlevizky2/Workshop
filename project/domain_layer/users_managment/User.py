@@ -6,3 +6,6 @@ class User:
         self.cart = Cart()
         self.username = name
         self.purchase_history = []
+
+    def view_cart(self):
+        self.cart.view()

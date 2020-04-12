@@ -10,13 +10,4 @@ class RegisteredUser(User):
         self.loggedin = False
 
 
-    def view_purchase_history(self):
-        return self.purchase_history
-
-    def loggout(self):
-        self.loggedin = False
-
-    def login(self):
-        self.loggedin = True
-
 

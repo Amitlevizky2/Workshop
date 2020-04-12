@@ -21,3 +21,6 @@ class Cart:
         total = 0
         for basket in self.baskets:
             total += basket.get_total()
+
+    def view(self):
+        return self.baskets
