@@ -23,3 +23,7 @@ class UsersManagerInterface:
 
     def logout(self, username):
         return self.user_manager.logout(username)
+
+    def view_purchases(self, username):
+        return self.user_manager.view_purchases(username)
+        ##if view purchases of username

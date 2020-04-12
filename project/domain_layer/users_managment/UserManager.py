@@ -66,3 +66,7 @@ class UserManager:
     def logout(self, username):
         user = self.find_reg_user(username)
         return user.logout()
+
+    def view_purchases(self,username):
+        return self.find_user(username).purchase_history
+        ##if view purchases of username

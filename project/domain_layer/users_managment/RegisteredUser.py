@@ -15,3 +15,5 @@ class RegisteredUser(User):
     def login(self):
         self.loggedin = True
 
+    def view_purchase_history(self):
+        return self.purchase_history
