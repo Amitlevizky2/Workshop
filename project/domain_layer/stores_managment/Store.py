@@ -234,7 +234,8 @@ class Store:
     def update_product(self, user, product_name, attribute, updated):
         if self.check_permission(user, self.update_product):
             self.inventory.update_product(product_name, attribute, updated)
-
+            return True
+        return False
     def add_new_sale(self, purchase: Purchase) -> bool:
         """
 
