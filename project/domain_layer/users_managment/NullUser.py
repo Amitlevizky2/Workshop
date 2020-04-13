@@ -26,3 +26,6 @@ class NullUser(RegisteredUser):
 
     def open_store(self):
         return None
+
+    def get_cart(self):
+        return None
