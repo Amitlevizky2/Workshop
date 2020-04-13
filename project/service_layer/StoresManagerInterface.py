@@ -38,3 +38,9 @@ class StoresManagerInterface:
 
     def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {Store: [Product]}:
         return self.stores_manager.search(search_term, categories, key_words)
+
+    def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
+                             product_categories: [str],
+                             key_words: [str]) -> bool:
+        if store_id in self.users_manager.get_stores(user_name):
+            self.stores_manager.add_product_to_store(store_id,user_name,product_name,product_price,product_categories,key_words)
