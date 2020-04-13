@@ -18,3 +18,10 @@ class RegisteredUser(User):
 
     def view_purchase_history(self):
         return self.purchase_history
+
+    def get_managed_store(self):
+        return self.managed_stores
+
+    def add_managed_store(self, store_id):
+        if store_id not in self.managed_stores:
+            self.managed_stores.append(store_id)

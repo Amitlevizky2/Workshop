@@ -19,3 +19,11 @@ class User:
 
     def get_cart(self):
         return self.cart
+
+    def remove_cart(self):
+        self.cart = {}
+
+    def add_purchase(self, purchase):
+        self.purchase_history.append(purchase)
+
+
