@@ -53,3 +53,7 @@ class StoresManagerInterface:
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         if store_id in self.users_manager.get_stores(owner) and self.users_manager.check_if_registered(to_appoint):
             self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint)
+
+    def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
+        if store_id in self.users_manager.get_stores(owner) and store_id in self.users_manager.get_stores(manager):
+            self.stores_manager.appoint_owner_to_store(store_id, owner, manager, permission)
