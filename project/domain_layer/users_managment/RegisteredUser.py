@@ -8,6 +8,7 @@ class RegisteredUser(User):
         self.username = username
         self.purchase_history = []
         self.loggedin = False
+        self.managed_stores = []
 
     def logout(self):
         self.loggedin = False
