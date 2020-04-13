@@ -3,11 +3,12 @@ from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
+from project.service_layer.Security import Security
 
 
 class UserManager:
 
-    security = service_layer.Security()
+    security = Security()
     incremental_id = 0
 
     def __init__(self):
