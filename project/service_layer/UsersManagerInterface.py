@@ -7,15 +7,15 @@ class UsersManagerInterface:
     def __init__(self):
         self.user_manager = UserManager()
 
-    def register(self, user, username, password):
-        return self.user_manager.register(user,username,password)
+    def register(self, username, new_username, password):
+        return self.user_manager.register(username, new_username,password)
 
     ##EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password) -> bool:
         return self.user_manager.login(username, login_username, password)
 
     def add_guest_user(self):
-        self.user_manager.add_guest_user()
+        return self.user_manager.add_guest_user()
 
     # look up via usr id change user list to map of ids and user
     def view_cart(self, username) -> Cart:
@@ -41,3 +41,21 @@ class UsersManagerInterface:
 
     def is_admin(self,username):
         return self.user_manager.is_admin(username)
+
+    def add_managed_store(self, username, store_id):
+        return self.user_manager.add_managed_store(username, store_id)
+
+    def get_managed_stores(self, username):
+        return self.user_manager.get_managed_stores(username)
+
+    def check_if_registered(self, username):
+        return self.user_manager.check_if_registered(username)
+
+    def check_if_loggedin(self, username):
+        return self.user_manager.check_if_loggedin(username)
+
+    def add_purchase(self, username, purchase):
+        return self.user_manager.add_purchase(username, purchase)
+
+    def remove_cart(self, username):
+        return self.user_manager.remove_cart(username)

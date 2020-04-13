@@ -24,8 +24,17 @@ class NullUser(RegisteredUser):
     def add_product(self, store, product, quantity):
         return False
 
-    def open_store(self):
-        return None
-
     def get_cart(self):
         return None
+
+    def get_managed_store(self):
+        return None
+
+    def add_managed_store(self, store_id):
+        return False
+
+    def remove_cart(self):
+        return None
+
+    def add_purchase(self, purchase):
+        return False

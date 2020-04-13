@@ -16,6 +16,9 @@ class UserManager:
         self.guest_user_list = {}
         ##maybe dictionary {id, username}
         self.admins = []
+        username = self.add_guest_user()
+        self.register(username, "admin", "1234")
+        self.admins.append("admin")
 
     def find_reg_user(self, username) -> RegisteredUser:
         user = self.reg_user_list[username]
@@ -58,6 +61,7 @@ class UserManager:
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
+        return user.username
 
     #look up via usr id change user list to map of ids and user
     def view_cart(self, username) -> Cart:
@@ -90,3 +94,26 @@ class UserManager:
 
     def is_admin(self,username):
         return username in self.admins
+
+    def add_managed_store(self, username, store_id):
+        user = self.find_reg_user(username)
+        return user.add_managed_store(store_id)
+
+    def get_managed_stores(self, username):
+        user = self.find_reg_user(username)
+        return user.get_managed_store()
+
+    def check_if_registered(self, username):
+        return username in self.reg_user_list.keys()
+
+    def check_if_loggedin(self, username):
+        user = self.find_reg_user(username)
+        return user.loggedin
+
+    def add_purchase(self, username, purchase):
+        user = self.find_user(username)
+        user.add_purchase(purchase)
+
+    def remove_cart(self, username):
+        user = self.find_user(username)
+        user.remove_cart()
