@@ -1,7 +1,7 @@
 class Basket:
     # send the initial product to init????
     def __init__(self, store_id):
-        # products = {"product name",(amount)}
+        # products = {"product name",(Product,amount)}
         self.products = {}
         self.store_id = store_id
         self.total = 0
