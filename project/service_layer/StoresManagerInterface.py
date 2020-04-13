@@ -64,6 +64,8 @@ class StoresManagerInterface:
 
     def open_store(self, owner: str, store_name):
         if self.users_manager.check_if_registered(owner):
-            store_id = self.stores_manager.open_store(owner,store_name)
-            self.users_manager.add_store(owner,store_id)
-            
+            store_id = self.stores_manager.open_store(owner, store_name)
+            self.users_manager.add_store(owner, store_id)
+
+    def buy(self, cart):
+        self.stores_manager.buy(cart)

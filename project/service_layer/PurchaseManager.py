@@ -13,7 +13,9 @@ class PurchaseManager:
 
     def buy(self, user):
         for purchase in self.payment_system.pay(user, self.user_manager.view_cart(user)):
-            self.user_manager.add_purchase(user, purchase)
+
+            self.store_manager.buy(self.user_manager.view_cart(user))
             self.store_manager.add_purchase_to_store(purchase.store_id, purchase)
+            self.user_manager.add_purchase(user, purchase)
         self.shipment_system.ship()
         self.user_manager.remove_cart(user)
