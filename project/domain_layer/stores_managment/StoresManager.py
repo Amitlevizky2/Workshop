@@ -34,14 +34,14 @@ class StoresManager:
         else:
             raise ValueError("wrong store id", store_id)
 
-    def add_product_to_store(self, store_id: int, user: User, product_name: str, product_price: int,
+    def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
                              key_words: [str]) -> bool:
         """
 
         Args:
             store_id:
-            user:
+            user_name:
             product_name:
             product_price:
             product_categories:
@@ -50,7 +50,7 @@ class StoresManager:
         Returns:
 
         """
-        return self.stores.get(store_id).add_product(user, product_name, product_price, product_categories, key_words)
+        return self.stores.get(store_id).add_product(user_name, product_name, product_price, product_categories, key_words)
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         """
@@ -84,6 +84,7 @@ class StoresManager:
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
         self.stores_idx += 1
+        return self.stores_idx-1
 
     def buy(self, cart: Cart):
         for basket in cart.baskets.keys():

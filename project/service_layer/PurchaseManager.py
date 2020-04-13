@@ -1,4 +1,5 @@
 from project.domain_layer.external_managment.PaymentSystem import PaymentSystem
+from project.domain_layer.external_managment.ShipmentSystem import ShipmentSystem
 from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
 
@@ -8,8 +9,13 @@ class PurchaseManager:
         self.user_manager = user_manager
         self.store_manager = store_manager
         self.payment_system = PaymentSystem()
+        self.shipment_system = ShipmentSystem()
 
     def buy(self, user):
-        for purchase in self.payment_system.pay(user, self.user_manager.get_cart(user)):
-            self.user_manager.add_purchase(user, purchase)
+        for purchase in self.payment_system.pay(user, self.user_manager.view_cart(user)):
+
+            self.store_manager.buy(self.user_manager.view_cart(user))
             self.store_manager.add_purchase_to_store(purchase.store_id, purchase)
+            self.user_manager.add_purchase(user, purchase)
+        self.shipment_system.ship()
+        self.user_manager.remove_cart(user)

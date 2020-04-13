@@ -175,12 +175,12 @@ class Store:
         else:
             return False
 
-    def add_product(self, user: User, product_name: str, product_price: int, product_categories,
+    def add_product(self, user_name: str, product_name: str, product_price: int, product_categories,
                     key_words: [str], amount) -> bool:
         """
 
         Args:
-            user:the user who wants to add product, should be a owner
+            user_name:the user who wants to add product, should be a owner
                 or a manager with permission
             product_name:product name
             product_price:product price
@@ -190,7 +190,7 @@ class Store:
         Returns:
 
         """
-        if self.check_permission(user, self.add_product):
+        if self.check_permission(user_name, self.add_product):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
             return True
