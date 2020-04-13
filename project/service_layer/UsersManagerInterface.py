@@ -1,5 +1,5 @@
 from project.domain_layer.users_managment.Cart import Cart
-from project.domain_layer.users_managment.UserManager import UserManager
+from project.domain_layer.users_managment.UsersManager import UserManager
 
 
 class UsersManagerInterface:
