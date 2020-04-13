@@ -61,3 +61,9 @@ class StoresManagerInterface:
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         if store_id in self.users_manager.get_stores(owner) and store_id in self.users_manager.get_stores(manager):
             self.stores_manager.remove_permission_from_manager_in_store(store_id, owner, manager, permission)
+
+    def open_store(self, owner: str, store_name):
+        if self.users_manager.check_if_registered(owner):
+            store_id = self.stores_manager.open_store(owner,store_name)
+            self.users_manager.add_store(owner,store_id)
+            

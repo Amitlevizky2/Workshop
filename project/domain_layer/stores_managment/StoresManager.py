@@ -84,6 +84,7 @@ class StoresManager:
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
         self.stores_idx += 1
+        return self.stores_idx-1
 
     def buy(self, cart: Cart):
         for basket in cart.baskets.keys():
