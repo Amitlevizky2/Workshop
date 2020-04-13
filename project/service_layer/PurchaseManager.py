@@ -1,13 +1,12 @@
 from project.domain_layer.external_managment.PaymentSystem import PaymentSystem
-from project.domain_layer.external_managment.ShipmentSystem import ShipmentSystem
 from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
+from project.domain_layer.external_managment.ShipmentSystem import ShipmentSystem
 
 
 class ExternalPaymentStub:
     def pay(self, cart):
         return True
-
 
 class PurchaseManager:
     def __init__(self, user_manager: UsersManagerInterface, store_manager: StoresManagerInterface):
