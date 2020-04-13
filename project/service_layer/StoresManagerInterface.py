@@ -56,4 +56,4 @@ class StoresManagerInterface:
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         if store_id in self.users_manager.get_stores(owner) and store_id in self.users_manager.get_stores(manager):
-            self.stores_manager.appoint_owner_to_store(store_id, owner, manager, permission)
+            self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
