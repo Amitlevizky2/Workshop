@@ -43,8 +43,13 @@ class StoresManagerInterface:
                              product_categories: [str],
                              key_words: [str]) -> bool:
         if store_id in self.users_manager.get_stores(user_name):
-            self.stores_manager.add_product_to_store(store_id,user_name,product_name,product_price,product_categories,key_words)
+            self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
+                                                     product_categories, key_words)
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         if store_id in self.users_manager.get_stores(owner) and self.users_manager.check_if_registered(to_appoint):
-            self.stores_manager.appoint_manager_to_store(store_id,owner,to_appoint)
+            self.stores_manager.appoint_manager_to_store(store_id, owner, to_appoint)
+
+    def appoint_owner_to_store(self, store_id, owner, to_appoint):
+        if store_id in self.users_manager.get_stores(owner) and self.users_manager.check_if_registered(to_appoint):
+            self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint)
