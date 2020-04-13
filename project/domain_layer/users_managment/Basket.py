@@ -1,13 +1,11 @@
 class Basket:
     # send the initial product to init????
     def __init__(self, store_id):
-        # products = {"product name",(amount)}
+        # products = {"product name",(Product, amount)}
         self.products = {}
         self.store_id = store_id
         self.total = 0
 
-    # NOT SURE IF THE FUNCTION WORKS
-    #NEED TO DECIDE IF HOLD PRODUCT OR NAME HOW TO GET PRICE IF NAME
     def get_total(self):
         total = 0
         for product in self.products.values():
@@ -15,8 +13,7 @@ class Basket:
         self.total = total
         return self.total
 
-        # check += ???????
-
+    # check += ???????
     def add_product(self, product, quantity):
         if product.name in self.products.keys():
             amount = self.products[product.name][1]
@@ -29,7 +26,7 @@ class Basket:
     def remove_product(self, product, quantity):
         if product.name in self.products.keys():
             amount = self.products[product.name][1]
-            amount = amount - quantity
+            amount = amount-quantity
             if amount <= 0:
                 self.products.pop(product)
             else:
