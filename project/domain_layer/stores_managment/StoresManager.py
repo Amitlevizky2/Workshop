@@ -50,7 +50,8 @@ class StoresManager:
         Returns:
 
         """
-        return self.stores.get(store_id).add_product(user_name, product_name, product_price, product_categories, key_words)
+        return self.stores.get(store_id).add_product(user_name, product_name, product_price,
+                                                     product_categories, key_words)
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         """
@@ -84,9 +85,12 @@ class StoresManager:
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
         self.stores_idx += 1
-        return self.stores_idx-1
+        return self.stores_idx - 1
 
     def buy(self, cart: Cart):
         for basket in cart.baskets.keys():
             for product in basket.products.keys():
                 self.stores.get(basket.store_id).buy_product(product, basket.products.get(product))
+
+    def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
+        return self.stores.get(store_id).get_sales_history(user, is_admin)

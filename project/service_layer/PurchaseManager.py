@@ -8,6 +8,7 @@ class ExternalPaymentStub:
     def pay(self, cart):
         return True
 
+
 class PurchaseManager:
     def __init__(self, user_manager: UsersManagerInterface, store_manager: StoresManagerInterface):
         self.user_manager = user_manager

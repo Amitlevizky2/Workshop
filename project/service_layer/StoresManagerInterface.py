@@ -5,8 +5,6 @@ from project.domain_layer.stores_managment.Store import Store
 from spellchecker import SpellChecker
 
 
-
-
 class StoresManagerInterface:
     def __init__(self, users_manager):
         self.stores_manager = StoresManager()
@@ -72,3 +70,8 @@ class StoresManagerInterface:
 
     def buy(self, cart):
         self.stores_manager.buy(cart)
+
+    def get_sales_history(self, store_id, user) -> [Purchase]:
+        if self.users_manager.check_if_registered(user) and (
+                store_id in self.users_manager.get_stores(user) or self.users_manager.is_admin(user)):
+            return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))

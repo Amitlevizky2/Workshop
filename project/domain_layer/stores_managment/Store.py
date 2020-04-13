@@ -227,7 +227,7 @@ class Store:
     def buy_product(self, product_name, amount):
         self.inventory.buy_product(product_name, amount)
 
-    def get_sales_history(self, user, is_admin) -> [(str, Basket)]:
+    def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, self.get_sales_history) or is_admin:
             return self.sales
 
