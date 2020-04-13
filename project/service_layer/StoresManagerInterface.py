@@ -4,9 +4,11 @@ from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from spellchecker import SpellChecker
 
+from project.service_layer.UsersManagerInterface import UsersManagerInterface
+
 
 class StoresManagerInterface:
-    def __init__(self, users_manager):
+    def __init__(self, users_manager: UsersManagerInterface):
         self.stores_manager = StoresManager()
         self.spell_checker = SpellChecker()
         self.users_manager = users_manager
@@ -43,8 +45,9 @@ class StoresManagerInterface:
                              product_categories: [str],
                              key_words: [str]) -> bool:
         if store_id in self.users_manager.get_stores(user_name):
-            self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
-                                                     product_categories, key_words)
+            return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
+                                                            product_categories, key_words)
+        return False
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         if store_id in self.users_manager.get_stores(owner) and self.users_manager.check_if_registered(to_appoint):
