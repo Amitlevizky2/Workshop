@@ -65,7 +65,7 @@ class TestStore(unittest.TestCase):
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
-            self.store.appoint_owner(users[i], users[i+1])  
+            self.store.appoint_owner(users[i], users[i+1])
 
     def test_remove_manager(self):
         pass
