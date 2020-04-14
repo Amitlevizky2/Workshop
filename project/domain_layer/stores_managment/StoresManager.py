@@ -1,7 +1,7 @@
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
-from project.domain_layer.users_managment import User
 from project.domain_layer.users_managment.Cart import Cart
 
 
@@ -32,7 +32,7 @@ class StoresManager:
         if store_id in self.stores.keys():
             return self.stores.get(store_id)
         else:
-            raise ValueError("wrong store id", store_id)
+            return NullStore()
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
