@@ -12,8 +12,10 @@ class TestStore(unittest.TestCase):
     def test_appoint_owner_one(self):
         # There is no such owner
         self.assertFalse(self.store.appoint_owner("not test owner", "Moshe"))
-        # Owner exists
+        # Valid appointment
         self.assertTrue(self.store.appoint_owner("test owner", "Moshe"))
+        # Moshe is already a store owner, should not e appointed again
+        self.assertFalse(self.store.appoint_owner("test owner", "Moshe"))
 
     def test_appoint_owner_two(self):
         self.store.appoint_owner("test owner", "Moshe")
