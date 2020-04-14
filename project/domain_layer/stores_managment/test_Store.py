@@ -16,6 +16,7 @@ class TestStore(unittest.TestCase):
         self.assertTrue(self.store.appoint_owner("test owner", "Moshe"))
 
     def test_appoint_owner_two(self):
+        self.store.appoint_owner("test owner", "Moshe")
         # to_appoint is already owner of the store
         self.assertFalse(self.store.appoint_owner("test owner", "test owner"))
         # If Moshe was a manager, pull him out from that list
