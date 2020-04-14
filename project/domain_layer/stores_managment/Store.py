@@ -172,7 +172,7 @@ class Store:
 
         """
         if owner in self.store_owners and to_appoint not in self.store_managers.keys():
-            self.store_managers[to_appoint] = [self.get_sales_history]
+            self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
             if owner in self.appointed_by.keys():
                 self.appointed_by[owner].append(to_appoint)
             else:
