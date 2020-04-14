@@ -7,7 +7,8 @@ from project.domain_layer.stores_managment.Store import Store
 class TestStore(unittest.TestCase):
     def setUp(self):
         self.store = Store(0, "test store", "test owner")
-        self.store.store_managers["Moshe"] = []
+        self.store.store_managers = {"Moshe": [], "Amit": [], "Hadar": [], "Lielle": [],
+                                     "Noa": [], "Evgeny": []}
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -27,6 +28,47 @@ class TestStore(unittest.TestCase):
         self.assertIn("Moshe", self.store.store_owners)
         # Validate that Moshe was appointed by test owner and now become his appointee
         self.assertIn("Moshe", self.store.appointed_by["test owner"])
+
+    def test_remove_owner_one(self):
+        users = [*self.store.store_managers]
+        self.store.appoint_owner("test owner", "Moshe")
+        self.appoint_managers_to_owners(users)
+
+        #owner is not really a store owner
+        self.assertFalse(self.store.remove_owner("Sebastian", "Amit"))
+        #to_remove is not a store owner
+        self.assertFalse(self.store.remove_owner("Amit", "Sebastian"))
+        #to_remove was not appointed by owner
+        self.assertFalse(self.store.remove_owner("Amit", "Lielle"))
+
+    def test_remove_owner_two(self):
+        users = [*self.store.store_managers]
+        self.store.appoint_owner("test owner", "Moshe")
+        self.appoint_managers_to_owners(users)
+
+        # Check that all of the owner that was appoint by Moshe will are in the owners list
+        for i in range(0, len(users)):
+            self.assertIn(users[i], self.store.store_owners)
+
+        # Check that every appointed owner is in the appointed by list of his appointee
+        for i in range(0, len(users) - 1):
+            self.assertIn(users[i + 1], self.store.appointed_by[users[i]])
+
+        self.store.remove_owner("test owner", "Moshe")
+        # Check that all of the owner that was appoint by Moshe will be deleted
+        for i in range(0, len(users)):
+            self.assertNotIn(users[i], self.store.store_owners)
+
+        # Check that every appointed owner is not in the appointed by list of his appointee
+        for i in range(0, len(users)):
+            self.assertNotIn(users[i], self.store.appointed_by)
+
+    def appoint_managers_to_owners(self, users):
+        for i in range(0, len(users) - 1):
+            self.store.appoint_owner(users[i], users[i+1])  
+
+    def test_remove_manager(self):
+        pass
 
     def test_add_product(self):
         self.store.add_product("test owner", "apple", 1, ["food", "fruit"], ["green"], 2)
@@ -67,11 +109,6 @@ class TestStore(unittest.TestCase):
         self.store.appoint_owner("test owner", "moshe")
         self.assertFalse(self.store.remove_owner("moshe", "test owner"))
         self.assertTrue(self.store.remove_owner("test owner", "moshe"))
-
-    def test_remove_manager(self):
-        self.store.appoint_manager("test owner", "moshe")
-        self.assertFalse(self.store.remove_manager("moshe", "test owner"))
-        self.assertTrue(self.store.remove_manager("test owner", "moshe"))
 
     def test_remove_permission_from_manager(self):
         self.store.appoint_manager("test owner", "moshe")

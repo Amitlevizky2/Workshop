@@ -59,7 +59,6 @@ class Store:
         """
         if owner in self.store_owners:
             if to_remove in self.store_owners:
-
                 if owner in self.appointed_by.keys() and to_remove in self.appointed_by.get(owner):
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
