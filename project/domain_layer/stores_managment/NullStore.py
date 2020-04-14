@@ -4,6 +4,9 @@ from project.domain_layer.stores_managment.Store import Store
 
 
 class NullStore(Store):
+    def __init__(self):
+        pass
+
     def appoint_owner(self, owner, to_appoint):
         pass
 
