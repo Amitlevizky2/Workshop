@@ -7,8 +7,15 @@ from project.domain_layer.stores_managment.Store import Store
 class TestStore(unittest.TestCase):
     def setUp(self):
         self.store = Store(0, "test store", "test owner")
-        self.store.store_managers = {"Moshe": [], "Amit": [], "Hadar": [], "Lielle": [],
-                                     "Noa": [], "Evgeny": []}
+        self.store.store_managers = {"Moshe": [],
+                                     "Amit": [],
+                                     "Hadar": [],
+                                     "Lielle": [],
+                                     "Noa": [],
+                                     "Evgeny": []}
+        self.standard_users = ["Avishay",
+                               "Alex",
+                               "Ron"]
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -67,8 +74,35 @@ class TestStore(unittest.TestCase):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i+1])
 
-    def test_remove_manager(self):
-        pass
+    def test_remove_manager_one(self):
+        self.store.appoint_owner("test owner", "Moshe")
+        self.store.appoint_manager("Moshe", "Hadar")
+
+        # Amit is not owner
+        self.assertFalse(self.store.remove_manager("Amit", "Lielle"))
+        # Sebastian is not in store managers dictionary
+        self.assertFalse(self.store.remove_manager("test store", "Sebastian"))
+        # Hadar was not appointed by test owner
+        self.assertFalse(self.store.remove_manager("test store", "Hadar"))
+
+    def test_remove_manager_two(self):
+        self.appoint_users_to_managers()
+        # Check that 3 managers was added to managers dictionary
+        for i in range(0, len(self.standard_users)):
+            self.assertIn(self.standard_users[i], self.store.store_managers)
+
+        # Avishay should be in the appointed by test owner list
+        self.assertIn("Avishay", self.store.appointed_by["test owner"])
+        # test owner and Avishay are valid parameters to the method
+        self.assertTrue(self.store.remove_manager("test owner", "Avishay"))
+        # Avishay should not be in store's mangers list.
+        self.assertNotIn("Avishay", self.store.store_managers)
+        # Avishay should not be in the appointed by test owner list
+        self.assertNotIn("Avishay", self.store.appointed_by["test owner"])
+
+    def appoint_users_to_managers(self):
+        for i in range(0, len(self.standard_users)):
+            self.store.appoint_manager("test owner", self.standard_users[i])
 
     def test_add_product(self):
         self.store.add_product("test owner", "apple", 1, ["food", "fruit"], ["green"], 2)
