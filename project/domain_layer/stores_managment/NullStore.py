@@ -27,7 +27,7 @@ class NullStore(Store):
 
     def add_product(self, user_name: str, product_name: str, product_price: int, product_categories, key_words: [str],
                     amount) -> bool:
-        pass
+        return False
 
     def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> [Product]:
         pass

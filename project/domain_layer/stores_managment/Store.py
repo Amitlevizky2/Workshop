@@ -243,6 +243,7 @@ class Store:
             self.inventory.update_product(product_name, attribute, updated)
             return True
         return False
+
     def add_new_sale(self, purchase: Purchase) -> bool:
         """
 
@@ -259,3 +260,5 @@ class Store:
     def check_permission(self, user, function):
         return user in self.store_owners or \
                (user in self.store_managers and function in self.store_managers.get(user))
+
+
