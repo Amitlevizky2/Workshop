@@ -13,9 +13,20 @@ class TestStore(unittest.TestCase):
                                      "Lielle": [],
                                      "Noa": [],
                                      "Evgeny": []}
+
         self.standard_users = ["Avishay",
                                "Alex",
                                "Ron"]
+
+        self.store.inventory.products = {"Apple": Product("Apple", 20, "Food", "Fruits", 10),
+                                         "Banana": Product("Banana", 20, "Food", "Fruits", 10),
+                                         "Orange": Product("Orange", 20, "Food", "Fruits", 10),
+                                         "Tomato": Product("Tomato", 20, "Food", "Vegetables", 10),
+                                         "Cucumber": Product("Cucumber", 20, "Food", "Vegetables", 10),
+                                         "Carrot": Product("Carrot", 20, "Food", "Vegetables", 10),
+                                         "Iphone": Product("Iphone", 20, "Electronics", "Computers", 10),
+                                         "Hard Disk": Product("Hard Disk", 20, "Electronics", "Computers", 10),
+                                         "Keyboard": Product("Keyboard", 20, "Electronics", "Computers", 10)}
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -178,6 +189,35 @@ class TestStore(unittest.TestCase):
         # Now that you become a manager, let see if you can see the store sales history
         self.assertIn(Store.get_sales_history, self.store.store_managers["Ron"])
 
+    def test_add_product_one(self):
+        # Lielle you silly, you don't have the add product permission, moreover,
+        self.assertFalse(self.store.add_product("Lielle", "Macbook", 25, "Food", "Fruits", 20))
+        # Sebastian is not one of the users in the system.
+        self.assertFalse(self.store.add_product("Sebastian", "Macbook", 25, "Food", "Fruits", 20))
+
+    def test_add_product_two(self):
+        p = Product("Macbook", 25, "Food", "Fruits", 20)
+        # Just checking that the product is not exist
+        self.assertNotIn("Macbook", self.store.inventory.products)
+        # Amitush, you have the permission to add product, use it!
+        self.assertTrue(self.store.add_product("Amit", p.name, p.price, p.categories, p.key_words, p.amount))
+        # Let's see if you did it well
+        self.assertIn("Macbook", self.store.inventory.products)
+
+    def test_search_one(self):
+        pass
+
+
+
+
+        # self.test_add_product()
+        # ap = self.store.search("apple")
+        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
+        # ap = self.store.search(categories=["food"])
+        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
+        # ap = self.store.search(key_words=["green"])
+        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
+        #
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i + 1])
@@ -185,21 +225,6 @@ class TestStore(unittest.TestCase):
     def appoint_users_to_managers(self):
         for i in range(0, len(self.standard_users)):
             self.store.appoint_manager("test owner", self.standard_users[i])
-
-    def test_add_product(self):
-        self.store.add_product("test owner", "apple", 1, ["food", "fruit"], ["green"], 2)
-        self.assertTrue(
-            Product("apple", 1, ["food", "fruit"], ["green"], 2) == self.store.inventory.products.get("apple"))
-        pass
-
-    def test_search(self):
-        self.test_add_product()
-        ap = self.store.search("apple")
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        ap = self.store.search(categories=["food"])
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        ap = self.store.search(key_words=["green"])
-        self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
 
     def test_appoint_manager(self):
         self.assertFalse(self.store.appoint_owner("not test owner", "michael"))

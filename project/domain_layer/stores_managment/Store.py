@@ -196,7 +196,7 @@ class Store:
         Returns:
 
         """
-        if self.check_permission(user_name, self.add_product):
+        if self.check_permission(user_name, getattr(Store, "add_product")):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
             return True
