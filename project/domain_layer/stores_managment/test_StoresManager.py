@@ -1,5 +1,7 @@
 import unittest
 import mock
+
+from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 
@@ -12,15 +14,35 @@ class test_StoresManager(unittest.TestCase):
             ("t-shirt", 20, ["cloth"], ["green"], 7),
             ("apple", 1, ["food", "green"], ["vegetable"], 10),
             ("orange", 1, ["food", "orange"], ["fruits"], 10),
-            ("iphone", 5000, ["electronics", "bag and expensive phone "], ["fruits"], 10)
+            ("iphone", 5000, ["electronics", "bad and expensive phone "], ["fruits"], 10)
         ]
 
     def test_update_product(self):
-        with mock.patch('project.domain_layer.stores_managment.Store'):
-            pass
+        self.test_add_product_to_store()
+        # check regular update
+
+        for attribute, value in Product(self.products[-1][0], 20, ["not so expensive now"], ["electronics"],
+                                        1).__dict__.items():
+            self.assertTrue(
+                self.store_manager.update_product(self.idx - 1, "moshe" + str(self.idx - 1), self.products[-1][0],
+                                                  attribute,
+                                                  value))
+
+            self.assertEqual(
+                self.store_manager.stores.get(self.idx - 1).inventory.products.get(
+                    self.products[-1][0]).__getattribute__(attribute),
+                value)
+
+        # update without permissions
+        self.assertFalse(
+            self.store_manager.update_product(self.idx - 1, "not moshe", self.products[-1][0],
+                                              "price",
+                                              73))
 
     def test_search(self):
-        assert False
+        
+
+        #by key words
 
     def test_get_store(self):
         assert False

@@ -21,7 +21,10 @@ class Inventory:
         self.products.pop(product_name)
 
     def update_product(self, product_name, attribute, updated):
-        setattr(self.products.get(product_name), attribute, updated)
+        if product_name in self.products.keys():
+            setattr(self.products.get(product_name), attribute, updated)
+            return True
+        return False
 
     def buy_product(self, product_name, amount):
         if amount > self.products.get(product_name):

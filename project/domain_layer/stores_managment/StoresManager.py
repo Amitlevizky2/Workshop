@@ -24,8 +24,9 @@ class StoresManager:
         Returns:True if succeed
 
         """
+        return self.get_store(store_id).update_product(user, product_name, attribute, updated)
 
-    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {Store: [Product]}:
+    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {int: [Product]}:
         """
 
         Args:
@@ -40,7 +41,7 @@ class StoresManager:
         for store_id in self.stores.keys():
             search_in_store = self.get_store(store_id).search(search_term, categories, key_words)
             if search_in_store is not None:
-                search_result[self.get_store(store_id)] = search_in_store
+                search_result[store_id] = search_in_store
         return search_result
 
     def get_store(self, store_id: int) -> Store:
