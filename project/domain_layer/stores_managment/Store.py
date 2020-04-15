@@ -28,16 +28,23 @@ class Store:
 
         """
         if owner in self.store_owners and \
-                to_appoint not in self.store_owners and \
-                to_appoint not in self.store_managers.keys():
-            self.store_owners.append(to_appoint)
-            if owner in self.appointed_by.keys():
-                self.appointed_by[owner].append(to_appoint)
-            else:
-                self.appointed_by[owner] = [to_appoint]
-            return True
+                to_appoint not in self.store_owners:
+            return self.appoint_owner_helper(owner, to_appoint)
         else:
             return False
+
+    def appoint_owner_helper(self, owner, to_appoint):
+        self.store_owners.append(to_appoint)
+        if to_appoint in self.store_managers:
+            self.store_managers.pop(to_appoint)
+
+        if owner in self.appointed_by.keys():
+            self.appointed_by[owner].append(to_appoint)
+
+        else:
+            self.appointed_by[owner] = [to_appoint]
+
+        return True
 
     def remove_owner(self, owner, to_remove):
 

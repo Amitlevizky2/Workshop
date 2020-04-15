@@ -34,13 +34,14 @@ class UserManager:
             user = NullUser()
         return user
 
-    def register(self, user, username, password):
-        check = self.find_reg_user(username)
+    def register(self, username, new_username, password):
+        check = self.find_reg_user(new_username)
         if isinstance(check, NullUser):
-            registered = RegisteredUser(username)
-            self.security.add_user(username, password)
+            registered = RegisteredUser(new_username)
+            self.security.add_user(new_username, password)
+            user = self.find_user(username)
             registered.cart = user.cart
-            self.reg_user_list[username] = registered
+            self.reg_user_list[new_username] = registered
             return True
         else:
             return False
