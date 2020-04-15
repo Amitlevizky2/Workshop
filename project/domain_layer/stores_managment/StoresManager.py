@@ -40,7 +40,7 @@ class StoresManager:
         search_result = {}
         for store_id in self.stores.keys():
             search_in_store = self.get_store(store_id).search(search_term, categories, key_words)
-            if search_in_store is not None:
+            if search_in_store is not None and len(search_in_store) > 0:
                 search_result[store_id] = search_in_store
         return search_result
 

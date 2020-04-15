@@ -6,7 +6,7 @@ from project.domain_layer.users_managment import User, Basket
 
 class Store:
     def __init__(self, store_id, name, store_owner):
-        self.id = store_id
+        self.store_id = store_id
         self.name = name
         self.inventory = Inventory()
         self.sale_policy = None

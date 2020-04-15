@@ -1,6 +1,7 @@
 import unittest
 import mock
 
+from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
@@ -40,12 +41,27 @@ class test_StoresManager(unittest.TestCase):
                                               73))
 
     def test_search(self):
-        
+        self.test_add_product_to_store()
+        # regular search
+        self.assertIn(self.idx - 1, self.store_manager.search("iphone").keys())
 
-        #by key words
+        # by category
+        self.assertIn(self.idx - 2, self.store_manager.search("", categories=["food"]).keys())
+        self.assertIn(self.idx - 3, self.store_manager.search("", categories=["food"]).keys())
+
+        # by key words
+
+        self.assertIn(self.idx - 1, self.store_manager.search("", key_words=["fruits"]).keys())
+        self.assertIn(self.idx - 2, self.store_manager.search("", key_words=["fruits"]).keys())
+        self.assertNotIn(self.idx - 3, self.store_manager.search("", key_words=["fruits"]).keys())
+
+        # search for non - existing product
+        self.assertTrue(len(self.store_manager.search("not real product")) == 0)
 
     def test_get_store(self):
-        assert False
+        self.assertTrue(isinstance(self.store_manager.get_store(self.idx + 1), NullStore))
+        self.test_open_store()
+        self.assertTrue(self.idx - 1 == self.store_manager.get_store(self.idx - 1).store_id)
 
     def test_add_product_to_store(self):
         # check when store does not exit
