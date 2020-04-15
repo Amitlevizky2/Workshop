@@ -96,7 +96,24 @@ class test_StoresManager(unittest.TestCase):
         self.assertFalse(
             self.store_manager.appoint_owner_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
 
-    
+    def test_add_permission_to_manager_in_store(self):
+        self.test_appoint_manager_to_store()
+        self.assertTrue(
+            self.store_manager.add_permission_to_manager_in_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit",
+                                                                  "add_product"))
+        self.assertIn(Store.add_product, self.store_manager.get_store(self.idx - 1).store_managers.get("Amit"))
+
+        self.assertFalse(
+            self.store_manager.add_permission_to_manager_in_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit",
+                                                                  "add_product"))
+
+    def test_remove_permission_from_manager_in_store(self):
+        self.test_add_permission_to_manager_in_store()
+        self.assertTrue(
+            self.store_manager.remove_permission_from_manager_in_store(self.idx - 1, "moshe" + str(self.idx - 1),
+                                                                       "Amit",
+                                                                       "add_product"))
+        self.assertNotIn(Store.add_product, self.store_manager.get_store(self.idx - 1).store_managers.get("Amit"))
 
     def test_add_purchase_to_store(self):
         pass
