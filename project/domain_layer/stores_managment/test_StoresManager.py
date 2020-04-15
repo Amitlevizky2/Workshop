@@ -1,6 +1,7 @@
 import unittest
 import mock
 
+from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
@@ -81,19 +82,15 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_product_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), *product))
 
     def test_appoint_manager_to_store(self):
-        assert False
+        self.test_open_store()
+        self.assertTrue(self.store_manager.appoint_manager_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertIn("Amit", self.store_manager.get_store(self.idx - 1).store_managers.keys())
+        self.assertFalse(
+            self.store_manager.appoint_manager_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
 
-    def test_appoint_owner_to_store(self):
-        assert False
-
-    def test_add_permission_to_manager_in_store(self):
-        assert False
-
-    def test_remove_permission_from_manager_in_store(self):
-        assert False
-
+    
     def test_add_purchase_to_store(self):
-        assert False
+        pass
 
     def test_open_store(self):
         self.assertEqual(self.idx,

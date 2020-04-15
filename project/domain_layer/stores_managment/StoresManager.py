@@ -78,7 +78,7 @@ class StoresManager:
             owner:
             to_appoint:
         """
-        self.get_store(store_id).appoint_manager(owner, to_appoint)
+        return self.get_store(store_id).appoint_manager(owner, to_appoint)
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         """
@@ -88,16 +88,16 @@ class StoresManager:
             owner:
             to_appoint:
         """
-        self.get_store(store_id).appoint_owner(owner, to_appoint)
+        return self.get_store(store_id).appoint_owner(owner, to_appoint)
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
-        self.get_store(store_id).add_permission_to_manager(owner, manager, permission)
+        return self.get_store(store_id).add_permission_to_manager(owner, manager, permission)
 
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
-        self.get_store(store_id).remove_permission_from_manager(owner, manager, permission)
+        return self.get_store(store_id).remove_permission_from_manager(owner, manager, permission)
 
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
-        self.get_store(store_id).add_new_sale(purchase)
+        return self.get_store(store_id).add_new_sale(purchase)
 
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
