@@ -12,8 +12,8 @@ products = [("Apple", 20, "Food", "Fruits", 10),
 
 
 def setup(service: Proxy):
-    service.register("avi", 123)
-    service.login("avi", 123)
+    service.register("avi", "123")
+    service.login("avi", "123")
     store_id = service.Open_store("avishop")
     for product in products:
         service.add_product_to_Store(store_id, *product)

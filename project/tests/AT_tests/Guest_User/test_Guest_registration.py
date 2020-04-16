@@ -7,7 +7,6 @@ class Register(unittest.TestCase):
     def setUp(self):
         self.service = Driver.make_bridge()
 
-        res2 = self.service.register("username", "password")
 
     def test_happy_registration(self):
         res1 = self.service.register("username", "password")
@@ -16,11 +15,10 @@ class Register(unittest.TestCase):
     def test_sad_registration(self):
         res1 = self.service.register("username", "password")
         res2 = self.service.register("username", "password")
-        self.assertEqual(res1, res2)
+        self.assertTrue(res1)
+        self.assertFalse(res2)
 
-    def test_bad_registration(self):
-        result1 = self.service.register("", "password")
-        self.assertIsNotNone(result1)
+
 
 
 if __name__ == '__main__':

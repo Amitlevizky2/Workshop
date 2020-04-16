@@ -1,5 +1,5 @@
 from project.tests.AT_tests.test_env.Proxy import Proxy
-
+from project.tests.AT_tests.test_env.Adapter import Adapter
 
 class Driver:
     def main(self): pass
@@ -7,8 +7,8 @@ class Driver:
     @staticmethod
     def make_bridge() -> Proxy:
         proxy = Proxy()
-        # adapter = Adapter()
-        # proxy.setReal(adapter)
+        adapter = Adapter()
+        proxy.set_real(adapter)
         return proxy
 
 

@@ -13,12 +13,13 @@ class Proxy:
         self.update = False
         self.appoint=False
         self.admin = False
-    # def set_real(self, adapter):
-    # self.real = Adapter()
+
+    def set_real(self, adapter):
+        self.real = Adapter()
 
     def register(self, username, password):
         if self.real != None:
-            self.real.register(username, password)
+            return self.real.register(username, password)
         else:
             return True
 
@@ -49,13 +50,14 @@ class Proxy:
     def add_product_to_Store(self, StoreID, product_name: str, product_price: int,
                              product_categories: [str],
                              key_words: [str], amount):
+        if self.out:
+            return False
         if self.real != None:
-            self.real.add_product_to_Store(self, StoreID)
+             self.real.add_product_to_Store(StoreID, product_name,product_price,product_categories,key_words,amount)
         else:
             if StoreID >= 40:
                 return False
-            if self.out:
-                return False
+
             return True
 
     def searchProduct(self, product, category=None, key_words=None):

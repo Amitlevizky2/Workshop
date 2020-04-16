@@ -10,7 +10,7 @@ class Logout(unittest.TestCase):
         self.service.register("user", "pass")
         self.service.login("user", "pass")
         res = self.service.logout()
-        self.assertTrue(res)
+        self.assertFalse(self.service.logout())
 
     def test_logout_bad(self):
         res2 = None
