@@ -12,8 +12,8 @@ class TestStore(unittest.TestCase):
         self.store.store_managers = {"Moshe": [],
                                      "Amit": [Store.add_product],
                                      "Hadar": [],
-                                     "Lielle": [],
-                                     "Noa": [],
+                                     "Lielle": [Store.remove_product],
+                                     "Noa": [Store.add_discount_to_product],
                                      "Evgeny": [Store.update_product]}
 
         self.standard_users = ["Avishay",
@@ -262,14 +262,16 @@ class TestStore(unittest.TestCase):
         self.assertTrue(self.store.buy_product("Apple", 5), "This is a valid amount it should be ok!")
 
     def test_remove_product(self):
-        self.assertFalse(self.store.remove_product("Melon"))
-        self.assertTrue(self.store.remove_product("Apple"))
+        self.assertFalse(self.store.remove_product("Melon", "test owner"))
+        self.assertTrue(self.store.remove_product("Apple", "test owner"))
+        self.assertFalse(self.store.remove_product("Banana", "Ron"))
+        self.assertTrue(self.store.remove_product("Banana", "Lielle"))
 
     def test_add_discount_to_product(self):
-        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
-        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
-        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
-        self.assertFalse(self.store.add_discount_to_product("False", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", "test owner", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", "test owner", self.discount))
+        self.assertFalse(self.store.add_discount_to_product("Banana", "Lielle", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", "Noa", self.discount))
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
