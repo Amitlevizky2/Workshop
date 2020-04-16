@@ -12,6 +12,7 @@ class Proxy:
         self.remove = False
         self.update = False
         self.appoint=False
+        self.admin = False
     # def set_real(self, adapter):
     # self.real = Adapter()
 
@@ -25,6 +26,8 @@ class Proxy:
         if self.real is not None:
             self.real.login(username, password)
         else:
+            if username == "admin":
+                self.admin = True
             self.out = False
             if username == "userNotName":
                 return False
@@ -37,9 +40,9 @@ class Proxy:
         else:
             return True
 
-    def add_Store(self, StoreName):
+    def add_Store(self, StoreName, StoreId):
         if self.real != None:
-            self.real.add_Store(self, StoreName)
+            self.real.add_Store(self, StoreName, StoreId)
         else:
             return True
 
@@ -47,9 +50,7 @@ class Proxy:
                              product_categories: [str],
                              key_words: [str], amount):
         if self.real != None:
-            self.real.add_product_to_Store(StoreID,product_name, product_price,
-                             product_categories,
-                             key_words, amount)
+            self.real.add_product_to_Store(self, StoreID)
         else:
             if StoreID >= 40:
                 return False
@@ -57,9 +58,9 @@ class Proxy:
                 return False
             return True
 
-    def searchProduct(self, product="", category=[], key_words=[]):
+    def searchProduct(self, product, category=None, key_words=None):
         if self.real != None:
-            self.real.searchProduct(product, category, key_words)
+            self.real.searchProduct(self, product, category, key_words)
         else:
             product_type = type('Product', (object,), {})
             if not self.update:
@@ -89,14 +90,14 @@ class Proxy:
 
     def Open_store(self, store_name):
         if self.real != None:
-            return self.real.Open_store( store_name)
+            self.real.Open_store(self, store_name)
         else:
             if store_name == "Failed": return -1
             return 0
 
     def get_managed_stores(self):
         if self.real != None:
-            return self.real.get_managed_stores()
+            self.real.get_managed_stores(self)
         else:
             if self.remove_manager:
                 return []
@@ -104,10 +105,11 @@ class Proxy:
 
     def logout(self):
         if self.real != None:
-            self.real.logout()
+            self.real.logout(self)
         else:
+            self.admin = False
             self.out = True
-            return ""
+            return True
 
     def get_purchase_history(self):
         if self.real != None:
@@ -179,7 +181,7 @@ class Proxy:
 
     def add_new_store_manager(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_manager(user, store_id)
+            return self.real.add_new_store_owner(user, store_id)
         else:
             if self.appoint:
                 self.appoint = not self.appoint
@@ -211,7 +213,7 @@ class Proxy:
 
     def remove_store_manager(self, store_id, user):
         if self.real != None:
-            return self.real.remove_store_manager(store_id, user)
+            return self.real.add_permission(store_id, user)
 
         else:
 

@@ -8,15 +8,14 @@ class View_store_Products(unittest.TestCase):
     def setUp(self):
         self.service = Driver.make_bridge()
         ATsetUP.setup(self.service)
-
+        self.service.register("user", "pass")
+        self.service.login("user","pass")
+        store_Id = self.service.Open_store("store")
+        self.service.add_product_to_Store(store_Id,"grape",50,"fruits","little",50)
     def test_view_products_happy(self):
-        res = self.service.searchProduct(("Apple", 20, "Food", "Fruits", 10))
+        res = self.service.searchProduct("grape")
+        self.assertEqual(res, "grape")
 
-    def test_view_products_sad(self):
-        self.assertin(self.product2, self.store1.inventory)
-
-    def test_view_products_bad(self):
-        self.assertin(None, self.store1.inventory)
 
 
 if __name__ == '__main__':
