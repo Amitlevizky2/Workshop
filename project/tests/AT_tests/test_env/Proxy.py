@@ -5,6 +5,7 @@ class Proxy:
         self.out = True
         # adapter = Adapter()
         self.remove = False
+
     # def set_real(self, adapter):
     # self.real = Adapter()
 
@@ -62,7 +63,7 @@ class Proxy:
             if not self.remove:
                 return {0: [p]}
             else:
-                return {1:[p]}
+                return {1: [p]}
 
     def Open_store(self, store_name):
         if self.real != None:
@@ -116,6 +117,16 @@ class Proxy:
             self.remove = True
             if self.out:
                 return False
-            if store_id>=40:
+            if store_id >= 40:
+                return False
+            return True
+
+    def update_product(self, store_id, product_name, att, updated):
+        if self.real != None:
+            return self.real.update_product(store_id, product_name, att, updated)
+        else:
+            if store_id >= 40:
+                return False
+            if self.out:
                 return False
             return True
