@@ -90,14 +90,14 @@ class Proxy:
 
     def Open_store(self, store_name):
         if self.real != None:
-            self.real.Open_store(self, store_name)
+            return self.real.Open_store(store_name)
         else:
             if store_name == "Failed": return -1
             return 0
 
     def get_managed_stores(self):
         if self.real != None:
-            self.real.get_managed_stores(self)
+            self.real.get_managed_stores()
         else:
             if self.remove_manager:
                 return []
@@ -105,7 +105,7 @@ class Proxy:
 
     def logout(self):
         if self.real != None:
-            self.real.logout(self)
+            self.real.logout()
         else:
             self.admin = False
             self.out = True

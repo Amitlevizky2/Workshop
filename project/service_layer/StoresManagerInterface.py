@@ -45,7 +45,7 @@ class StoresManagerInterface:
             " product price:%d product categories:%s,key words:%s, amount:%d",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
 
-        if store_id in self.users_manager.get_stores(user_name):
+        if store_id in self.users_manager.get_managed_stores(user_name):
             return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
                                                             product_categories, key_words, amount)
         return False
@@ -62,17 +62,21 @@ class StoresManagerInterface:
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint owner %s to store no.%d", owner, to_appoint, store_id)
-        if store_id in self.users_manager.get_stores(owner) and self.users_manager.check_if_registered(to_appoint):
-            self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint)
+        if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(to_appoint):
+            if self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint):
+                self.users_manager.add_managed_store(to_appoint,store_id)
+                return True
+
+        return False
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s add %s permission to %s in store no.%d", owner, permission, manager, store_id)
-        if store_id in self.users_manager.get_stores(owner) and store_id in self.users_manager.get_stores(manager):
+        if store_id in self.users_manager.get_managed_stores(owner) and store_id in self.users_manager.get_managed_stores(manager):
             self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
 
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
-        if store_id in self.users_manager.get_stores(owner) and store_id in self.users_manager.get_stores(manager):
+        if store_id in self.users_manager.get_managed_stores(owner) and store_id in self.users_manager.get_managed_stores(manager):
             self.stores_manager.remove_permission_from_manager_in_store(store_id, owner, manager, permission)
 
     def open_store(self, owner: str, store_name):
@@ -89,5 +93,5 @@ class StoresManagerInterface:
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
         if self.users_manager.check_if_registered(user) and (
-                store_id in self.users_manager.get_stores(user) or self.users_manager.is_admin(user)):
+                store_id in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)):
             return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))
