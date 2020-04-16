@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
 from project.domain_layer.users_managment.UsersManager import UsersManager
@@ -61,6 +63,8 @@ class TestUserManager(TestCase):
         logout_un2 = self.users_mng.logout("not_registered")
         self.assertEqual(logout_un2, "not_registered")
 
+        self.users_mng.reg_user_list.pop("reg_user10")
+
     def test_view_purchases(self):
         self.fail()
 
@@ -74,7 +78,22 @@ class TestUserManager(TestCase):
         self.fail()
 
     def test_view_purchases_admin(self):
-        self.fail()
+        reg_lielle = RegisteredUser("lielle")
+        self.users_mng.reg_user_list["lielle"] = reg_lielle
+        product_orange = Product("orange", 2, "food", None, 100)
+        purchase = Purchase([product_orange], "lielle", 1234, 1)
+        reg_lielle.purchase_history.append(purchase)
+        purch = [purchase]
+
+        x = self.users_mng.view_purchases_admin("lielle", "admin")
+        self.assertListEqual(x, purch)
+
+        y = self.users_mng.view_purchases_admin("lielle", "not_admin")
+        self.assertFalse(y)
+
+        self.assertIsNone(self.users_mng.view_purchases_admin("stam", "admin"))
+
+        self.users_mng.reg_user_list.pop("lielle")
 
     def test_is_admin(self):
         self.fail()

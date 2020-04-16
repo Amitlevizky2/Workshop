@@ -78,7 +78,7 @@ class UsersManager:
         return username
 
     def view_purchases(self, username):
-        return self.find_user(username).purchase_history
+        return self.find_user(username).view_purchase_history()
         # if view purchases of username
 
     def add_product(self, username, store_id, product, quantity):
@@ -95,7 +95,8 @@ class UsersManager:
 
     def view_purchases_admin(self, username, admin):
         if admin in self.admins:
-            return self.find_reg_user(username).purchase_history
+            return self.find_reg_user(username).view_purchase_history()
+        return False
 
     def is_admin(self, username):
         return username in self.admins
