@@ -38,12 +38,8 @@ class Store:
         self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
             self.store_managers.pop(to_appoint)
-
-        if owner in self.appointed_by.keys():
             self.appointed_by[owner].append(to_appoint)
 
-        else:
-            self.appointed_by[owner] = [to_appoint]
 
         return True
 
@@ -153,18 +149,18 @@ class Store:
         """
 
         if owner in self.store_owners:
-            if manager in self.appointed_by[owner]:
                 if manager in self.store_managers.keys():
-                    permission_function = getattr(Store, permission)
-                    if permission_function in self.store_managers.get(manager):
-                        self.store_managers[manager].remove(permission_function)
-                        return True
+                    if manager in self.appointed_by[owner]:
+                        permission_function = getattr(Store, permission)
+                        if permission_function in self.store_managers.get(manager):
+                            self.store_managers[manager].remove(permission_function)
+                            return True
+                        else:
+                            return False
                     else:
                         return False
                 else:
                     return False
-            else:
-                return False
         else:
             return False
 
@@ -180,10 +176,7 @@ class Store:
         """
         if owner in self.store_owners and to_appoint not in self.store_managers.keys():
             self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
-            if owner in self.appointed_by.keys():
-                self.appointed_by[owner].append(to_appoint)
-            else:
-                self.appointed_by[owner] = [to_appoint]
+            self.appointed_by[owner].append(to_appoint)
             return True
         else:
             return False
