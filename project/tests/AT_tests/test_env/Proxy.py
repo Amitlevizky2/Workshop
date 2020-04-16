@@ -18,13 +18,13 @@ class Proxy:
 
     def register(self, username, password):
         if self.real != None:
-            self.real.register(username, password)
+            return self.real.register(username, password)
         else:
             return True
 
     def login(self, username, password):
         if self.real is not None:
-            self.real.login(username, password)
+            return self.real.login(username, password)
         else:
             if username == "admin":
                 self.admin = True
@@ -58,9 +58,9 @@ class Proxy:
                 return False
             return True
 
-    def searchProduct(self, product, category=None, key_words=None):
+    def searchProduct(self, product="", category=[], key_words=[]):
         if self.real != None:
-            self.real.searchProduct(self, product, category, key_words)
+            return self.real.searchProduct( product, category, key_words)
         else:
             product_type = type('Product', (object,), {})
             if not self.update:
@@ -216,7 +216,7 @@ class Proxy:
 
     def remove_store_manager(self, store_id, user):
         if self.real != None:
-            return self.real.add_permission(store_id, user)
+            return self.real.remove_store_manager(store_id, user)
 
         else:
 
