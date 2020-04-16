@@ -1,5 +1,4 @@
 import unittest
-import mock
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
