@@ -6,7 +6,7 @@ from project.domain_layer.users_managment import User, Basket
 
 class Store:
     def __init__(self, store_id, name, store_owner):
-        self.id = store_id
+        self.store_id = store_id
         self.name = name
         self.inventory = Inventory()
         self.sale_policy = None
@@ -239,7 +239,9 @@ class Store:
 
     def update_product(self, user, product_name, attribute, updated):
         if self.check_permission(user, self.update_product):
-            self.inventory.update_product(product_name, attribute, updated)
+
+            return self.inventory.update_product(product_name, attribute, updated)
+        return False
 
     def add_new_sale(self, purchase: Purchase) -> bool:
         """
@@ -257,3 +259,5 @@ class Store:
     def check_permission(self, user, function):
         return user in self.store_owners or \
                (user in self.store_managers and function in self.store_managers.get(user))
+
+
