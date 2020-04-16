@@ -79,7 +79,21 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(len(self.store_manager.search("Banana")), 5)
         self.assertEqual(len(self.store_manager.search(categories=["fruit"])), 4)
 
-    
+    def test_get_store(self):
+        self.assertTrue(isinstance(self.store_manager.get_store(self.idx + 1), NullStore))
+        self.test_open_store()
+        self.assertTrue(self.idx - 1 == self.store_manager.get_store(self.idx - 1).store_id)
+
+    def test_add_product_to_store(self):
+        self.assertFalse(
+            self.store_manager.add_product_to_store(7, "not real store", "what a product", 1222, ["imaginary products"],
+                                                    ["no"], 20))
+        self.assertFalse(
+            self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
+                                                    ["no"], 20))
+        self.assertTrue(
+            self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
+                                                    ["no"], 20))
 
     def test_appoint_manager_to_store(self):
         pass
