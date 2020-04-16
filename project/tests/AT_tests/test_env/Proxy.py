@@ -167,3 +167,20 @@ class Proxy:
                 return False
             self.appoint = not self.appoint
             return True
+
+    def add_new_store_manager(self, user, store_id):
+        if self.real != None:
+            return self.real.add_new_store_owner(user, store_id)
+        else:
+            if self.appoint:
+                self.appoint = not self.appoint
+                return False
+
+            if self.out:
+                return False
+            if user == "not new manager":
+                return False
+            if store_id >= 40:
+                return False
+            self.appoint = not self.appoint
+            return True
