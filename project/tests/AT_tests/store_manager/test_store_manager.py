@@ -1,6 +1,6 @@
 import unittest
 
-from project.tests.AT_tests.store_owner.add_store_permiision_to_manager import AddStorePermission
+from project.tests.AT_tests.store_owner.test_add_store_permiision_to_manager import AddStorePermission
 from project.tests.AT_tests.test_env.Driver import Driver
 from project.tests.AT_tests import ATsetUP
 
