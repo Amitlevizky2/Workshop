@@ -1,24 +1,25 @@
 import unittest
-from Driver import Driver
+from project.tests.AT_tests.test_env.Driver import Driver
 
-service = Driver.make_bridge()
-username1 = "avi"
-password1 = 123
-username2 = "beni"
-password2 = 321
 
-class login(unittest.TestCase):
+
+class Login(unittest.TestCase):
+
+    def setUp(self):
+        self.service = Driver.make_bridge()
+        self.service.register("username","password")
     def test_happy_registration(self):
-        service.register(username1, password1)
-        result1 = service.login(username1, password1)
-        self.assertTrue(result1, service.login(username1, password1))
+        res1 = self.service.login("username", "password")
+        self.assertTrue(res1)
 
     def test_sad_registration(self):
-        service.register(username2, password2)
-        result1 = service.login(username2, password2)
-        self.assertFalse(result1, service.login(username2, password1))
+        res1 = self.service.login("userNotName", "password")
+        self.assertFalse(res1)
 
     def test_bad_registration(self):
-        service.register(username2, password2)
-        result1 = service.login(username2, password2)
-        self.assertFalse(result1, service.login(None, None))
+        result1 = self.service.login("", "password")
+        self.assertIsNotNone(result1)
+
+
+if __name__ == '__main__':
+    unittest.main()

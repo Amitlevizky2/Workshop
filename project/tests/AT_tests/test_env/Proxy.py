@@ -1,8 +1,7 @@
-from Bridge import Bridge
-from User import User
 
 
-class Proxy(Bridge):
+
+class Proxy:
 
     def __init__(self):
         self.real = None
@@ -15,17 +14,20 @@ class Proxy(Bridge):
         if self.real != None:
             self.real.register(username, password)
         else:
-            return
+            return True
 
     def login(self, username, password):
-        if self.real != None:
-            self.real.register(username, password)
+        if self.real is not None:
+            self.real.login(username, password)
         else:
-            return True
+             if username == "userNotName":
+                 return False
+             else:
+                 return True
 
     def showProductStore(self, store):
         if self.real != None:
-            self.real.showProductStore(stroe)
+            self.real.showProductStore(store)
         else:
             return True
 
@@ -39,7 +41,7 @@ class Proxy(Bridge):
                              product_categories: [str],
                              key_words: [str], amount):
         if self.real != None:
-            self.real.add_product_to_Store(self, StoreID, ProductID)
+            self.real.add_product_to_Store(self, StoreID)
         else:
             return True
 

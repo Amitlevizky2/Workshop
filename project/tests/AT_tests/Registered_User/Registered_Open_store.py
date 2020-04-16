@@ -1,25 +1,26 @@
 
 import unittest
 
-from Driver import Driver
+from project.tests.AT_tests.test_env.Driver import Driver
 
 
-service = Driver.make_bridge()
+
 
 
 
 class test_Open_store(unittest.TestCase):
     def setUp(self):
-        service.register("username", "password")
-        service.login("username", "password")
+        self.service = Driver.make_bridge()
+        self.service.register("username", "password")
+        self.service.login("username", "password")
 
     def test_open_happy(self):
-        result1 = service.Open_store("apple")
-        self.assertIn(result1, service.get_managed_stores())
+        result1 = self.service.Open_store("apple")
+        self.assertIn(result1, self.service.get_managed_stores())
 
     def test_open_bad(self):
-        service.logout()
-        resutlt1 = service.Open_store("Failed")
+        self.service.logout()
+        resutlt1 = self.service.Open_store("Failed")
         self.assertEqual(resutlt1, -1)
 
 
