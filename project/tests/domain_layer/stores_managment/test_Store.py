@@ -1,7 +1,9 @@
 import unittest
 
-from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
+import datetime
 
 
 class TestStore(unittest.TestCase):
@@ -12,21 +14,22 @@ class TestStore(unittest.TestCase):
                                      "Hadar": [],
                                      "Lielle": [],
                                      "Noa": [],
-                                     "Evgeny": []}
+                                     "Evgeny": [Store.update_product]}
 
         self.standard_users = ["Avishay",
                                "Alex",
                                "Ron"]
 
-        self.store.inventory.products = {"Apple": Product("Apple", 20, "Food", "Fruits", 10),
-                                         "Banana": Product("Banana", 20, "Food", "Fruits", 10),
-                                         "Orange": Product("Orange", 20, "Food", "Fruits", 10),
-                                         "Tomato": Product("Tomato", 20, "Food", "Vegetables", 10),
-                                         "Cucumber": Product("Cucumber", 20, "Food", "Vegetables", 10),
-                                         "Carrot": Product("Carrot", 20, "Food", "Vegetables", 10),
-                                         "Iphone": Product("Iphone", 20, "Electronics", "Computers", 10),
-                                         "Hard Disk": Product("Hard Disk", 20, "Electronics", "Computers", 10),
-                                         "Keyboard": Product("Keyboard", 20, "Electronics", "Computers", 10)}
+        self.store.inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 10),
+                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
+                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
+                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
+                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10),
+                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10),
+                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
+                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
+                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+        self.discount = Discount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -77,9 +80,9 @@ class TestStore(unittest.TestCase):
         for i in range(0, len(users)):
             self.assertNotIn(users[i], self.store.store_owners)
 
-        # Check that every appointed owner is not in the appointed by list of his appointee
-        for i in range(0, len(users)):
-            self.assertNotIn(users[i], self.store.appointed_by)
+        # # Check that every appointed owner is not in the appointed by list of his appointee
+        # for i in range(0, len(users)):
+        #     self.assertNotIn(users[i], self.store.appointed_by[])
 
     def test_remove_manager_one(self):
         self.store.appoint_owner("test owner", "Moshe")
@@ -87,10 +90,10 @@ class TestStore(unittest.TestCase):
 
         # Amit is not owner
         self.assertFalse(self.store.remove_manager("Amit", "Lielle"))
-        # Sebastian is not in store managers dictionary
-        self.assertFalse(self.store.remove_manager("test store", "Sebastian"))
+        # Ron is not in store managers dictionary
+        self.assertFalse(self.store.remove_manager("test owner", "Ron"))
         # Hadar was not appointed by test owner
-        self.assertFalse(self.store.remove_manager("test store", "Hadar"))
+        self.assertFalse(self.store.remove_manager("test owner", "Hadar"))
 
     def test_remove_manager_two(self):
         self.appoint_users_to_managers()
@@ -119,6 +122,10 @@ class TestStore(unittest.TestCase):
         # Amit is not owner
         self.assertFalse(self.store.add_permission_to_manager("Amit", "Lielle", "add_product"))
 
+        # Sebastian is not manager
+        self.assertFalse(self.store.add_permission_to_manager("test owner", "Sebastian", "add_product"))
+
+        self.store.appointed_by["test owner"].append("Amit")
         # add_product is already in Amit permissions
         self.assertFalse(self.store.add_permission_to_manager("test owner", "Amit", "add_product"))
 
@@ -134,8 +141,6 @@ class TestStore(unittest.TestCase):
         # Add product permission should now be in Alex's permissions
         self.assertIn(Store.add_product, self.store.store_managers["Alex"])
 
-        # TODO: Only owner that appointed the manager can give him permissions
-
     def test_remove_permission_from_manager_one(self):
         # Amit is not an owner
         self.assertFalse(self.store.remove_permission_from_manager("Amit", "Evgeny", "add_product"))
@@ -148,17 +153,21 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.remove_permission_from_manager("test owner", "Ron", "add_product"))
 
     def test_remove_permission_from_manager_two(self):
+        self.assertFalse(self.store.remove_permission_from_manager("test owner", "Alex", "add_product"))
+
         self.appoint_users_to_managers()
         self.store.appoint_owner("test owner", "Moshe")
+        self.store.appoint_manager("test owner", "Avishay")
+        self.store.appoint_manager("Moshe", "Ron")
         self.store.add_permission_to_manager("test owner", "Avishay", "add_product")
 
         # Don't be blind dude, I just added Avishay's permissions the add product permission
         self.assertIn(Store.add_product, self.store.store_managers["Avishay"])
 
-        #TODO: Only owner that appointed the manager can remove his permissions
-
         # Moshe, it is really not your business what permissions Avishay have, Let it go.
-        # self.assertFalse(self.store.remove_permission_from_manager("Moshe", "Avishay", "add_product"))
+        self.assertFalse(self.store.remove_permission_from_manager("Moshe", "Avishay", "add_product"))
+
+        self.assertFalse(self.store.remove_permission_from_manager("test owner", "Ron", "add_product"))
 
         # Look Avishay, it's is not you, its me, I'm taking this permission from you, I'm sorry
         self.assertTrue(self.store.remove_permission_from_manager("test owner", "Avishay", "add_product"))
@@ -168,6 +177,8 @@ class TestStore(unittest.TestCase):
 
         # Ok, last time I swear
         self.assertFalse(self.store.remove_permission_from_manager("test owner", "Avishay", "add_product"))
+
+        self.assertFalse(self.store.remove_permission_from_manager("Alex", "Avishay", "add_product"))
 
     def test_appoint_manager_one(self):
         # Well, Moshe  you are not an owner yet, so...
@@ -204,20 +215,62 @@ class TestStore(unittest.TestCase):
         # Let's see if you did it well
         self.assertIn("Macbook", self.store.inventory.products)
 
-    def test_search_one(self):
-        pass
+    def test_search(self):
+        # Well let's see if you have an Apple dude
+        self.assertIn(self.store.inventory.products["Apple"], self.store.search("Apple"))
+        # Now let's get some category
+        fruits_vegs = [self.store.inventory.products["Apple"],
+                       self.store.inventory.products["Banana"],
+                       self.store.inventory.products["Orange"],
+                       self.store.inventory.products["Tomato"],
+                       self.store.inventory.products["Cucumber"],
+                       self.store.inventory.products["Carrot"]]
 
+        res_key_words = self.store.search(key_words=["Fruits", "Vegetables"])
+        res_categoty = self.store.search(categories=["Food"])
+        self.assertListEqual(fruits_vegs, res_key_words)
+        self.assertListEqual(fruits_vegs, res_categoty)
+        # No such category
+        self.assertListEqual([], self.store.search(categories=["Kitchen"]))
+        # No such keywords
+        self.assertListEqual([], self.store.search(key_words=["Compil"]))
+        # No such name
+        self.assertListEqual([], self.store.search(search_term="Melon"))
 
+    def test_update_product(self):
+        # Lielle dont have the permission to update the product
+        self.assertFalse(self.store.update_product("Lielle", "Apple", "amount", 8))
+        # Evgeny have the permission
+        self.assertTrue(self.store.update_product("Evgeny", "Apple", "amount", 8))
+        # Owner can always do that
+        self.assertTrue(self.store.update_product("test owner", "Apple", "amount", 8))
+        # You can also append discount to a product
+        self.assertTrue(self.store.update_product("test owner", "Apple", "discount", self.discount))
 
+    def test_add_new_sale(self):
+        # Sale is None
+        self.assertFalse(self.store.add_new_sale(None))
+        # Valid new sale
+        self.assertTrue(self.store.add_new_sale(Purchase(["Apple"], "Ron", self.store.store_id, 1)))
 
-        # self.test_add_product()
-        # ap = self.store.search("apple")
-        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        # ap = self.store.search(categories=["food"])
-        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        # ap = self.store.search(key_words=["green"])
-        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        #
+    def test_buy_product(self):
+        # The amount of the product you are asking to but is to big
+        self.assertFalse(self.store.buy_product("Apple", 30), "Store Cannot sell more than what it has")
+        # The amount of the product is illegal
+        self.assertFalse(self.store.buy_product("Apple", -1), "Store Cannot sell more than what it has")
+        # Buying in good amount
+        self.assertTrue(self.store.buy_product("Apple", 5), "This is a valid amount it should be ok!")
+
+    def test_remove_product(self):
+        self.assertFalse(self.store.remove_product("Melon"))
+        self.assertTrue(self.store.remove_product("Apple"))
+
+    def test_add_discount_to_product(self):
+        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
+        self.assertFalse(self.store.add_discount_to_product("False", self.discount))
+
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i + 1])
@@ -225,25 +278,6 @@ class TestStore(unittest.TestCase):
     def appoint_users_to_managers(self):
         for i in range(0, len(self.standard_users)):
             self.store.appoint_manager("test owner", self.standard_users[i])
-
-    def test_appoint_manager(self):
-        self.assertFalse(self.store.appoint_owner("not test owner", "michael"))
-        self.assertTrue(self.store.appoint_owner("test owner", "michael"))
-
-    def test_get_sales_history(self):
-        pass
-
-    def test_add_new_sale(self):
-        pass
-
-    def test_check_permission(self):
-        pass
-
-    def test_remove_owner(self):
-        self.store.appoint_owner("test owner", "moshe")
-        self.assertFalse(self.store.remove_owner("moshe", "test owner"))
-        self.assertTrue(self.store.remove_owner("test owner", "moshe"))
-
 
 if __name__ == '__main__':
     unittest.main()
