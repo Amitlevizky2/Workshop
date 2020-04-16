@@ -7,9 +7,4 @@ class test_StoresManagerInterface(unittest.TestCase):
         self.store_manager_interface = StoresManagerInterface(None)
 
     def test_search_product(self):
-        pass
-
-    def test_get_store(self):
-        self.store_manager_interface.get_store(0)
-        pass
-
+        self.store_manager_interface.search_product("sd",["sdfs"],["sdf"])

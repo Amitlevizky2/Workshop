@@ -210,7 +210,7 @@ class Store:
             logger.error("%s Don't have this permission", user_name)
             return False
 
-    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> [Product]:
+    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> [Product]:
         """
 
         Args:
@@ -225,10 +225,10 @@ class Store:
             if search_term in product_name:
                 result.append(self.inventory.products.get(product_name))
 
-        if categories is not None:
+        if len(categories)>0:
             result = [product for product in result if any(category in product.categories for category in categories)]
 
-        if key_words is not None:
+        if len(key_words)>0:
             result = [product for product in result if any(key_word in product.key_words for key_word in key_words)]
 
         return result
