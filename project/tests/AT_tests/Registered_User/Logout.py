@@ -13,7 +13,10 @@ class Logout(unittest.TestCase):
         self.assertTrue(res)
 
     def test_logout_bad(self):
-        res =
+        res2 = None
+        if not self.service.out:
+            res2 = self.service.logout()
+        self.assertIsNone(res2)
 
 
 

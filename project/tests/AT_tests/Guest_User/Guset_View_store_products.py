@@ -7,10 +7,10 @@ from project.tests.AT_tests import ATsetUP
 class View_store_Products(unittest.TestCase):
     def setUp(self):
         self.service = Driver.make_bridge()
-        ATsetUP.setUP(self.service)
+        ATsetUP.setup(self.service)
 
     def test_view_products_happy(self):
-        res = self.service.
+        res = self.service.searchProduct(("Apple", 20, "Food", "Fruits", 10))
 
     def test_view_products_sad(self):
         self.assertin(self.product2, self.store1.inventory)

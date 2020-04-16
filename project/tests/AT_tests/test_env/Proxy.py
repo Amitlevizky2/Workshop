@@ -6,7 +6,7 @@ class Proxy:
         # adapter = Adapter()
         self.remove = False
         self.update = False
-        self.appoint = False
+
     # def set_real(self, adapter):
     # self.real = Adapter()
 
@@ -140,7 +140,7 @@ class Proxy:
         if self.real != None:
             return self.real.update_product(store_id, product_name, att, updated)
         else:
-            if updated is int and updated < 0:
+            if updated is int and updated<0:
                 return False
             if product_name != "Banana":
                 return False
@@ -151,9 +151,9 @@ class Proxy:
                 return False
             return True
 
-    def add_new_store_owner(self, user,store_id):
+    def add_new_store_owner(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_owner(user,store_id)
+            return self.real.add_new_store_owner(user, store_id)
         else:
             if self.appoint:
                 self.appoint = not self.appoint
@@ -163,7 +163,7 @@ class Proxy:
                 return False
             if user == "not new owner":
                 return False
-            if store_id>=40:
+            if store_id >= 40:
                 return False
             self.appoint = not self.appoint
             return True
