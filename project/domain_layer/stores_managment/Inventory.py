@@ -30,6 +30,8 @@ class Inventory:
         return False
 
     def buy_product(self, product_name, amount):
+        if product_name not in self.products.keys():
+            return False
         if amount > self.products.get(product_name).amount:
             return False
         self.products.get(product_name).amount -= amount

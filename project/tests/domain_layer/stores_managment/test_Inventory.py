@@ -8,11 +8,8 @@ class TestInventory(unittest.TestCase):
         self.inv = Inventory()
         self.inv.products = {"orange": Product("orange", 2, "food", None, 2)}
 
-    def tearDown(self) -> None:
-        self.inv.products = {}
-
     def test_add_product(self):
-        apple = Product("apple", 1, "food", None,2)
+        apple = Product("apple", 1, "food", None, 2)
         self.inv.add_product(apple.name, Product("apple", 1, "food", None, 2))
         inv_apple = self.inv.products.get(apple.name)
         self.assertTrue(apple == inv_apple)
@@ -21,6 +18,12 @@ class TestInventory(unittest.TestCase):
         self.inv.update_product("orange", "price", 5)
         self.assertEqual(5, self.inv.products.get("orange").price)
 
+    def test_remove_product(self):
+        self.assertIn("orange", self.inv.products.keys())
+        self.inv.remove_product("orange")
+        self.assertNotIn("orange", self.inv.products.keys())
+
+   
 
 if __name__ == '__main__':
     unittest.main()
