@@ -97,7 +97,7 @@ class Proxy:
 
     def get_managed_stores(self):
         if self.real != None:
-            self.real.get_managed_stores()
+            return self.real.get_managed_stores()
         else:
             if self.remove_manager:
                 return []
