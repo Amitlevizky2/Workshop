@@ -24,15 +24,16 @@ class test_StoresManager(unittest.TestCase):
 
         for attribute, value in Product(self.products[-1][0], 20, ["not so expensive now"], ["electronics"],
                                         1).__dict__.items():
-            self.assertTrue(
-                self.store_manager.update_product(self.idx - 1, "moshe" + str(self.idx - 1), self.products[-1][0],
-                                                  attribute,
-                                                  value))
+            if attribute!="discount":
+                self.assertTrue(
+                    self.store_manager.update_product(self.idx - 1, "moshe" + str(self.idx - 1), self.products[-1][0],
+                                                      attribute,
+                                                      value))
 
-            self.assertEqual(
-                self.store_manager.stores.get(self.idx - 1).inventory.products.get(
-                    self.products[-1][0]).__getattribute__(attribute),
-                value)
+                self.assertEqual(
+                    self.store_manager.stores.get(self.idx - 1).inventory.products.get(
+                        self.products[-1][0]).__getattribute__(attribute),
+                    value)
 
         # update without permissions
         self.assertFalse(

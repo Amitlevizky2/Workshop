@@ -45,7 +45,7 @@ class StubStore(Store):
         super().buy_product(product_name, amount)
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
-        return super().get_sales_history(user, is_admin)
+        return ["hi,i'm a admin view purchase"] if is_admin else ["i'm no admin"]
 
     def update_product(self, user, product_name, attribute, updated):
         return product_name != "not real product"
@@ -75,14 +75,15 @@ class test_StoresManager(unittest.TestCase):
             self.assertTrue(
                 self.store_manager.update_product(store_id, "test_owner" + str(store_id), "real product", "price",
                                                   20))
+
     def test_search(self):
         self.assertEqual(len(self.store_manager.search("Banana")), 5)
         self.assertEqual(len(self.store_manager.search(categories=["fruit"])), 4)
 
     def test_get_store(self):
-        self.assertTrue(isinstance(self.store_manager.get_store(self.idx + 1), NullStore))
+        self.assertTrue(isinstance(self.store_manager.get_store(7), NullStore))
         self.test_open_store()
-        self.assertTrue(self.idx - 1 == self.store_manager.get_store(self.idx - 1).store_id)
+        self.assertTrue(2 == self.store_manager.get_store(2).store_id)
 
     def test_add_product_to_store(self):
         self.assertFalse(
@@ -111,13 +112,15 @@ class test_StoresManager(unittest.TestCase):
         pass
 
     def test_open_store(self):
-        pass
-
-    def test_buy(self):
-        pass
+        index = self.store_manager.stores_idx
+        self.store_manager.open_store("t_ownet", "test")
+        self.assertEqual(index + 1, self.store_manager.stores_idx)
 
     def test_get_sales_history(self):
-        pass
+        self.assertIsNone(self.store_manager.get_sales_history(78, "the king", True))
+
+        self.assertEqual(self.store_manager.get_sales_history(0, "some owner", False)[0], "i'm no admin")
+        self.assertEqual(self.store_manager.get_sales_history(0, "some owner", True)[0], "hi,i'm a admin view purchase")
 
 
 if __name__ == '__main__':

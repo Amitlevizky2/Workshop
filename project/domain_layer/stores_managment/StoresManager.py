@@ -110,9 +110,12 @@ class StoresManager:
         return self.stores_idx - 1
 
     def buy(self, cart: Cart):
+
         for basket in cart.baskets.keys():
             for product in basket.products.keys():
-                self.get_store(basket.store_id).buy_product(product, basket.products.get(product))
+                if not self.get_store(basket.store_id).buy_product(product, basket.products.get(product)):
+                    return False
+        return True
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
         return self.get_store(store_id).get_sales_history(user, is_admin)
