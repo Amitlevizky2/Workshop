@@ -49,7 +49,7 @@ class StoresManager:
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():
-            logger.log("find store #%d",store_id)
+
             return self.stores.get(store_id)
         else:
             logger.error("%d store id doesn't exist", store_id)
