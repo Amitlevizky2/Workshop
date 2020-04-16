@@ -1,7 +1,7 @@
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Inventory import Inventory
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.users_managment import User, Basket
+from project import logger
 
 
 class Store:
@@ -31,6 +31,7 @@ class Store:
                 to_appoint not in self.store_owners:
             return self.appoint_owner_helper(owner, to_appoint)
         else:
+            logger.error("%s is not a store owner or %s is already owner", owner, to_appoint)
             return False
 
     def appoint_owner_helper(self, owner, to_appoint):
@@ -38,9 +39,7 @@ class Store:
         self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
             self.store_managers.pop(to_appoint)
-            self.appointed_by[owner].append(to_appoint)
-
-
+        self.appointed_by[owner].append(to_appoint)
         return True
 
     def remove_owner(self, owner, to_remove):
@@ -60,9 +59,9 @@ class Store:
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
                         self.__remove_owner_all_appointed(to_remove)
-
                     return True
                 else:
+                    logger.error("%s is not a store owner", owner)
                     return False
             else:
                 return False
@@ -96,6 +95,7 @@ class Store:
                 return False
 
         else:
+            logger.error("%s is not a store owner", owner)
             return False
 
     def __remove_owner_all_appointed(self, to_remove):
@@ -134,6 +134,7 @@ class Store:
             else:
                 return False
         else:
+            logger.error("%s is not a store owner", owner)
             return False
 
     def remove_permission_from_manager(self, owner, manager, permission):
@@ -162,6 +163,7 @@ class Store:
                 else:
                     return False
         else:
+            logger.error("%s is not a store owner", owner)
             return False
 
     def appoint_manager(self, owner, to_appoint):
@@ -174,11 +176,15 @@ class Store:
         Returns:
 
         """
-        if owner in self.store_owners and to_appoint not in self.store_managers.keys():
-            self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
-            self.appointed_by[owner].append(to_appoint)
-            return True
+        if owner in self.store_owners:
+            if to_appoint not in self.store_managers.keys():
+                self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
+                self.appointed_by[owner].append(to_appoint)
+                return True
+            else:
+                return False
         else:
+            logger.error("%s is not a store owner", owner)
             return False
 
     def add_product(self, user_name: str, product_name: str, product_price: int, product_categories,
@@ -201,6 +207,7 @@ class Store:
                                        Product(product_name, product_price, product_categories, key_words, amount))
             return True
         else:
+            logger.error("%s Don't have this permission", user_name)
             return False
 
     def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> [Product]:
@@ -236,6 +243,7 @@ class Store:
     def update_product(self, user, product_name, attribute, updated):
         if self.check_permission(user, getattr(Store, "update_product")):
             return self.inventory.update_product(product_name, attribute, updated)
+        logger.error("%s don't have this permission", user)
         return False
 
     def add_new_sale(self, purchase: Purchase) -> bool:
