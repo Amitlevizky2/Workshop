@@ -1,6 +1,7 @@
 class Proxy:
 
     def __init__(self):
+        self.hist = False
         self.remove_manager = False
         self.real = None
         self.out = True
@@ -217,3 +218,20 @@ class Proxy:
                 return False
             self.remove_manager = True
             return True
+
+    def view_store_history(self, store_id):
+        if self.real != None:
+            return self.real.view_store_history(store_id)
+        else:
+            if self.out:
+                return None
+            if store_id>=40:
+                return None
+            purchase_type = type('Purchase', (object,), {})
+            product_type = type('Product', (object,), {})
+            p = product_type()
+            p.product_name = "Apple"
+            pur = purchase_type()
+            pur.products = [p]
+            pur.store_id = store_id
+            return pur
