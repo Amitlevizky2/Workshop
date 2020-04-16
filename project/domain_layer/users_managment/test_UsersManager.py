@@ -66,6 +66,8 @@ class TestUserManager(TestCase):
         self.users_mng.add_guest_user()
         self.assertTrue("guestUser" + str(self.users_mng.incremental_id - 1) in self.users_mng.guest_user_list.keys())
 
+    def test_view_cart(self):
+        pass
 
     def test_logout(self):
         reg_user10 = RegisteredUser("reg_user10")
@@ -73,7 +75,7 @@ class TestUserManager(TestCase):
         reg_user10.loggedin = True
         logout_un = self.users_mng.logout("reg_user10")
         incr = self.users_mng.incremental_id - 1
-        self.assertEqual(logout_un, "guestUser"+str(incr))
+        self.assertEqual(logout_un, "guestUser" + str(incr))
 
         logout_un2 = self.users_mng.logout("not_registered")
         self.assertEqual(logout_un2, "not_registered")
@@ -99,9 +101,11 @@ class TestUserManager(TestCase):
 
         self.users_mng.reg_user_list.pop("lielle")
 
+    # tested in test_Cart and in test_Basket
     def test_add_product(self):
         pass
 
+    # tested in test_Cart and in test_Basket
     def test_remove_product(self):
         pass
 
@@ -130,11 +134,35 @@ class TestUserManager(TestCase):
         self.assertTrue(self.users_mng.is_admin("admin"))
         self.assertFalse(self.users_mng.is_admin("not_admin"))
 
+        # tested in test_RegisteredUser
+
+    def test_add_managed_store(self):
+        pass
+
     def test_get_managed_stores(self):
         pass
 
+    def test_check_if_registered(self):
+        reg_user95 = RegisteredUser("reg_user95")
+        self.users_mng.reg_user_list["reg_user95"] = reg_user95
 
+        self.assertTrue(self.users_mng.check_if_registered("reg_user95"))
+        self.assertFalse(self.users_mng.check_if_registered("not_registered_user"))
 
+        self.users_mng.reg_user_list.pop("reg_user95")
+
+    def test_check_if_loggedin(self):
+        reg_user95 = RegisteredUser("reg_user95")
+        self.users_mng.reg_user_list["reg_user95"] = reg_user95
+
+        self.assertFalse(self.users_mng.check_if_loggedin("reg_user95"))
+        reg_user95.loggedin = True
+        self.assertTrue(self.users_mng.check_if_loggedin("reg_user95"))
+        self.assertFalse(self.users_mng.check_if_loggedin("not_registered_user"))
+
+        self.users_mng.reg_user_list.pop("reg_user95")
+
+    # tested in test_User
     def test_add_purchase(self):
         pass
 

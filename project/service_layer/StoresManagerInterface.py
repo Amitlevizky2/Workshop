@@ -62,21 +62,24 @@ class StoresManagerInterface:
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint owner %s to store no.%d", owner, to_appoint, store_id)
-        if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(to_appoint):
+        if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
+                to_appoint):
             if self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint):
-                self.users_manager.add_managed_store(to_appoint,store_id)
+                self.users_manager.add_managed_store(to_appoint, store_id)
                 return True
 
         return False
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s add %s permission to %s in store no.%d", owner, permission, manager, store_id)
-        if store_id in self.users_manager.get_managed_stores(owner) and store_id in self.users_manager.get_managed_stores(manager):
-            self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
-
+        if store_id in self.users_manager.get_managed_stores(
+                owner) and store_id in self.users_manager.get_managed_stores(manager):
+            return self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
+        return False
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
-        if store_id in self.users_manager.get_managed_stores(owner) and store_id in self.users_manager.get_managed_stores(manager):
+        if store_id in self.users_manager.get_managed_stores(
+                owner) and store_id in self.users_manager.get_managed_stores(manager):
             self.stores_manager.remove_permission_from_manager_in_store(store_id, owner, manager, permission)
 
     def open_store(self, owner: str, store_name):

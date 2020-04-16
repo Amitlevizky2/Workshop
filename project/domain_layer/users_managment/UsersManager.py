@@ -1,4 +1,3 @@
-from project import service_layer
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
