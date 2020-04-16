@@ -45,3 +45,6 @@ class Cart:
             basket = self.add_basket(store_id)
         basket.add_product(product, quantity)
         return True
+
+    def clear_cart(self):
+        self.baskets = {}

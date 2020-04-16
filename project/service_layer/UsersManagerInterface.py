@@ -1,11 +1,11 @@
 from project.domain_layer.users_managment.Cart import Cart
-from project.domain_layer.users_managment.UsersManager import UserManager
+from project.domain_layer.users_managment.UsersManager import UsersManager
 
 
 class UsersManagerInterface:
 
     def __init__(self):
-        self.user_manager = UserManager()
+        self.user_manager = UsersManager()
 
     def register(self, username, new_username, password):
         return self.user_manager.register(username, new_username,password)
