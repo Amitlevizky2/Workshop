@@ -13,8 +13,8 @@ class open_store(unittest.TestCase):
         self.assertEqual(res1, 0)
 
     def test_open_store_bad(self):
-        res1 = self.service.logout("")
-        if res1:
+        self.service.logout()
+        if self.service.out:
             res1 = -1
         res2 = self.service.Open_store("Failed")
         self.assertEqual(res1,res2)

@@ -103,6 +103,8 @@ class Proxy:
         if self.real != None:
             return self.real.get_purchase_history()
         else:
+            if self.out:
+                return None
             purchase_type = type('Purchase', (object,), {})
             product_type = type('Product', (object,), {})
             p = product_type()
