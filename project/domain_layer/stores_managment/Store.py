@@ -264,4 +264,13 @@ class Store:
         return user in self.store_owners or \
                (user in self.store_managers and function in self.store_managers.get(user))
 
+    def get_store_products(self):
+        return self.inventory.get_products()
+
+    def remove_product(self, product_name):
+        return self.inventory.remove_product(product_name)
+
+    def add_discount_to_product(self, product_name, discount):
+        return self.inventory.add_discount_to_product(product_name, discount)
+
 

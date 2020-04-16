@@ -261,6 +261,16 @@ class TestStore(unittest.TestCase):
         # Buying in good amount
         self.assertTrue(self.store.buy_product("Apple", 5), "This is a valid amount it should be ok!")
 
+    def test_remove_product(self):
+        self.assertFalse(self.store.remove_product("Melon"))
+        self.assertTrue(self.store.remove_product("Apple"))
+
+    def test_add_discount_to_product(self):
+        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
+        self.assertTrue(self.store.add_discount_to_product("Banana", self.discount))
+        self.assertFalse(self.store.add_discount_to_product("False", self.discount))
+
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i + 1])
