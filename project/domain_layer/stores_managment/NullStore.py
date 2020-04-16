@@ -39,7 +39,7 @@ class NullStore(Store):
         pass
 
     def update_product(self, user, product_name, attribute, updated):
-        pass
+        return False
 
     def add_new_sale(self, purchase: Purchase) -> bool:
         pass
