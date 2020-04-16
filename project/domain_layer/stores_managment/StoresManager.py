@@ -4,7 +4,6 @@ from project import logger
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
-from project.domain_layer.users_managment import User
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.stores_managment.NullStore import NullStore
 
@@ -132,5 +131,16 @@ class StoresManager:
         return False
 
     def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.get_store(store_id).add_discount_to_product(product_name, username,
+        store = self.get_store(store_id)
+        product = store.search(product_name)
+        if product:
+            return store.add_discount_to_product(product_name, username,
                                                                 Discount(product_name, start_date, end_date, percent))
+
+    def remove_manager(self, store_id, owner, to_remove):
+        store = self.get_store(store_id)
+        return store.remove_manager(owner, to_remove)
+
+    def remove_owner(self, store_id, owner, to_remove):
+        store = self.get_store(store_id)
+        return store.remove_owner(owner, to_remove)

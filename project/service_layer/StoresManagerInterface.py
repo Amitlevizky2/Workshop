@@ -77,3 +77,18 @@ class StoresManagerInterface:
         if self.users_manager.check_if_registered(user) and (
                 store_id in self.users_manager.get_stores(user) or self.users_manager.is_admin(user)):
             return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))
+
+    def remove_product(self, store_id, product_name, username):
+        return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
+
+    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+
+    def update_product(self, store_id, username, product_name, attribute, updated):
+        return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)
+
+    def remove_manager(self, store_id, owner, to_remove):
+        return self.stores_manager.remove_manager(store_id, owner, to_remove)
+
+    def remove_owner(self, store_id, owner, to_remove):
+        return self.stores_manager.remove_owner(store_id, owner, to_remove)
