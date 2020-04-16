@@ -75,8 +75,12 @@ class test_StoresManager(unittest.TestCase):
             self.assertTrue(
                 self.store_manager.update_product(store_id, "test_owner" + str(store_id), "real product", "price",
                                                   20))
+    def test_search(self):
+        self.assertEqual(len(self.store_manager.search("Banana")), 5)
+        self.assertEqual(len(self.store_manager.search(categories=["fruit"])), 4)
 
     
+
     def test_appoint_manager_to_store(self):
         pass
 
