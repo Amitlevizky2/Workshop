@@ -50,7 +50,7 @@ class Proxy:
                              product_categories: [str],
                              key_words: [str], amount):
         if self.real != None:
-            self.real.add_product_to_Store(self, StoreID)
+            return self.real.add_product_to_Store(StoreID,product_name,product_price,product_categories,key_words,amount)
         else:
             if StoreID >= 40:
                 return False
@@ -184,7 +184,7 @@ class Proxy:
 
     def add_new_store_manager(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_owner(user, store_id)
+            return self.real.add_new_store_manager(user, store_id)
         else:
             if self.appoint:
                 self.appoint = not self.appoint
