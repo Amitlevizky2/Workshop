@@ -6,6 +6,7 @@ class Proxy:
         # adapter = Adapter()
         self.remove = False
         self.update = False
+        self.admin = False
 
     # def set_real(self, adapter):
     # self.real = Adapter()
@@ -20,6 +21,8 @@ class Proxy:
         if self.real is not None:
             self.real.login(username, password)
         else:
+            if username == "admin":
+                self.admin = True
             self.out = False
             if username == "userNotName":
                 return False
@@ -97,6 +100,7 @@ class Proxy:
         if self.real != None:
             self.real.logout(self)
         else:
+            self.admin = False
             self.out = True
             return True
 
@@ -172,3 +176,20 @@ class Proxy:
                 return False
             self.appoint = not self.appoint
             return True
+
+    def view_store_history(self, store_id):
+        if self.real != None:
+            return self.real.view_store_history(store_id)
+        else:
+            if self.out:
+                return None
+            if store_id >= 40:
+                return None
+            purchase_type = type('Purchase', (object,), {})
+            product_type = type('Product', (object,), {})
+            p = product_type()
+            p.product_name = "Apple"
+            pur = purchase_type()
+            pur.products = [p]
+            pur.store_id = store_id
+            return pur
