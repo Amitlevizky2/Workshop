@@ -17,17 +17,37 @@ class Inventory:
         """
         self.products[product_name] = product
 
-    def remove_product(self, product_name):
-        self.products.pop(product_name)
+    # def remove_product(self, product_name):
+    #     self.products.pop(product_name)
 
     def update_product(self, product_name, attribute, updated):
         if product_name in self.products.keys():
-            setattr(self.products.get(product_name), attribute, updated)
+            if attribute == "discount":
+                self.products.get(product_name).discount.append(updated)
+            else:
+                setattr(self.products.get(product_name), attribute, updated)
             return True
         return False
 
     def buy_product(self, product_name, amount):
-        if amount > self.products.get(product_name):
-            raise Exception("buying way to many")
+        if product_name not in self.products.keys():
+            return False
+        if amount > self.products.get(product_name).amount  or amount < 0:
+            return False
         self.products.get(product_name).amount -= amount
-        return self.products.get(product_name).amount
+        return True
+
+    def get_products(self):
+        return self.products
+
+    def remove_product(self, product_name):
+        if product_name in self.products.keys():
+            self.products.pop(product_name)
+            return True
+        return False
+
+    def add_discount_to_product(self, product_name, discount):
+        if product_name in self.products.keys():
+            self.products[product_name].discount.append(discount)
+            return True
+        return False

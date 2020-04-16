@@ -6,7 +6,6 @@ class Proxy:
         # adapter = Adapter()
         self.remove = False
         self.update = False
-        self.admin = False
 
     # def set_real(self, adapter):
     # self.real = Adapter()
@@ -21,8 +20,6 @@ class Proxy:
         if self.real is not None:
             self.real.login(username, password)
         else:
-            if username == "admin":
-                self.admin = True
             self.out = False
             if username == "userNotName":
                 return False
@@ -119,19 +116,8 @@ class Proxy:
         if self.real != None:
             return self.real.add_product(store_id, product, amount)
         else:
-            purchase_type = type('Purchase', (object,), {})
-            product_type = type('Product', (object,), {})
-            p = product_type()
-            p.name = "Banana"
-            pur = purchase_type()
-            pur.products = [p]
-            return pur
 
-    def get_cart(self):
-        if self.real != None:
-            return self.real.get_cart()
-        else:
-            return 0
+            return True
 
     def buy(self):
         if self.real != None:

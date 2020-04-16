@@ -27,4 +27,4 @@ class Security:
         return pwdhash == stored_password
 
     def add_user(self, username, password):
-        self.passwords[username]= self.hash_password(password)
+        self.passwords[username] = self.hash_password(password)

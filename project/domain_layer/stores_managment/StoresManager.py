@@ -2,7 +2,7 @@ import logging
 from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import User
 from project.domain_layer.users_managment.Cart import Cart
@@ -29,7 +29,7 @@ class StoresManager:
         """
         return self.get_store(store_id).update_product(user, product_name, attribute, updated)
 
-    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {int: [Product]}:
+    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> {int: [Product]}:
         """
 
         Args:
@@ -49,7 +49,7 @@ class StoresManager:
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():
-            logger.log("find store #%d",store_id)
+
             return self.stores.get(store_id)
         else:
             logger.error("%d store id doesn't exist", store_id)
@@ -110,9 +110,27 @@ class StoresManager:
         return self.stores_idx - 1
 
     def buy(self, cart: Cart):
-        for basket in cart.baskets.keys():
+
+        for store in cart.baskets.keys():
+            basket = cart.get_basket(store)
             for product in basket.products.keys():
-                self.get_store(basket.store_id).buy_product(product, basket.products.get(product))
+                if not self.get_store(store).buy_product(product, basket.products.get(product)[1]):
+                    return False
+        return True
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
         return self.get_store(store_id).get_sales_history(user, is_admin)
+
+    def get_store_products(self, store_id):
+        return self.get_store(store_id).get_store_products()
+
+    def remove_produce_from_store(self, store_id, product_name):
+        store = self.get_store(store_id)
+        product = store.search(product_name)
+        if product:
+            return store.remove_product(product_name)
+        return False
+
+    def add_discount_to_product(self, store_id, product_name, start_date, end_date, percent):
+        return self.get_store(store_id).add_discount_to_product(product_name,
+                                                                Discount(product_name, start_date, end_date, percent))
