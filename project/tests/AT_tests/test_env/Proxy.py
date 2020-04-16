@@ -182,7 +182,7 @@ class Proxy:
 
             if self.out:
                 return False
-            if user == "not new manager":
+            if user == "not new manager" or "no permission":
                 return False
             if store_id >= 40:
                 return False
