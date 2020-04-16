@@ -23,7 +23,11 @@ class TestInventory(unittest.TestCase):
         self.inv.remove_product("orange")
         self.assertNotIn("orange", self.inv.products.keys())
 
-   
+    def test_buy_product(self):
+        self.assertFalse(self.inv.buy_product("not real product", 1000))
+        self.assertFalse(self.inv.buy_product("orange", 5))
+        self.assertTrue(self.inv.buy_product("orange", 2))
+
 
 if __name__ == '__main__':
     unittest.main()
