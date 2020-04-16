@@ -29,7 +29,7 @@ class StoresManager:
         """
         return self.get_store(store_id).update_product(user, product_name, attribute, updated)
 
-    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {int: [Product]}:
+    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> {int: [Product]}:
         """
 
         Args:
