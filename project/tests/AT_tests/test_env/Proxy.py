@@ -36,11 +36,6 @@ class Proxy:
         else:
             return True
 
-    def add_Store(self, StoreName, StoreId):
-        if self.real != None:
-            self.real.add_Store(self, StoreName, StoreId)
-        else:
-            return True
 
     def add_product_to_Store(self, StoreID, product_name: str, product_price: int,
                              product_categories: [str],
