@@ -17,8 +17,8 @@ class Inventory:
         """
         self.products[product_name] = product
 
-    def remove_product(self, product_name):
-        self.products.pop(product_name)
+    # def remove_product(self, product_name):
+    #     self.products.pop(product_name)
 
     def update_product(self, product_name, attribute, updated):
         if product_name in self.products.keys():
@@ -36,3 +36,18 @@ class Inventory:
             return False
         self.products.get(product_name).amount -= amount
         return True
+
+    def get_products(self):
+        return self.products
+
+    def remove_product(self, product_name):
+        if product_name in self.products.keys():
+            self.products.pop(product_name)
+            return True
+        return False
+
+    def add_discount_to_product(self, product_name, discount):
+        if product_name in self.products.keys():
+            self.products[product_name].discount.append(discount)
+            return True
+        return False

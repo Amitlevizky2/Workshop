@@ -2,7 +2,7 @@ import logging
 from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import User
 from project.domain_layer.users_managment.Cart import Cart
@@ -120,3 +120,17 @@ class StoresManager:
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
         return self.get_store(store_id).get_sales_history(user, is_admin)
+
+    def get_store_products(self, store_id):
+        return self.get_store(store_id).get_store_products()
+
+    def remove_produce_from_store(self, store_id, product_name):
+        store = self.get_store(store_id)
+        product = store.search(product_name)
+        if product:
+            return store.remove_product(product_name)
+        return False
+
+    def add_discount_to_product(self, store_id, product_name, start_date, end_date, percent):
+        return self.get_store(store_id).add_discount_to_product(product_name,
+                                                                Discount(product_name, start_date, end_date, percent))
