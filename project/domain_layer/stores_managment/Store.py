@@ -267,10 +267,18 @@ class Store:
     def get_store_products(self):
         return self.inventory.get_products()
 
-    def remove_product(self, product_name):
-        return self.inventory.remove_product(product_name)
+    def remove_product(self, product_name, username):
+        if self.is_owner(username) or self.check_permission(username, getattr(Store, "remove_product")):
+            return self.inventory.remove_product(product_name)
+        return False
 
-    def add_discount_to_product(self, product_name, discount):
-        return self.inventory.add_discount_to_product(product_name, discount)
+    def add_discount_to_product(self, product_name, username,  discount):
+        if self.is_owner(username) or self.check_permission(username, getattr(Store, "add_discount_to_product")):
+            return self.inventory.add_discount_to_product(product_name, discount)
+        return False
 
+    def is_owner(self, username):
+        if username in self.store_owners:
+            return True
+        return False
 
