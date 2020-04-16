@@ -18,7 +18,11 @@ class purchase_History(unittest.TestCase):
         self.assertEqual(result.products[0].name, "Banana")
 
     def test_purchase_bad(self):
-        res1 = self.service.logout()
+        res1 = self.service.logout("")
+
+    def test_purchase_sad(self):
+        res1 = self.service.get_purchase_history()
+        self.assertNotEqual(res1.products[0].name, "marshmelo")
 
 
 
