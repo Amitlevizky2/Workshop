@@ -7,20 +7,25 @@ class Cart:
         #{store_id, basket}
 
     def add_basket(self, store_id):
-        if self.baskets[store_id] is None:
-            return Basket(store_id)
+        if store_id not in self.baskets.keys():
+            basket = Basket(store_id)
+            self.baskets[store_id] = basket
+            return basket
 
     def remove_basket(self, store_id):
-        if self.baskets[store_id] is not None:
+        if store_id in self.baskets.keys():
             self.baskets.pop(store_id)
 
     def get_basket(self, store_id):
-        return self.baskets[store_id]
+        if store_id in self.baskets.keys():
+            return self.baskets[store_id]
+        return None
 
     def get_total(self):
         total = 0
-        for basket in self.baskets:
+        for basket in self.baskets.values():
             total += basket.get_total()
+        return total
 
     def view(self):
         return self.baskets
@@ -40,3 +45,6 @@ class Cart:
             basket = self.add_basket(store_id)
         basket.add_product(product, quantity)
         return True
+
+    def clear_cart(self):
+        self.baskets = {}

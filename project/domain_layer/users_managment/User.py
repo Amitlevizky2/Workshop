@@ -21,9 +21,11 @@ class User:
         return self.cart
 
     def remove_cart(self):
-        self.cart = {}
+        self.cart.clear_cart()
 
     def add_purchase(self, purchase):
         self.purchase_history.append(purchase)
 
+    def view_purchase_history(self):
+        return self.purchase_history
 
