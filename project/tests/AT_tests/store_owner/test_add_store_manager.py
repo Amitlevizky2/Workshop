@@ -3,7 +3,7 @@ import unittest
 from project.tests.AT_tests.test_env.Driver import Driver
 
 
-class addStoremanager(unittest.TestCase):
+class test_addStoremanager(unittest.TestCase):
     def setUp(self) -> None:
         self.service = Driver.make_bridge()
         self.service.register("new manager", "new pass")
@@ -15,7 +15,8 @@ class addStoremanager(unittest.TestCase):
         self.assertTrue(self.service.add_new_store_manager("new manager", self.store_id))
         self.service.logout()
         self.service.login("new manager", "new pass")
-        self.assertIn(self.store_id, self.service.get_managed_stores())
+        maneged_stores = self.service.get_managed_stores()
+        self.assertIn(self.store_id,maneged_stores)
 
     def test_add_new_manager_sad(self):
         self.assertFalse(self.service.add_new_store_manager("not new manager", self.store_id))

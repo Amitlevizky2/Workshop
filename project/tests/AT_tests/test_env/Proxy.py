@@ -1,13 +1,18 @@
+from project.tests.AT_tests.test_env.Adapter import Adapter
+
+
 class Proxy:
 
     def __init__(self):
-        self.real = None
+        self.hist = False
+        self.remove_manager = False
+        self.real = Adapter()
         self.out = True
         # adapter = Adapter()
         self.remove = False
         self.update = False
+        self.appoint=False
         self.admin = False
-
     # def set_real(self, adapter):
     # self.real = Adapter()
 
@@ -85,20 +90,22 @@ class Proxy:
 
     def Open_store(self, store_name):
         if self.real != None:
-            self.real.Open_store(self, store_name)
+            return self.real.Open_store(store_name)
         else:
             if store_name == "Failed": return -1
             return 0
 
     def get_managed_stores(self):
         if self.real != None:
-            self.real.get_managed_stores(self)
+            return self.real.get_managed_stores()
         else:
+            if self.remove_manager:
+                return []
             return [0]
 
     def logout(self):
         if self.real != None:
-            self.real.logout(self)
+            self.real.logout()
         else:
             self.admin = False
             self.out = True
@@ -123,13 +130,8 @@ class Proxy:
         if self.real != None:
             return self.real.add_product(store_id, product, amount)
         else:
-            purchase_type = type('Purchase', (object,), {})
-            product_type = type('Product', (object,), {})
-            p = product_type()
-            p.name = "Banana"
-            pur = purchase_type()
-            pur.products = [p]
-            return pur
+
+            return True
 
     def buy(self):
         if self.real != None:
@@ -152,7 +154,7 @@ class Proxy:
         if self.real != None:
             return self.real.update_product(store_id, product_name, att, updated)
         else:
-            if updated is int and updated<0:
+            if updated is int and updated < 0:
                 return False
             if product_name != "Banana":
                 return False
@@ -180,13 +182,60 @@ class Proxy:
             self.appoint = not self.appoint
             return True
 
+    def add_new_store_manager(self, user, store_id):
+        if self.real != None:
+            return self.real.add_new_store_owner(user, store_id)
+        else:
+            if self.appoint:
+                self.appoint = not self.appoint
+                return False
+
+            if self.out:
+                return False
+            if user == "not new manager" or "no permission":
+                return False
+            if store_id >= 40:
+                return False
+            self.appoint = not self.appoint
+            return True
+
+    def add_permission(self, store_id, user, permission):
+
+        if self.real != None:
+            return self.real.add_permission(store_id, user,permission)
+
+        else:
+
+            if user == "not new manager" or user=="manager":
+                return False
+            if self.out:
+                return False
+            if store_id >= 40:
+                return False
+            return True
+
+    def remove_store_manager(self, store_id, user):
+        if self.real != None:
+            return self.real.add_permission(store_id, user)
+
+        else:
+
+            if user == "not new manager" or user == "manager":
+                return False
+            if self.out:
+                return False
+            if store_id >= 40:
+                return False
+            self.remove_manager = True
+            return True
+
     def view_store_history(self, store_id):
         if self.real != None:
             return self.real.view_store_history(store_id)
         else:
             if self.out:
                 return None
-            if store_id >= 40:
+            if store_id>=40:
                 return None
             purchase_type = type('Purchase', (object,), {})
             product_type = type('Product', (object,), {})
