@@ -5,6 +5,8 @@ from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
+from project.domain_layer.users_managment.Basket import Basket
+from project.domain_layer.users_managment.Cart import Cart
 
 
 class test_StoresManager(unittest.TestCase):
@@ -24,7 +26,7 @@ class test_StoresManager(unittest.TestCase):
 
         for attribute, value in Product(self.products[-1][0], 20, ["not so expensive now"], ["electronics"],
                                         1).__dict__.items():
-            if attribute!="discount":
+            if attribute != "discount":
                 self.assertTrue(
                     self.store_manager.update_product(self.idx - 1, "moshe" + str(self.idx - 1), self.products[-1][0],
                                                       attribute,
@@ -58,8 +60,6 @@ class test_StoresManager(unittest.TestCase):
 
         # search for non - existing product
         self.assertTrue(len(self.store_manager.search("not real product")) == 0)
-
-
 
     def test_add_product_to_store(self):
         # check when store does not exit
@@ -112,7 +112,9 @@ class test_StoresManager(unittest.TestCase):
         self.assertNotIn(Store.add_product, self.store_manager.get_store(self.idx - 1).store_managers.get("Amit"))
 
     def test_add_purchase_to_store(self):
-        pass
+        self.test_add_product_to_store()
+        purchase = Purchase({self.products[-1][0]: (Product(*self.products[-1]), 2)}, "moshe", self.idx - 1, 0)
+        self.assertTrue(self.store_manager.add_purchase_to_store(self.idx - 1, purchase))
 
     def test_open_store(self):
         self.assertEqual(self.idx,
@@ -121,11 +123,13 @@ class test_StoresManager(unittest.TestCase):
         self.assertIn(self.idx, self.store_manager.stores.keys())
         self.idx += 1
 
-    def test_buy(self):
-        pass
+   
 
     def test_get_sales_history(self):
-        pass
+        self.test_add_purchase_to_store()
+        self.assertEqual(len(self.store_manager.get_sales_history(self.idx - 1, "moshe" + str(self.idx - 1), False)), 1)
+        self.assertEqual(len(self.store_manager.get_sales_history(self.idx - 1, "not moshe" + str(self.idx - 1), True)),
+                         1)
 
 
 if __name__ == '__main__':

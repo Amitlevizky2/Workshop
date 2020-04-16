@@ -111,9 +111,10 @@ class StoresManager:
 
     def buy(self, cart: Cart):
 
-        for basket in cart.baskets.keys():
+        for store in cart.baskets.keys():
+            basket = cart.get_basket(store)
             for product in basket.products.keys():
-                if not self.get_store(basket.store_id).buy_product(product, basket.products.get(product)):
+                if not self.get_store(store).buy_product(product, basket.products.get(product)[1]):
                     return False
         return True
 
