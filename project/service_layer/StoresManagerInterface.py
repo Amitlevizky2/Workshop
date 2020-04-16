@@ -41,10 +41,10 @@ class StoresManagerInterface:
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
-                             key_words: [str]) -> bool:
+                             key_words: [str],amount) -> bool:
         if store_id in self.users_manager.get_stores(user_name):
             return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
-                                                            product_categories, key_words)
+                                                            product_categories, key_words,amount)
         return False
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
@@ -67,6 +67,8 @@ class StoresManagerInterface:
         if self.users_manager.check_if_registered(owner):
             store_id = self.stores_manager.open_store(owner, store_name)
             self.users_manager.add_store(owner, store_id)
+            return store_id
+        return -1
 
     def buy(self, cart):
         self.stores_manager.buy(cart)
