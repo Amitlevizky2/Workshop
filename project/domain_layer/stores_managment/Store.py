@@ -15,7 +15,7 @@ class Store:
         self.store_managers = {}  # {manager_name:functions}
         self.sales = []
         self.rate = 0
-        self.appointed_by = {}
+        self.appointed_by = {store_owner: []}
 
     def appoint_owner(self, owner, to_appoint):
         """
@@ -35,6 +35,7 @@ class Store:
 
     def appoint_owner_helper(self, owner, to_appoint):
         self.store_owners.append(to_appoint)
+        self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
             self.store_managers.pop(to_appoint)
 
@@ -124,11 +125,14 @@ class Store:
 
         """
         if owner in self.store_owners:
-            if manager in self.store_managers.keys():
-                permission_function = getattr(Store, permission)
-                if permission_function not in self.store_managers.get(manager):
-                    self.store_managers[manager].append(permission_function)
-                    return True
+            if manager in self.appointed_by.get(owner):
+                if manager in self.store_managers.keys():
+                    permission_function = getattr(Store, permission)
+                    if permission_function not in self.store_managers.get(manager):
+                        self.store_managers[manager].append(permission_function)
+                        return True
+                    else:
+                        return False
                 else:
                     return False
             else:
@@ -149,11 +153,14 @@ class Store:
         """
 
         if owner in self.store_owners:
-            if manager in self.store_managers.keys():
-                permission_function = getattr(Store, permission)
-                if permission_function in self.store_managers.get(manager):
-                    self.store_managers[manager].remove(permission_function)
-                    return True
+            if manager in self.appointed_by[owner]:
+                if manager in self.store_managers.keys():
+                    permission_function = getattr(Store, permission)
+                    if permission_function in self.store_managers.get(manager):
+                        self.store_managers[manager].remove(permission_function)
+                        return True
+                    else:
+                        return False
                 else:
                     return False
             else:
@@ -217,21 +224,17 @@ class Store:
         for product_name in self.inventory.products.keys():
             if search_term in product_name:
                 result.append(self.inventory.products.get(product_name))
+
         if categories is not None:
-            for product in result:
-                for category in categories:
-                    if category not in product.categories:
-                        result.remove(product)
+            result = [product for product in result if any(category in product.categories for category in categories)]
 
         if key_words is not None:
-            for product in result:
-                for word in key_words:
-                    if word not in product.key_words:
-                        result.remove(product)
+            result = [product for product in result if any(key_word in product.key_words for key_word in key_words)]
+
         return result
 
     def buy_product(self, product_name, amount):
-        self.inventory.buy_product(product_name, amount)
+        return self.inventory.buy_product(product_name, amount)
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, self.get_sales_history) or is_admin:
