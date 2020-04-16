@@ -6,7 +6,7 @@ class Proxy:
     def __init__(self):
         self.hist = False
         self.remove_manager = False
-        self.real =None # Adapter()
+        self.real = Adapter()
         self.out = True
         # adapter = Adapter()
         self.remove = False
@@ -89,14 +89,14 @@ class Proxy:
 
     def Open_store(self, store_name):
         if self.real != None:
-            self.real.Open_store(self, store_name)
+            return self.real.Open_store( store_name)
         else:
             if store_name == "Failed": return -1
             return 0
 
     def get_managed_stores(self):
         if self.real != None:
-            self.real.get_managed_stores(self)
+            return self.real.get_managed_stores()
         else:
             if self.remove_manager:
                 return []
@@ -104,7 +104,7 @@ class Proxy:
 
     def logout(self):
         if self.real != None:
-            self.real.logout(self)
+            self.real.logout()
         else:
             self.out = True
             return ""
@@ -179,7 +179,7 @@ class Proxy:
 
     def add_new_store_manager(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_owner(user, store_id)
+            return self.real.add_new_store_manager(user, store_id)
         else:
             if self.appoint:
                 self.appoint = not self.appoint

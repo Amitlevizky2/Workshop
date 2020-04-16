@@ -52,8 +52,13 @@ class StoresManagerInterface:
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint manager %s to store no.%d", owner, to_appoint, store_id)
-        if store_id in self.users_manager.get_stores(owner) and self.users_manager.check_if_registered(to_appoint):
-            self.stores_manager.appoint_manager_to_store(store_id, owner, to_appoint)
+        if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
+                to_appoint):
+            if self.stores_manager.appoint_manager_to_store(store_id, owner, to_appoint):
+                self.users_manager.add_managed_store(to_appoint, store_id)
+                return True
+
+        return False
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint owner %s to store no.%d", owner, to_appoint, store_id)
@@ -74,7 +79,7 @@ class StoresManagerInterface:
         logger.log("user %s open %s store", owner, store_name)
         if self.users_manager.check_if_registered(owner):
             store_id = self.stores_manager.open_store(owner, store_name)
-            self.users_manager.add_store(owner, store_id)
+            self.users_manager.add_managed_store(owner, store_id)
             return store_id
         return -1
 
