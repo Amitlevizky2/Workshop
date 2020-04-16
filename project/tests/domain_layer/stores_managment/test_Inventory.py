@@ -17,7 +17,7 @@ class TestInventory(unittest.TestCase):
     def test_update_product(self):
         self.inv.update_product("orange", "price", 5)
         self.assertEqual(5, self.inv.products.get("orange").price)
-
+        self.inv.update_product("not real product", "price", 5)
     def test_remove_product(self):
         self.assertIn("orange", self.inv.products.keys())
         self.inv.remove_product("orange")

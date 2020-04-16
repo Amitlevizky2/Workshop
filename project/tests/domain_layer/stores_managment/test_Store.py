@@ -91,9 +91,9 @@ class TestStore(unittest.TestCase):
         # Amit is not owner
         self.assertFalse(self.store.remove_manager("Amit", "Lielle"))
         # Sebastian is not in store managers dictionary
-        self.assertFalse(self.store.remove_manager("test store", "Sebastian"))
+        self.assertFalse(self.store.remove_manager("test owner", "Sebastian"))
         # Hadar was not appointed by test owner
-        self.assertFalse(self.store.remove_manager("test store", "Hadar"))
+        self.assertFalse(self.store.remove_manager("test owner", "Hadar"))
 
     def test_remove_manager_two(self):
         self.appoint_users_to_managers()
