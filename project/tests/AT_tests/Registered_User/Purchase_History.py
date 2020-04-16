@@ -5,7 +5,7 @@ from project.tests.AT_tests import ATsetUP
 class purchase_History(unittest.TestCase):
     def setUp(self):
         self.service = Driver.make_bridge()
-        ATsetUP.setUp(self.service)
+        ATsetUP.setup(self.service)
 
         self.service.register("user","pass")
         self.service.login("user", "pass")

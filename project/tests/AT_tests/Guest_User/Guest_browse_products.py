@@ -4,14 +4,7 @@ import unittest
 from project.tests.AT_tests.test_env.Driver import Driver
 
 
-service = Driver.make_bridge()
-storename = "abc"
-storeID = 123
-product1 = Product("apple watch", 1223, 45, "watches")
-product2 = Product("IPhone", 5555, 1000000, "smartphone")
-product3 = Product("xiaomi", 4444, 5, "smartphone")
-inventory = []
-store1 = Store(storename, storeID, inventory.append(product1))
+
 
 
 class MyTestCase(unittest.TestCase):

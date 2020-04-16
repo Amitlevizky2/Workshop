@@ -7,6 +7,9 @@ class Proxy:
         # adapter = Adapter()
         self.remove = False
 
+        self.update = False
+
+
     # def set_real(self, adapter):
     # self.real = Adapter()
     def add_guest_user(self):
@@ -63,17 +66,23 @@ class Proxy:
         if self.real != None:
             self.real.searchProduct(self, product, category, key_words)
         else:
+            p =""
             product_type = type('Product', (object,), {})
-            p = product_type()
-            p.name = "Banana"
-            p.price = 20
-            p.categories = ["Food"]
-            p.key_words = ["Fruits"]
-            p.amount = 10
-            if not self.remove:
-                return {0: [p]}
+            if not self.update:
+
+                p = product_type()
+                p.name = "Banana"
+                p.price = 20
+                p.categories = ["Food"]
+                p.key_words = ["Fruits"]
+                p.amount = 10
+                if not self.remove:
+                    return {0: [p]}
+                else:
+                    return {1: [p]}
             else:
                 return {1: [p]}
+
 
 
     def Open_store(self, store_name):
@@ -127,6 +136,7 @@ class Proxy:
             else:
                 return True
     def remove_product_from_store(self, store_id, product_name):
+
                 if self.real != None:
                     return self.real.remove_product_from_store(store_id, product_name)
                 else:
@@ -136,3 +146,29 @@ class Proxy:
                     if store_id>=40:
                         return False
                     return True
+
+                if self.real != None:
+                    return self.real.remove_product_from_store(store_id, product_name)
+                else:
+                    self.remove = True
+                    if self.out:
+                        return False
+                    if store_id >= 40:
+                        return False
+                    return True
+
+    def update_product(self, store_id, product_name, att, updated):
+        if self.real != None:
+            return self.real.update_product(store_id, product_name, att, updated)
+        else:
+            if updated is int and updated<0:
+                return False
+            if product_name != "Banana":
+                return False
+            self.update = True
+            if store_id >= 40:
+                return False
+            if self.out:
+                return False
+            return True
+
