@@ -1,6 +1,7 @@
 class Proxy:
 
     def __init__(self):
+        self.remove_manager = False
         self.real = None
         self.out = True
         # adapter = Adapter()
@@ -91,6 +92,8 @@ class Proxy:
         if self.real != None:
             self.real.get_managed_stores(self)
         else:
+            if self.remove_manager:
+                return []
             return [0]
 
     def logout(self):
@@ -198,4 +201,19 @@ class Proxy:
                 return False
             if store_id >= 40:
                 return False
+            return True
+
+    def remove_store_manager(self, store_id, user):
+        if self.real != None:
+            return self.real.add_permission(store_id, user)
+
+        else:
+
+            if user == "not new manager" or user == "manager":
+                return False
+            if self.out:
+                return False
+            if store_id >= 40:
+                return False
+            self.remove_manager = True
             return True

@@ -26,6 +26,7 @@ class AddStorePermission(unittest.TestCase):
         self.assertFalse(self.service.add_permission(self.store_id, "manager", "add_product"))
 
     def test_add_permission_bad(self):
+        self.assertFalse(self.service.add_permission(self.store_id+40, "new manager", "add_product"))
         self.service.logout()
         self.assertFalse(self.service.add_permission(self.store_id, "new manager", "add_product"))
 
