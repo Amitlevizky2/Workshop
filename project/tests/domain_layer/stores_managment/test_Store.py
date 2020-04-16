@@ -90,10 +90,10 @@ class TestStore(unittest.TestCase):
 
         # Amit is not owner
         self.assertFalse(self.store.remove_manager("Amit", "Lielle"))
-        # Sebastian is not in store managers dictionary
-        self.assertFalse(self.store.remove_manager("test store", "Sebastian"))
+        # Ron is not in store managers dictionary
+        self.assertFalse(self.store.remove_manager("test owner", "Ron"))
         # Hadar was not appointed by test owner
-        self.assertFalse(self.store.remove_manager("test store", "Hadar"))
+        self.assertFalse(self.store.remove_manager("test owner", "Hadar"))
 
     def test_remove_manager_two(self):
         self.appoint_users_to_managers()
@@ -122,6 +122,10 @@ class TestStore(unittest.TestCase):
         # Amit is not owner
         self.assertFalse(self.store.add_permission_to_manager("Amit", "Lielle", "add_product"))
 
+        # Sebastian is not manager
+        self.assertFalse(self.store.add_permission_to_manager("test owner", "Sebastian", "add_product"))
+
+        self.store.appointed_by["test owner"].append("Amit")
         # add_product is already in Amit permissions
         self.assertFalse(self.store.add_permission_to_manager("test owner", "Amit", "add_product"))
 
@@ -149,8 +153,12 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.remove_permission_from_manager("test owner", "Ron", "add_product"))
 
     def test_remove_permission_from_manager_two(self):
+        self.assertFalse(self.store.remove_permission_from_manager("test owner", "Alex", "add_product"))
+
         self.appoint_users_to_managers()
         self.store.appoint_owner("test owner", "Moshe")
+        self.store.appoint_manager("test owner", "Avishay")
+        self.store.appoint_manager("Moshe", "Ron")
         self.store.add_permission_to_manager("test owner", "Avishay", "add_product")
 
         # Don't be blind dude, I just added Avishay's permissions the add product permission
@@ -158,6 +166,8 @@ class TestStore(unittest.TestCase):
 
         # Moshe, it is really not your business what permissions Avishay have, Let it go.
         self.assertFalse(self.store.remove_permission_from_manager("Moshe", "Avishay", "add_product"))
+
+        self.assertFalse(self.store.remove_permission_from_manager("test owner", "Ron", "add_product"))
 
         # Look Avishay, it's is not you, its me, I'm taking this permission from you, I'm sorry
         self.assertTrue(self.store.remove_permission_from_manager("test owner", "Avishay", "add_product"))
@@ -167,6 +177,8 @@ class TestStore(unittest.TestCase):
 
         # Ok, last time I swear
         self.assertFalse(self.store.remove_permission_from_manager("test owner", "Avishay", "add_product"))
+
+        self.assertFalse(self.store.remove_permission_from_manager("Alex", "Avishay", "add_product"))
 
     def test_appoint_manager_one(self):
         # Well, Moshe  you are not an owner yet, so...
