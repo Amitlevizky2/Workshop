@@ -59,11 +59,15 @@ class StorageManaging(unittest.TestCase):
         self.assertTrue(res.get(self.store_id)[0].amount == 40)
 
     def test_update_product_in_store_sad(self):
+        self.assertFalse(self.service.update_product(self.store_id, "not real product", "price", 700))
         self.service.logout()
-        self.assertFalse(self.service.add_product_to_Store(self.store_id, "Banana", 20, "Food", "Fruits", 10))
+        self.assertFalse(self.service.update_product(self.store_id, "Banana", "price", 10))
 
+        self.assertFalse(self.service.update_product(self.store_id, "Banana", "amount", -10))
     def test_update_product_in_store_bad(self):
-        self.assertFalse(self.service.add_product_to_Store(self.store_id + 40, "Banana", 20, "Food", "Fruits", 10))
+        self.assertFalse(self.service.update_product(self.store_id + 40, "Banana", "price", 10))
+
+
 
 
 if __name__ == '__main__':

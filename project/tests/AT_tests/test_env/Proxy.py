@@ -5,6 +5,7 @@ class Proxy:
         self.out = True
         # adapter = Adapter()
         self.remove = False
+        self.update = False
 
     # def set_real(self, adapter):
     # self.real = Adapter()
@@ -54,16 +55,30 @@ class Proxy:
             self.real.searchProduct(self, product, category, key_words)
         else:
             product_type = type('Product', (object,), {})
-            p = product_type()
-            p.name = "Banana"
-            p.price = 20
-            p.categories = ["Food"]
-            p.key_words = ["Fruits"]
-            p.amount = 10
-            if not self.remove:
-                return {0: [p]}
+            if not self.update:
+
+                p = product_type()
+                p.name = "Banana"
+                p.price = 20
+                p.categories = ["Food"]
+                p.key_words = ["Fruits"]
+                p.amount = 10
+                if not self.remove:
+                    return {0: [p]}
+                else:
+                    return {1: [p]}
             else:
-                return {1: [p]}
+
+                p = product_type()
+                p.name = "Banana"
+                p.price = 40
+                p.categories = ["yellow", "Food"]
+                p.key_words = ["Fruits"]
+                p.amount = 40
+                if not self.remove:
+                    return {0: [p]}
+                else:
+                    return {1: [p]}
 
     def Open_store(self, store_name):
         if self.real != None:
@@ -125,6 +140,11 @@ class Proxy:
         if self.real != None:
             return self.real.update_product(store_id, product_name, att, updated)
         else:
+            if updated is int and updated<0:
+                return False
+            if product_name != "Banana":
+                return False
+            self.update = True
             if store_id >= 40:
                 return False
             if self.out:
