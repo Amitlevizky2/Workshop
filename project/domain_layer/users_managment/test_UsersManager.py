@@ -66,8 +66,6 @@ class TestUserManager(TestCase):
         self.users_mng.add_guest_user()
         self.assertTrue("guestUser" + str(self.users_mng.incremental_id - 1) in self.users_mng.guest_user_list.keys())
 
-    def test_view_cart(self):
-        self.fail()
 
     def test_logout(self):
         reg_user10 = RegisteredUser("reg_user10")
@@ -132,17 +130,10 @@ class TestUserManager(TestCase):
         self.assertTrue(self.users_mng.is_admin("admin"))
         self.assertFalse(self.users_mng.is_admin("not_admin"))
 
-    def test_add_managed_store(self):
-        self.fail()
-
     def test_get_managed_stores(self):
         pass
 
-    def test_check_if_registered(self):
-        self.fail()
 
-    def test_check_if_loggedin(self):
-        self.fail()
 
     def test_add_purchase(self):
         pass
