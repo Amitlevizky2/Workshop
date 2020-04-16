@@ -115,13 +115,16 @@ class Proxy:
         if self.real != None:
             return self.real.get_purchase_history()
         else:
-            purchase_type = type('Purchase', (object,), {})
-            product_type = type('Product', (object,), {})
-            p = product_type()
-            p.name = "Banana"
-            pur = purchase_type()
-            pur.products = [p]
-            return pur
+            if not self.out:
+                purchase_type = type('Purchase', (object,), {})
+                product_type = type('Product', (object,), {})
+                p = product_type()
+                p.name = "Banana"
+                pur = purchase_type()
+                pur.products = [p]
+                return pur
+            else:
+                return None
 
     def add_product(self, store_id, product, amount):
         if self.real != None:
