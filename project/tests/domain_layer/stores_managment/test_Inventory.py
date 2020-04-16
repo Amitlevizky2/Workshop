@@ -1,5 +1,5 @@
 from project.domain_layer.stores_managment.Product import Product
-from .Inventory import Inventory
+from project.domain_layer.stores_managment.Inventory import Inventory
 import unittest
 
 
