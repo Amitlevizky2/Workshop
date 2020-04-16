@@ -88,7 +88,6 @@ class test_StoresManager(unittest.TestCase):
         self.assertFalse(
             self.store_manager.appoint_manager_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
 
-
     def test_appoint_owner_to_store(self):
         self.test_open_store()
         self.assertTrue(self.store_manager.appoint_owner_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))

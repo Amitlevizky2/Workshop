@@ -1,3 +1,6 @@
+import logging
+from project import logger
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
@@ -46,8 +49,10 @@ class StoresManager:
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():
+            logger.log("find store #%d",store_id)
             return self.stores.get(store_id)
         else:
+            logger.error("%d store id doesn't exist", store_id)
             return NullStore()
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,

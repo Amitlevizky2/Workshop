@@ -8,6 +8,9 @@
 # Mac/OSX
 .DS_Store
 
+#logs
+.log
+
 # Windows
 Thumbs.db
 
