@@ -1,7 +1,9 @@
 import unittest
 
-from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
+import datetime
 
 
 class TestStore(unittest.TestCase):
@@ -12,7 +14,7 @@ class TestStore(unittest.TestCase):
                                      "Hadar": [],
                                      "Lielle": [],
                                      "Noa": [],
-                                     "Evgeny": []}
+                                     "Evgeny": [Store.update_product]}
 
         self.standard_users = ["Avishay",
                                "Alex",
@@ -27,6 +29,7 @@ class TestStore(unittest.TestCase):
                                          "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
                                          "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
                                          "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+        self.discount = Discount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -134,8 +137,6 @@ class TestStore(unittest.TestCase):
         # Add product permission should now be in Alex's permissions
         self.assertIn(Store.add_product, self.store.store_managers["Alex"])
 
-        # TODO: Only owner that appointed the manager can give him permissions
-
     def test_remove_permission_from_manager_one(self):
         # Amit is not an owner
         self.assertFalse(self.store.remove_permission_from_manager("Amit", "Evgeny", "add_product"))
@@ -154,8 +155,6 @@ class TestStore(unittest.TestCase):
 
         # Don't be blind dude, I just added Avishay's permissions the add product permission
         self.assertIn(Store.add_product, self.store.store_managers["Avishay"])
-
-        #TODO: Only owner that appointed the manager can remove his permissions
 
         # Moshe, it is really not your business what permissions Avishay have, Let it go.
         self.assertFalse(self.store.remove_permission_from_manager("Moshe", "Avishay", "add_product"))
@@ -226,11 +225,29 @@ class TestStore(unittest.TestCase):
         # No such name
         self.assertListEqual([], self.store.search(search_term="Melon"))
 
+    def test_update_product(self):
+        # Lielle dont have the permission to update the product
+        self.assertFalse(self.store.update_product("Lielle", "Apple", "amount", 8))
+        # Evgeny have the permission
+        self.assertTrue(self.store.update_product("Evgeny", "Apple", "amount", 8))
+        # Owner can always do that
+        self.assertTrue(self.store.update_product("test owner", "Apple", "amount", 8))
+        # You can also append discount to a product
+        self.assertTrue(self.store.update_product("test owner", "Apple", "discount", self.discount))
+
+    def test_add_new_sale(self):
+        # Sale is None
+        self.assertFalse(self.store.add_new_sale(None))
+        # Valid new sale
+        self.assertTrue(self.store.add_new_sale(Purchase(["Apple"], "Ron", self.store.store_id, 1)))
+
     def test_buy_product(self):
         # The amount of the product you are asking to but is to big
         self.assertFalse(self.store.buy_product("Apple", 30), "Store Cannot sell more than what it has")
-
-
+        # The amount of the product is illegal
+        self.assertFalse(self.store.buy_product("Apple", -1), "Store Cannot sell more than what it has")
+        # Buying in good amount
+        self.assertTrue(self.store.buy_product("Apple", 5), "This is a valid amount it should be ok!")
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
@@ -239,25 +256,6 @@ class TestStore(unittest.TestCase):
     def appoint_users_to_managers(self):
         for i in range(0, len(self.standard_users)):
             self.store.appoint_manager("test owner", self.standard_users[i])
-
-    def test_appoint_manager(self):
-        self.assertFalse(self.store.appoint_owner("not test owner", "michael"))
-        self.assertTrue(self.store.appoint_owner("test owner", "michael"))
-
-    def test_get_sales_history(self):
-        pass
-
-    def test_add_new_sale(self):
-        pass
-
-    def test_check_permission(self):
-        pass
-
-    def test_remove_owner(self):
-        self.store.appoint_owner("test owner", "moshe")
-        self.assertFalse(self.store.remove_owner("moshe", "test owner"))
-        self.assertTrue(self.store.remove_owner("test owner", "moshe"))
-
 
 if __name__ == '__main__':
     unittest.main()

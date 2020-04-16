@@ -241,8 +241,7 @@ class Store:
             return self.sales
 
     def update_product(self, user, product_name, attribute, updated):
-        if self.check_permission(user, self.update_product):
-
+        if self.check_permission(user, getattr(Store, "update_product")):
             return self.inventory.update_product(product_name, attribute, updated)
         return False
 
@@ -255,7 +254,8 @@ class Store:
          Returns:
                  True if @new_sale was added to @self.sales list, else false
          """
-        if self.sales.append(purchase) is None:
+        if purchase is not None:
+            self.sales.append(purchase)
             return True
         return False
 
