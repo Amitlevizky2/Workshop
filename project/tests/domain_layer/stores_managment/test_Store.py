@@ -18,15 +18,15 @@ class TestStore(unittest.TestCase):
                                "Alex",
                                "Ron"]
 
-        self.store.inventory.products = {"Apple": Product("Apple", 20, "Food", "Fruits", 10),
-                                         "Banana": Product("Banana", 20, "Food", "Fruits", 10),
-                                         "Orange": Product("Orange", 20, "Food", "Fruits", 10),
-                                         "Tomato": Product("Tomato", 20, "Food", "Vegetables", 10),
-                                         "Cucumber": Product("Cucumber", 20, "Food", "Vegetables", 10),
-                                         "Carrot": Product("Carrot", 20, "Food", "Vegetables", 10),
-                                         "Iphone": Product("Iphone", 20, "Electronics", "Computers", 10),
-                                         "Hard Disk": Product("Hard Disk", 20, "Electronics", "Computers", 10),
-                                         "Keyboard": Product("Keyboard", 20, "Electronics", "Computers", 10)}
+        self.store.inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 10),
+                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
+                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
+                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
+                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10),
+                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10),
+                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
+                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
+                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -77,9 +77,9 @@ class TestStore(unittest.TestCase):
         for i in range(0, len(users)):
             self.assertNotIn(users[i], self.store.store_owners)
 
-        # Check that every appointed owner is not in the appointed by list of his appointee
-        for i in range(0, len(users)):
-            self.assertNotIn(users[i], self.store.appointed_by)
+        # # Check that every appointed owner is not in the appointed by list of his appointee
+        # for i in range(0, len(users)):
+        #     self.assertNotIn(users[i], self.store.appointed_by[])
 
     def test_remove_manager_one(self):
         self.store.appoint_owner("test owner", "Moshe")
@@ -158,7 +158,7 @@ class TestStore(unittest.TestCase):
         #TODO: Only owner that appointed the manager can remove his permissions
 
         # Moshe, it is really not your business what permissions Avishay have, Let it go.
-        # self.assertFalse(self.store.remove_permission_from_manager("Moshe", "Avishay", "add_product"))
+        self.assertFalse(self.store.remove_permission_from_manager("Moshe", "Avishay", "add_product"))
 
         # Look Avishay, it's is not you, its me, I'm taking this permission from you, I'm sorry
         self.assertTrue(self.store.remove_permission_from_manager("test owner", "Avishay", "add_product"))
@@ -204,20 +204,34 @@ class TestStore(unittest.TestCase):
         # Let's see if you did it well
         self.assertIn("Macbook", self.store.inventory.products)
 
-    def test_search_one(self):
-        pass
+    def test_search(self):
+        # Well let's see if you have an Apple dude
+        self.assertIn(self.store.inventory.products["Apple"], self.store.search("Apple"))
+        # Now let's get some category
+        fruits_vegs = [self.store.inventory.products["Apple"],
+                       self.store.inventory.products["Banana"],
+                       self.store.inventory.products["Orange"],
+                       self.store.inventory.products["Tomato"],
+                       self.store.inventory.products["Cucumber"],
+                       self.store.inventory.products["Carrot"]]
+
+        res_key_words = self.store.search(key_words=["Fruits", "Vegetables"])
+        res_categoty = self.store.search(categories=["Food"])
+        self.assertListEqual(fruits_vegs, res_key_words)
+        self.assertListEqual(fruits_vegs, res_categoty)
+        # No such category
+        self.assertListEqual([], self.store.search(categories=["Kitchen"]))
+        # No such keywords
+        self.assertListEqual([], self.store.search(key_words=["Compil"]))
+        # No such name
+        self.assertListEqual([], self.store.search(search_term="Melon"))
+
+    def test_buy_product(self):
+        # The amount of the product you are asking to but is to big
+        self.assertFalse(self.store.buy_product("Apple", 30), "Store Cannot sell more than what it has")
 
 
 
-
-        # self.test_add_product()
-        # ap = self.store.search("apple")
-        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        # ap = self.store.search(categories=["food"])
-        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        # ap = self.store.search(key_words=["green"])
-        # self.assertTrue(Product("apple", 1, ["food", "fruit"], ["green"],2) == ap[0])
-        #
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i + 1])
