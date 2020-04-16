@@ -7,8 +7,8 @@ logger.setLevel(logging.INFO)
 
 # Create handlers
 abs_path = str(__file__).replace(str(os.path.basename(__file__)), '')
-e_handler = logging.FileHandler(abs_path + 'log/Error.log')
-log_handler = logging.FileHandler(abs_path + 'log/log.log')
+e_handler = logging.FileHandler(abs_path + 'logs/Error.log')
+log_handler = logging.FileHandler(abs_path + 'logs/logs.log')
 e_handler.setLevel(logging.ERROR)
 
 # Create formatters and add it to handlers
