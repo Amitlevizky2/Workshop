@@ -9,11 +9,12 @@ class Logout(unittest.TestCase):
     def test_logout_happy(self):
         self.service.register("user", "pass")
         self.service.login("user", "pass")
-        res = self.service.logout()
+        res = self.service.logout("user")
         self.assertTrue(res)
 
     def test_logout_bad(self):
-        res =
+        res1 = self.service.logout("guestuser")
+        self.assertFalse(res1)
 
 
 

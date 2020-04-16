@@ -9,6 +9,11 @@ class Proxy:
 
     # def set_real(self, adapter):
     # self.real = Adapter()
+    def add_guest_user(self):
+        if self.real != None:
+            self.real.add_guest_user()
+        else:
+            return "guestuser"
 
     def register(self, username, password):
         if self.real != None:
@@ -64,11 +69,14 @@ class Proxy:
         else:
             return [0]
 
-    def logout(self):
+    def logout(self,username):
         if self.real != None:
             self.real.logout(self)
         else:
-            return True
+            if username == "guestuser":
+                return False
+            else:
+                return True
 
     def get_purchase_history(self):
         if self.real!=None:
