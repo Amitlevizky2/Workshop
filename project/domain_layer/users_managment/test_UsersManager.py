@@ -24,7 +24,17 @@ class TestUserManager(TestCase):
         self.fail()
 
     def test_register(self):
-        self.fail()
+        user = User("guestUser700")
+        self.users_mng.guest_user_list[user.username] = user
+
+        self.users_mng.register("guestUser700", "user200", "1234")
+        self.assertTrue("user200" in self.users_mng.reg_user_list.keys())
+        self.users_mng.reg_user_list.pop("user200")
+
+        reg_lielle = RegisteredUser("lielle")
+        self.users_mng.reg_user_list["lielle"] = reg_lielle
+        self.assertFalse(self.users_mng.register("guestUser700", "lielle", "1234"))
+        self.users_mng.reg_user_list.pop("lielle")
 
     def test_login(self):
         self.users_mng.security.add_user("lielle", "noa")
@@ -66,16 +76,17 @@ class TestUserManager(TestCase):
         self.users_mng.reg_user_list.pop("reg_user10")
 
     def test_view_purchases(self):
+        # #24
         self.fail()
 
     def test_add_product(self):
-        self.fail()
+        pass
 
     def test_remove_product(self):
-        self.fail()
+        pass
 
     def test_get_cart(self):
-        self.fail()
+        pass
 
     def test_view_purchases_admin(self):
         reg_lielle = RegisteredUser("lielle")
@@ -102,7 +113,7 @@ class TestUserManager(TestCase):
         self.fail()
 
     def test_get_managed_stores(self):
-        self.fail()
+        pass
 
     def test_check_if_registered(self):
         self.fail()
@@ -111,7 +122,7 @@ class TestUserManager(TestCase):
         self.fail()
 
     def test_add_purchase(self):
-        self.fail()
+        pass
 
     def test_remove_cart(self):
-        self.fail()
+        pass
