@@ -123,7 +123,16 @@ class test_StoresManager(unittest.TestCase):
         self.assertIn(self.idx, self.store_manager.stores.keys())
         self.idx += 1
 
-   
+    def test_buy(self):
+        self.test_add_product_to_store()
+        cart = Cart()
+        cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
+        cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 2)
+        self.assertTrue(self.store_manager.buy(cart))
+        cart = Cart()
+        cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
+        cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 30)
+        self.assertFalse(self.store_manager.buy(cart))
 
     def test_get_sales_history(self):
         self.test_add_purchase_to_store()
