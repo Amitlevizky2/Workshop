@@ -1,9 +1,12 @@
+from project.tests.AT_tests.test_env.Adapter import Adapter
+
+
 class Proxy:
 
     def __init__(self):
         self.hist = False
         self.remove_manager = False
-        self.real = None
+        self.real =None # Adapter()
         self.out = True
         # adapter = Adapter()
         self.remove = False
@@ -34,9 +37,9 @@ class Proxy:
         else:
             return True
 
-    def add_Store(self, StoreName, StoreId):
+    def add_Store(self, StoreName):
         if self.real != None:
-            self.real.add_Store(self, StoreName, StoreId)
+            self.real.add_Store(self, StoreName)
         else:
             return True
 
@@ -44,7 +47,9 @@ class Proxy:
                              product_categories: [str],
                              key_words: [str], amount):
         if self.real != None:
-            self.real.add_product_to_Store(self, StoreID)
+            self.real.add_product_to_Store(StoreID,product_name, product_price,
+                             product_categories,
+                             key_words, amount)
         else:
             if StoreID >= 40:
                 return False
@@ -52,9 +57,9 @@ class Proxy:
                 return False
             return True
 
-    def searchProduct(self, product, category=None, key_words=None):
+    def searchProduct(self, product="", category=[], key_words=[]):
         if self.real != None:
-            self.real.searchProduct(self, product, category, key_words)
+            self.real.searchProduct(product, category, key_words)
         else:
             product_type = type('Product', (object,), {})
             if not self.update:
@@ -102,7 +107,7 @@ class Proxy:
             self.real.logout(self)
         else:
             self.out = True
-            return True
+            return ""
 
     def get_purchase_history(self):
         if self.real != None:
@@ -206,7 +211,7 @@ class Proxy:
 
     def remove_store_manager(self, store_id, user):
         if self.real != None:
-            return self.real.add_permission(store_id, user)
+            return self.real.remove_store_manager(store_id, user)
 
         else:
 
