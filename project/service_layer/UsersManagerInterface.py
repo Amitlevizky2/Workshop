@@ -8,7 +8,7 @@ class UsersManagerInterface:
         self.user_manager = UsersManager()
 
     def register(self, username, new_username, password):
-        return self.user_manager.register(username, new_username,password)
+        return self.user_manager.register(username, new_username, password)
 
     ##EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password) -> bool:
@@ -28,10 +28,10 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
     def add_product(self, username, store_id, product, quantity):
-        return self.user_manager.add_product(username,store_id, product, quantity)
+        return self.user_manager.add_product(username, store_id, product, quantity)
 
     def remove_product(self, username, store_id, product, quantity):
-        return self.user_manager.remove_product(username,store_id, product, quantity)
+        return self.user_manager.remove_product(username, store_id, product, quantity)
 
     def get_cart(self, username):
         return self.user_manager.get_cart(username)
@@ -39,11 +39,14 @@ class UsersManagerInterface:
     def view_purchases_admin(self, username, admin):
         return self.user_manager.view_purchases_admin(username, admin)
 
-    def is_admin(self,username):
+    def is_admin(self, username):
         return self.user_manager.is_admin(username)
 
     def add_managed_store(self, username, store_id):
         return self.user_manager.add_managed_store(username, store_id)
+
+    def remove_managed_store(self, username, store_id):
+        return self.user_manager.remove_managed_store(username, store_id)
 
     def get_managed_stores(self, username):
         return self.user_manager.get_managed_stores(username)

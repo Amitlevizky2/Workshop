@@ -11,21 +11,21 @@ class purchase_History(unittest.TestCase):
         self.service.login("user", "pass")
         res = self.service.searchProduct("Banana")
         first_store_id = list(res)[0]
-        self.service.add_product(first_store_id,res.get(first_store_id), 2)
+        self.service.add_product(first_store_id,res.get(first_store_id)[0], 2)
         self.service.buy()
     def test_purchase_happy(self):
         result = self.service.get_purchase_history()
-        self.assertEqual(result.products[0].name, "Banana")
+        self.assertEqual(list(result[0].products)[0], "Banana")
 
     def test_purchase_bad(self):
         self.service.logout()
         result = self.service.get_purchase_history()
-        self.assertIsNone(result)
+        self.assertTrue(len(result)==0)
 
 
     def test_purchase_sad(self):
         res1 = self.service.get_purchase_history()
-        self.assertNotEqual(res1.products[0].name, "marshmelo")
+        self.assertNotEqual(list(res1[0].products)[0], "marshmelo")
 
 
 

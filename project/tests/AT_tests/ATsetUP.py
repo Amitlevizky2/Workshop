@@ -17,5 +17,7 @@ def setup(service: Proxy):
     store_id = service.Open_store("avishop")
     for product in products:
         service.add_product_to_Store(store_id, *product)
+    service.logout()
     return store_id
+
 

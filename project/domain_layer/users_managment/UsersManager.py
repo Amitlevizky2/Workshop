@@ -67,7 +67,7 @@ class UsersManager:
     # look up via usr id change user list to map of ids and user
     def view_cart(self, username) -> Cart:
         user = self.find_user(username)
-        return user.view_cart()
+        return user.cart
 
     def logout(self, username):
         user = self.find_reg_user(username)
@@ -122,3 +122,7 @@ class UsersManager:
     def remove_cart(self, username):
         user = self.find_user(username)
         user.remove_cart()
+
+    def remove_managed_store(self, username, store_id):
+        user = self.find_reg_user(username)
+        return user.remove_managed_store(store_id)
