@@ -8,41 +8,41 @@ class NullStore(Store):
         pass
 
     def appoint_owner(self, owner, to_appoint):
-        pass
+        return False
 
     def remove_owner(self, owner, to_remove):
-        pass
+        return False
 
     def remove_manager(self, owner, to_remove):
-        pass
+        return False
 
     def add_permission_to_manager(self, owner, manager, permission):
-        pass
+        return False
 
     def remove_permission_from_manager(self, owner, manager, permission):
-        pass
+        return False
 
     def appoint_manager(self, owner, to_appoint):
-        pass
+        return False
 
     def add_product(self, user_name: str, product_name: str, product_price: int, product_categories, key_words: [str],
                     amount) -> bool:
         return False
 
     def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> [Product]:
-        pass
+        return False
 
     def buy_product(self, product_name, amount):
-        pass
+        return False
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
-        pass
+        return False
 
     def update_product(self, user, product_name, attribute, updated):
         return False
 
     def add_new_sale(self, purchase: Purchase) -> bool:
-        pass
+        return False
 
     def check_permission(self, user, function):
-        pass
+        return False

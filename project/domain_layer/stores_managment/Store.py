@@ -237,7 +237,7 @@ class Store:
         return self.inventory.buy_product(product_name, amount)
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
-        if self.check_permission(user, self.get_sales_history) or is_admin:
+        if self.check_permission(user, getattr(Store, "get_sales_history")) or is_admin:
             return self.sales
 
     def update_product(self, user, product_name, attribute, updated):
