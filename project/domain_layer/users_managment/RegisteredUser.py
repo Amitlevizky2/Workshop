@@ -25,3 +25,7 @@ class RegisteredUser(User):
     def add_managed_store(self, store_id):
         if store_id not in self.managed_stores:
             self.managed_stores.append(store_id)
+
+    def remove_managed_store(self, store_id):
+        if store_id in self.managed_stores:
+            self.managed_stores.remove(store_id)

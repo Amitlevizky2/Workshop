@@ -18,13 +18,13 @@ class Proxy:
 
     def register(self, username, password):
         if self.real != None:
-            self.real.register(username, password)
+            return self.real.register(username, password)
         else:
             return True
 
     def login(self, username, password):
         if self.real is not None:
-            self.real.login(username, password)
+            return self.real.login(username, password)
         else:
             if username == "admin":
                 self.admin = True
@@ -50,7 +50,7 @@ class Proxy:
                              product_categories: [str],
                              key_words: [str], amount):
         if self.real != None:
-            self.real.add_product_to_Store(self, StoreID)
+            return self.real.add_product_to_Store(StoreID,product_name,product_price,product_categories,key_words,amount)
         else:
             if StoreID >= 40:
                 return False
@@ -58,9 +58,9 @@ class Proxy:
                 return False
             return True
 
-    def searchProduct(self, product, category=None, key_words=None):
+    def searchProduct(self, product, category=[], key_words=[]):
         if self.real != None:
-            self.real.searchProduct(self, product, category, key_words)
+            return self.real.searchProduct(product, category, key_words)
         else:
             product_type = type('Product', (object,), {})
             if not self.update:
@@ -184,7 +184,7 @@ class Proxy:
 
     def add_new_store_manager(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_owner(user, store_id)
+            return self.real.add_new_store_manager(user, store_id)
         else:
             if self.appoint:
                 self.appoint = not self.appoint
@@ -216,7 +216,7 @@ class Proxy:
 
     def remove_store_manager(self, store_id, user):
         if self.real != None:
-            return self.real.add_permission(store_id, user)
+            return self.real.remove_store_manager(store_id, user)
 
         else:
 

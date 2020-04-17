@@ -8,7 +8,7 @@ class Driver:
     def make_bridge() -> Proxy:
         proxy = Proxy()
         adapter = Adapter()
-        proxy.set_real(adapter)
+        #proxy.set_real(adapter)
         return proxy
 
 

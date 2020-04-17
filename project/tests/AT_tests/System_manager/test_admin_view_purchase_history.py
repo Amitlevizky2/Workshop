@@ -7,9 +7,9 @@ class admin_view_purchase_history(unittest.TestCase):
     def setUp(self):
         self.service = Driver.make_bridge()
         self.store_id = ATsetUP.setup(self.service)
-        self.service.register("admin","admin")
-        self.service.login("admin","admin")
-
+        self.service.register("admin","1234")
+        self.service.login("admin","1234")
+        self.service.logout()
 
     def test_admin_view_happy(self):
         self.service.register("user", "pass")

@@ -18,6 +18,7 @@ class Adapter:
 
         self.username = username
         return res
+
     def showProductStore(self, store):
         pass
 
@@ -25,7 +26,7 @@ class Adapter:
                              product_categories: [str],
                              key_words: [str], amount):
         return self.store_manager_interface.add_product_to_store(store_id, self.username, product_name, product_price,
-                                                          product_categories, key_words, amount)
+                                                                 product_categories, key_words, amount)
 
     def searchProduct(self, product="", category=[], key_words=[]):
         return self.store_manager_interface.search_product(product, category, key_words)
@@ -50,10 +51,10 @@ class Adapter:
         return self.purchase_manager.buy(self.username)
 
     def remove_product_from_store(self, store_id, product_name):
-        pass
+        return self.store_manager_interface.remove_product(store_id, product_name, self.username)
 
     def update_product(self, store_id, product_name, att, updated):
-        pass
+        return self.store_manager_interface.update_product(store_id,self.username, product_name, att, updated)
 
     def add_new_store_owner(self, user, store_id):
         return self.store_manager_interface.appoint_owner_to_store(store_id, self.username, user)
@@ -63,7 +64,7 @@ class Adapter:
                                                                                permission)
 
     def remove_store_manager(self, store_id, user):
-        pass
+        return self.store_manager_interface.remove_manager(store_id,self.username,user)
 
     def view_store_history(self, store_id):
         return self.store_manager_interface.get_sales_history(store_id, self.username)

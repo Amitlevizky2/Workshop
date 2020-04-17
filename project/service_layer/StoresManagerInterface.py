@@ -109,7 +109,10 @@ class StoresManagerInterface:
         return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)
 
     def remove_manager(self, store_id, owner, to_remove):
-        return self.stores_manager.remove_manager(store_id, owner, to_remove)
+        if self.stores_manager.remove_manager(store_id, owner, to_remove):
+            self.users_manager.remove_managed_store(to_remove,store_id)
+            return True
+        return False
 
     def remove_owner(self, store_id, owner, to_remove):
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
