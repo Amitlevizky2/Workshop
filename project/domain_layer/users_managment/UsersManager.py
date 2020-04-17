@@ -2,6 +2,7 @@ from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
+from project.logger import logger
 from project.service_layer.Security import Security
 
 
@@ -22,6 +23,7 @@ class UsersManager:
         if username in self.reg_user_list.keys():
             user = self.reg_user_list[username]
             return user
+        logger.error("registered user with username %s does not exist", username)
         return NullUser()
 
     def find_user(self, username) -> User:
@@ -31,6 +33,7 @@ class UsersManager:
             if username in self.guest_user_list.keys():
                 user = self.guest_user_list[username]
             else:
+                logger.error("user with username %s does not exist", username)
                 user = NullUser()
         return user
 
@@ -58,10 +61,12 @@ class UsersManager:
         else:
             return False
 
+    # make sure when  user exits system to remove the user from guest user list
     def add_guest_user(self):
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
+        logger.log("guest user with username %s was added to system", user.username)
         return user.username
 
     # look up via usr id change user list to map of ids and user
