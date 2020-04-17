@@ -66,7 +66,7 @@ class UsersManager:
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
-        logger.log("guest user with username %s was added to system", user.username)
+        logger.info("guest user with username %s was added to system", user.username)
         return user.username
 
     # look up via usr id change user list to map of ids and user
