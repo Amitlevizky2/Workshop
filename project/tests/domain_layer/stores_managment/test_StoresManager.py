@@ -72,8 +72,7 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(index + 1, self.store_manager.stores_idx)
 
     def test_get_sales_history(self):
-        self.assertIsNone(self.store_manager.get_sales_history(78, "the king", True))
-
+        self.assertFalse(self.store_manager.get_sales_history(78, "the king", True))
         self.assertEqual(self.store_manager.get_sales_history(0, "some owner", False)[0], "i'm no admin")
         self.assertEqual(self.store_manager.get_sales_history(0, "some owner", True)[0], "hi,i'm a admin view purchase")
 
