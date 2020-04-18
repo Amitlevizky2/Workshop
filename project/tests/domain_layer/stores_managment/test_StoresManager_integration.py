@@ -1,8 +1,9 @@
+import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
-from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
@@ -19,6 +20,7 @@ class test_StoresManager(unittest.TestCase):
             ("orange", 1, ["food", "orange"], ["fruits"], 10),
             ("iphone", 5000, ["electronics", "bad and expensive phone "], ["fruits"], 10)
         ]
+        self.discount = Discount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
 
     def test_update_product(self):
         self.test_add_product_to_store()
@@ -168,6 +170,16 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(len(self.store_manager.get_sales_history(self.idx - 1, "not moshe" + str(self.idx - 1), True)),
                          1)
 
+    def test_add_discount_to_product(self):
+        self.test_add_product_to_store()
+        self.assertTrue(
+            self.store_manager.add_discount_to_product(self.idx - 1, self.products[-1][0], "moshe" + str(self.idx - 1),
+                                                       datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
+                                                       10))
+        self.assertFalse(
+            self.store_manager.add_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
+                                                       datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
+                                                       10))
 
 if __name__ == '__main__':
     unittest.main()

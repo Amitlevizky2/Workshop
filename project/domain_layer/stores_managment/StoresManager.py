@@ -132,10 +132,9 @@ class StoresManager:
 
     def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
         store = self.get_store(store_id)
-        product = store.search(product_name)
-        if product:
-            return store.add_discount_to_product(product_name, username,
-                                                                Discount(product_name, start_date, end_date, percent))
+
+        return store.add_discount_to_product(product_name, username,
+                                             Discount(start_date, end_date, percent))
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
