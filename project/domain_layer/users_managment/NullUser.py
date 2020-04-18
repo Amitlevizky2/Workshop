@@ -28,7 +28,7 @@ class NullUser(RegisteredUser):
         return None
 
     def get_managed_store(self):
-        return None
+        return []
 
     def add_managed_store(self, store_id):
         return False

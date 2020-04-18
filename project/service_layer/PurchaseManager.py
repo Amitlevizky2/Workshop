@@ -5,7 +5,7 @@ from project.domain_layer.external_managment.ShipmentSystem import ShipmentSyste
 
 
 class ExternalPaymentStub:
-    def pay(self, cart):
+    def pay(self, user, cart):
         return True
 
 

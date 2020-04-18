@@ -75,7 +75,7 @@ class TestUserManager(TestCase):
         reg_user10.loggedin = True
         logout_un = self.users_mng.logout("reg_user10")
         incr = self.users_mng.incremental_id - 1
-        self.assertEqual(logout_un, "guestUser"+str(incr))
+        self.assertEqual(logout_un, "guestUser" + str(incr))
 
         logout_un2 = self.users_mng.logout("not_registered")
         self.assertEqual(logout_un2, "not_registered")
@@ -134,7 +134,8 @@ class TestUserManager(TestCase):
         self.assertTrue(self.users_mng.is_admin("admin"))
         self.assertFalse(self.users_mng.is_admin("not_admin"))
 
-    # tested in test_RegisteredUser
+        # tested in test_RegisteredUser
+
     def test_add_managed_store(self):
         pass
 
