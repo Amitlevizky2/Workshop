@@ -11,8 +11,9 @@ class Proxy:
         # adapter = Adapter()
         self.remove = False
         self.update = False
-        self.appoint=False
+        self.appoint = False
         self.admin = False
+
     # def set_real(self, adapter):
     # self.real = Adapter()
 
@@ -50,7 +51,8 @@ class Proxy:
                              product_categories: [str],
                              key_words: [str], amount):
         if self.real != None:
-            return self.real.add_product_to_Store(StoreID,product_name,product_price,product_categories,key_words,amount)
+            return self.real.add_product_to_Store(StoreID, product_name, product_price, product_categories, key_words,
+                                                  amount)
         else:
             if StoreID >= 40:
                 return False
@@ -125,6 +127,12 @@ class Proxy:
                 return pur
             else:
                 return None
+
+    def add_discount_to_product(self, storedID, product_name, username, start_date, end_date, percent):
+        if self.real != None:
+            return self.real.add_discount_to_product(storedID, product_name, username, start_date, end_date, percent)
+        else:
+            return True
 
     def add_product(self, store_id, product, amount):
         if self.real != None:
@@ -202,11 +210,11 @@ class Proxy:
     def add_permission(self, store_id, user, permission):
 
         if self.real != None:
-            return self.real.add_permission(store_id, user,permission)
+            return self.real.add_permission(store_id, user, permission)
 
         else:
 
-            if user == "not new manager" or user=="manager":
+            if user == "not new manager" or user == "manager":
                 return False
             if self.out:
                 return False
@@ -235,7 +243,7 @@ class Proxy:
         else:
             if self.out:
                 return None
-            if store_id>=40:
+            if store_id >= 40:
                 return None
             purchase_type = type('Purchase', (object,), {})
             product_type = type('Product', (object,), {})
