@@ -221,9 +221,9 @@ class Store:
                 list of products
         """
         result = []
-        for product_name in self.inventory.products.keys():
+        for product_name in self.inventory.get_products().keys():
             if search_term in product_name:
-                result.append(self.inventory.products.get(product_name))
+                result.append(self.inventory.get_products().get(product_name))
 
         if len(categories)>0:
             result = [product for product in result if any(category in product.categories for category in categories)]

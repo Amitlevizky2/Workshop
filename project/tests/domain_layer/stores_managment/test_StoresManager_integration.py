@@ -1,8 +1,9 @@
+import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
-from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
@@ -19,6 +20,7 @@ class test_StoresManager(unittest.TestCase):
             ("orange", 1, ["food", "orange"], ["fruits"], 10),
             ("iphone", 5000, ["electronics", "bad and expensive phone "], ["fruits"], 10)
         ]
+        self.discount = Discount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
 
     def test_update_product(self):
         self.test_add_product_to_store()
@@ -80,6 +82,7 @@ class test_StoresManager(unittest.TestCase):
 
     def test_appoint_manager_to_store(self):
         self.test_open_store()
+        self.assertFalse(self.store_manager.appoint_manager_to_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
         self.assertTrue(self.store_manager.appoint_manager_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
         self.assertIn("Amit", self.store_manager.get_store(self.idx - 1).store_managers.keys())
         self.assertFalse(
@@ -87,13 +90,30 @@ class test_StoresManager(unittest.TestCase):
 
     def test_appoint_owner_to_store(self):
         self.test_open_store()
+        self.assertFalse(self.store_manager.appoint_owner_to_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
         self.assertTrue(self.store_manager.appoint_owner_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
         self.assertIn("Amit", self.store_manager.get_store(self.idx - 1).store_owners)
         self.assertFalse(
             self.store_manager.appoint_owner_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
 
+    def test_remove_manager_from_store(self):
+        self.test_appoint_manager_to_store()
+        # not real store
+        self.assertFalse(self.store_manager.remove_manager(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertTrue(self.store_manager.remove_manager(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+
+    def test_remove_owner_from_store(self):
+        self.test_appoint_owner_to_store()
+        # not real store
+        self.assertFalse(self.store_manager.remove_owner(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertTrue(self.store_manager.remove_owner(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+
     def test_add_permission_to_manager_in_store(self):
         self.test_appoint_manager_to_store()
+        # not real store
+        self.assertFalse(
+            self.store_manager.add_permission_to_manager_in_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit",
+                                                                  "add_product"))
         self.assertTrue(
             self.store_manager.add_permission_to_manager_in_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit",
                                                                   "add_product"))
@@ -105,6 +125,11 @@ class test_StoresManager(unittest.TestCase):
 
     def test_remove_permission_from_manager_in_store(self):
         self.test_add_permission_to_manager_in_store()
+        # not real store
+        self.assertFalse(
+            self.store_manager.remove_permission_from_manager_in_store(self.idx + 1, "moshe" + str(self.idx - 1),
+                                                                       "Amit",
+                                                                       "add_product"))
         self.assertTrue(
             self.store_manager.remove_permission_from_manager_in_store(self.idx - 1, "moshe" + str(self.idx - 1),
                                                                        "Amit",
@@ -115,6 +140,7 @@ class test_StoresManager(unittest.TestCase):
         self.test_add_product_to_store()
         purchase = Purchase({self.products[-1][0]: (Product(*self.products[-1]), 2)}, "moshe", self.idx - 1, 0)
         self.assertTrue(self.store_manager.add_purchase_to_store(self.idx - 1, purchase))
+        self.assertFalse(self.store_manager.add_purchase_to_store(self.idx + 1, purchase))
 
     def test_open_store(self):
         self.assertEqual(self.idx,
@@ -130,6 +156,10 @@ class test_StoresManager(unittest.TestCase):
         cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 2)
         self.assertTrue(self.store_manager.buy(cart))
         cart = Cart()
+        cart.baskets = {self.idx + 1: Basket(self.idx + 1)}
+        cart.get_basket(self.idx + 1).add_product(Product(*self.products[-1]), 2)
+        self.assertFalse(self.store_manager.buy(cart))
+        cart = Cart()
         cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
         cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 30)
         self.assertFalse(self.store_manager.buy(cart))
@@ -140,6 +170,16 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(len(self.store_manager.get_sales_history(self.idx - 1, "not moshe" + str(self.idx - 1), True)),
                          1)
 
+    def test_add_discount_to_product(self):
+        self.test_add_product_to_store()
+        self.assertTrue(
+            self.store_manager.add_discount_to_product(self.idx - 1, self.products[-1][0], "moshe" + str(self.idx - 1),
+                                                       datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
+                                                       10))
+        self.assertFalse(
+            self.store_manager.add_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
+                                                       datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
+                                                       10))
 
 if __name__ == '__main__':
     unittest.main()

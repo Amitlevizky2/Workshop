@@ -44,5 +44,6 @@ class NullStore(Store):
     def add_new_sale(self, purchase: Purchase) -> bool:
         return False
 
-    def check_permission(self, user, function):
+
+    def add_discount_to_product(self, product_name, username, discount):
         return False
