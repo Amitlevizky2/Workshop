@@ -80,6 +80,7 @@ class test_StoresManager(unittest.TestCase):
 
     def test_appoint_manager_to_store(self):
         self.test_open_store()
+        self.assertFalse(self.store_manager.appoint_manager_to_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
         self.assertTrue(self.store_manager.appoint_manager_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
         self.assertIn("Amit", self.store_manager.get_store(self.idx - 1).store_managers.keys())
         self.assertFalse(
@@ -93,15 +94,24 @@ class test_StoresManager(unittest.TestCase):
         self.assertFalse(
             self.store_manager.appoint_owner_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
 
-
     def test_remove_manager_from_store(self):
         self.test_appoint_manager_to_store()
-        #not real store
-        self.assertFalse(self.store_manager.appoint_manager_to_store(self.idx +1, "moshe" + str(self.idx - 1), "Amit"))
-        self.assertTrue(self.store_manager.appoint_owner_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
-        
+        # not real store
+        self.assertFalse(self.store_manager.remove_manager(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertTrue(self.store_manager.remove_manager(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+
+    def test_remove_owner_from_store(self):
+        self.test_appoint_owner_to_store()
+        # not real store
+        self.assertFalse(self.store_manager.remove_owner(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertTrue(self.store_manager.remove_owner(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+
     def test_add_permission_to_manager_in_store(self):
         self.test_appoint_manager_to_store()
+        # not real store
+        self.assertFalse(
+            self.store_manager.add_permission_to_manager_in_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit",
+                                                                  "add_product"))
         self.assertTrue(
             self.store_manager.add_permission_to_manager_in_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit",
                                                                   "add_product"))
@@ -113,6 +123,11 @@ class test_StoresManager(unittest.TestCase):
 
     def test_remove_permission_from_manager_in_store(self):
         self.test_add_permission_to_manager_in_store()
+        # not real store
+        self.assertFalse(
+            self.store_manager.remove_permission_from_manager_in_store(self.idx + 1, "moshe" + str(self.idx - 1),
+                                                                       "Amit",
+                                                                       "add_product"))
         self.assertTrue(
             self.store_manager.remove_permission_from_manager_in_store(self.idx - 1, "moshe" + str(self.idx - 1),
                                                                        "Amit",
@@ -123,6 +138,7 @@ class test_StoresManager(unittest.TestCase):
         self.test_add_product_to_store()
         purchase = Purchase({self.products[-1][0]: (Product(*self.products[-1]), 2)}, "moshe", self.idx - 1, 0)
         self.assertTrue(self.store_manager.add_purchase_to_store(self.idx - 1, purchase))
+        self.assertFalse(self.store_manager.add_purchase_to_store(self.idx + 1, purchase))
 
     def test_open_store(self):
         self.assertEqual(self.idx,
@@ -137,6 +153,10 @@ class test_StoresManager(unittest.TestCase):
         cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
         cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 2)
         self.assertTrue(self.store_manager.buy(cart))
+        cart = Cart()
+        cart.baskets = {self.idx + 1: Basket(self.idx + 1)}
+        cart.get_basket(self.idx + 1).add_product(Product(*self.products[-1]), 2)
+        self.assertFalse(self.store_manager.buy(cart))
         cart = Cart()
         cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
         cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 30)

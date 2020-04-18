@@ -43,6 +43,3 @@ class NullStore(Store):
 
     def add_new_sale(self, purchase: Purchase) -> bool:
         return False
-
-    def check_permission(self, user, function):
-        return False
