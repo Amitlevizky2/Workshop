@@ -28,7 +28,6 @@ class Product:
                self.rate == other.rate
 
     def get_price(self):
-        rel_discount = map(
-            lambda discount: discount.discount if discount.start < datetime.datetime.now() < discount.end else 1,
-            self.discount)
-        return self.price * reduce(lambda x, y: x * y, rel_discount)
+        for discount in self.discount:
+            self.price = self.price * discount.discount
+        return self.price

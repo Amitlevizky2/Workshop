@@ -22,7 +22,7 @@ class StoreManagerTest(unittest.TestCase):
         self.assertTrue(self.service.add_product_to_Store(self.store_id, *ATsetUP.products[0]))
 
     def test_manager_action_sad(self):
-        self.assertFalse(self.service.add_new_store_manager(self.store_id, "no permission"))
+        self.assertFalse(self.service.add_new_store_manager("no permission", self.store_id))
 
     def test_manager_action_bad(self):
         self.service.logout()
