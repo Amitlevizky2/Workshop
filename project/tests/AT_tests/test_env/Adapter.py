@@ -44,6 +44,9 @@ class Adapter:
     def get_purchase_history(self):
         return self.users_manager_interface.view_purchases(self.username)
 
+    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+        return self.store_manager_interface.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+
     def add_product(self, store_id, product, amount):
         return self.users_manager_interface.add_product(self.username, store_id, product, amount)
 
