@@ -94,7 +94,12 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.appoint_owner_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
 
 
-
+    def test_remove_manager_from_store(self):
+        self.test_appoint_manager_to_store()
+        #not real store
+        self.assertFalse(self.store_manager.appoint_manager_to_store(self.idx +1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertTrue(self.store_manager.appoint_owner_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+        
     def test_add_permission_to_manager_in_store(self):
         self.test_appoint_manager_to_store()
         self.assertTrue(
