@@ -272,7 +272,7 @@ class TestStore(unittest.TestCase):
         self.assertTrue(self.store.add_discount_to_product("Banana", "test owner", self.discount))
         self.assertFalse(self.store.add_discount_to_product("Banana", "Lielle", self.discount))
         self.assertTrue(self.store.add_discount_to_product("Banana", "Noa", self.discount))
-
+        self.assertFalse(self.store.add_discount_to_product("not real product", "test owner", self.discount))
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i + 1])

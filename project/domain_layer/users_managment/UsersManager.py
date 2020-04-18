@@ -2,7 +2,7 @@ from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
-from project.logger import logger
+from project import logger
 from project.service_layer.Security import Security
 
 
@@ -66,7 +66,7 @@ class UsersManager:
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
-        logger.info("guest user with username %s was added to system", user.username)
+        logger.log("guest user with username %s was added to system", user.username)
         return user.username
 
     # look up via usr id change user list to map of ids and user
