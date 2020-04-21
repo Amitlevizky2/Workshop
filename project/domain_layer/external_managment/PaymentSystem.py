@@ -7,7 +7,7 @@ class PaymentSystem:
         self.external_payment_system = external_payment_system
         self.p_id = 0
 
-    def pay(self, user, cart: Cart) -> [Purchase]:
+    def pay(self, user, cart: Cart) -> [Purchase]: #TODO חדםמ
         if self.external_payment_system.pay(user, cart):
             res = []
             for store in cart.baskets.keys():
