@@ -1,21 +1,30 @@
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.UsersManager import UsersManager
 from project import logger
+from project.service_layer.Security import Security
 
 
 class UsersManagerInterface:
+    security = Security()
 
     def __init__(self):
         self.user_manager = UsersManager()
 
     def register(self, username, new_username, password):
-        logger.log("user %s called register with new_username:%s, password:%s", username, new_username, password)
-        return self.user_manager.register(username, new_username,password)
+        logger.log("user %s called register with new_username:%s", username, new_username)
+        if self.user_manager.register(username, new_username, password):
+            self.security.add_user(new_username, password)
+            return True
+        else:
+            return False
 
     ##EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password) -> bool:
-        logger.log("user %s called login with login_username:%s, password:%s", username, login_username, password)
-        return self.user_manager.login(username, login_username, password)
+        logger.log("user %s called login with login_username:%s", username, login_username)
+        if self.security.verify_password(login_username, password):
+            return self.user_manager.login(username, login_username, password)
+        else:
+            return False
 
     def add_guest_user(self):
         return self.user_manager.add_guest_user()

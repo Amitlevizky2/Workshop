@@ -7,7 +7,7 @@ from project.service_layer.Security import Security
 
 
 class UsersManager:
-    security = Security()
+
     incremental_id = 0
 
     def __init__(self):
@@ -41,7 +41,6 @@ class UsersManager:
         check = self.find_reg_user(new_username)
         if isinstance(check, NullUser):
             registered = RegisteredUser(new_username)
-            self.security.add_user(new_username, password)
             user = self.find_user(username)
             registered.cart = user.cart
             self.reg_user_list[new_username] = registered
@@ -52,12 +51,11 @@ class UsersManager:
     def login(self, username: str, login_username: str, password):
         check = self.find_reg_user(login_username)
         if not (isinstance(check, NullUser)):
-            if self.security.verify_password(login_username, password):
-                check.loggedin = True
-                self.guest_user_list.pop(username)
-                return login_username
-            else:
+            if check.loggedin is True:
                 return False
+            check.loggedin = True
+            self.guest_user_list.pop(username)
+            return login_username
         else:
             return False
 
