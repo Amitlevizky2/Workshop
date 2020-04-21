@@ -38,7 +38,8 @@ class TestStore(unittest.TestCase):
         self.assertTrue(self.store.appoint_owner("test owner", "Moshe"))
         # Moshe is already a store owner, should not e appointed again
         self.assertFalse(self.store.appoint_owner("test owner", "Moshe"))
-
+        # circle appointment is not allowed
+        self.assertFalse(self.store.appoint_owner("moshe", "test owner"))
     def test_appoint_owner_two(self):
         self.store.appoint_owner("test owner", "Moshe")
         # to_appoint is already owner of the store

@@ -28,6 +28,8 @@ class Product:
                self.rate == other.rate
 
     def get_price(self):
+        price = self.price
         for discount in self.discount:
-            self.price = self.price * discount.discount
-        return self.price
+            if discount.start < datetime.datetime.now() < discount.end:
+                price = price * discount.discount
+        return price
