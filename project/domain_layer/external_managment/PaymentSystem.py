@@ -1,3 +1,5 @@
+import jsonpickle
+
 from project import logger
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.users_managment.Cart import Cart
@@ -20,6 +22,7 @@ class PaymentSystem:
 
     def pay(self, user, cart: Cart) -> [Purchase]:
         res = []
+        cart = jsonpickle.decode(cart)
         if self.external_payment_system.pay(user, cart):
 
             for store in cart.baskets.keys():
@@ -27,7 +30,7 @@ class PaymentSystem:
                 self.p_id += 1
         else:
             logger.error("Failed to complete payment")
-        return res
+        return jsonpickle.encode(res)
 
     def cancel(self, purchases):
         self.external_payment_system.cancel(purchases)

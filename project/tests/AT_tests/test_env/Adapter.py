@@ -1,6 +1,8 @@
 from project.service_layer.PurchaseManager import PurchaseManager
 from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
+from project.tests.external_systems.test_PaymentSystem import external_paymentstub
+from project.tests.external_systems.test_ShipmentSystemInterface import external_shipmentstub
 
 
 class Adapter:
@@ -8,6 +10,8 @@ class Adapter:
         self.users_manager_interface = UsersManagerInterface()
         self.store_manager_interface = StoresManagerInterface(self.users_manager_interface)
         self.purchase_manager = PurchaseManager(self.users_manager_interface, self.store_manager_interface)
+        self.purchase_manager.set_external_payment(external_paymentstub())
+        self.purchase_manager.set_external_shipment(external_shipmentstub())
         self.username = self.users_manager_interface.add_guest_user()
 
     def register(self, username, password):

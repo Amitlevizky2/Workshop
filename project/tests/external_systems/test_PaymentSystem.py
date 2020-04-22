@@ -1,5 +1,7 @@
 import unittest
 
+import jsonpickle
+
 from project.domain_layer.external_managment.PaymentSystem import PaymentSystem
 from project.domain_layer.users_managment.Cart import Cart
 
@@ -32,4 +34,4 @@ class test_PaymentSystem(unittest.TestCase):
 
     def test_pay(self):
         self.payment.set_external(failed_paymenstub())
-        self.assertListEqual(self.payment.pay("user",Cart()),[])
+        self.assertListEqual(jsonpickle.decode(self.payment.pay("user",jsonpickle.encode(Cart()))),[])
