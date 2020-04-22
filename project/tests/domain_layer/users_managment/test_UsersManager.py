@@ -6,11 +6,13 @@ from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
 from project.domain_layer.users_managment.UsersManager import UsersManager
+from project.service_layer.Security import Security
 
 
 class TestUserManager(TestCase):
     def setUp(self) -> None:
         self.users_mng = UsersManager()
+        self.security = Security()
 
     def test_find_reg_user(self):
         reg_user1 = RegisteredUser("reg_user1")
@@ -44,7 +46,7 @@ class TestUserManager(TestCase):
         self.users_mng.reg_user_list.pop("lielle")
 
     def test_login(self):
-        self.users_mng.security.add_user("lielle", "noa")
+        self.security.add_user("lielle", "noa")
         user = User("guestUser800")
         self.users_mng.guest_user_list[user.username] = user
         reg_lielle = RegisteredUser("lielle")
