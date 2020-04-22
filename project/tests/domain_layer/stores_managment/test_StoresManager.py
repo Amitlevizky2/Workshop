@@ -1,5 +1,7 @@
 import unittest
 
+import jsonpickle
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
@@ -72,9 +74,11 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(index + 1, self.store_manager.stores_idx)
 
     def test_get_sales_history(self):
-        self.assertFalse(self.store_manager.get_sales_history(78, "the king", True))
-        self.assertEqual(self.store_manager.get_sales_history(0, "some owner", False)[0], "i'm no admin")
-        self.assertEqual(self.store_manager.get_sales_history(0, "some owner", True)[0], "hi,i'm a admin view purchase")
+        self.assertListEqual(jsonpickle.decode(self.store_manager.get_sales_history(78, "the king", True)), [])
+        self.assertEqual(jsonpickle.decode(self.store_manager.get_sales_history(0, "some owner", False))[0],
+                         "i'm no admin")
+        self.assertEqual(jsonpickle.decode(self.store_manager.get_sales_history(0, "some owner", True))[0],
+                         "hi,i'm a admin view purchase")
 
 
 if __name__ == '__main__':
