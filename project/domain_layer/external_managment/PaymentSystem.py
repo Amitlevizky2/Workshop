@@ -25,6 +25,8 @@ class PaymentSystem:
             for store in cart.baskets.keys():
                 res.append(Purchase(cart.baskets.get(store).products, user, store, self.p_id))
                 self.p_id += 1
+        else:
+            logger.error("Failed to complete payment")
         return res
 
     def cancel(self, purchases):

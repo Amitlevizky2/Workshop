@@ -32,5 +32,8 @@ class PurchaseManager:
                     self.store_manager.add_purchase_to_store(purchase.store_id, purchase)
                     self.user_manager.add_purchase(user, purchase)
                 self.user_manager.remove_cart(user)
+                return True
             else:
                 self.payment_system.cancel(purchases)
+
+        return False
