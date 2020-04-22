@@ -1,3 +1,6 @@
+from project import logger
+
+
 class ShipmentSystemInterface:
     def __init__(self):
         self.external = None
@@ -7,7 +10,9 @@ class ShipmentSystemInterface:
 
     def connect(self):
         if self.external is not None:
-            return self.external.connect()
+            if self.external.connect():
+                logger.error("Failed to connect to shipment system")
+                return True
         return False
 
     def ship(self):

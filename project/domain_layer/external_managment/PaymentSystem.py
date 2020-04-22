@@ -1,3 +1,4 @@
+from project import logger
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.users_managment.Cart import Cart
 
@@ -12,16 +13,19 @@ class PaymentSystem:
 
     def connect(self):
         if self.external_payment_system is not None:
-            return self.external_payment_system.connect()
+            if self.external_payment_system.connect():
+                return True
+            logger.error("Failed to connect to payment system")
         return False
 
-    def pay(self, user, cart: Cart) -> [Purchase]: 
+    def pay(self, user, cart: Cart) -> [Purchase]:
+        res = []
         if self.external_payment_system.pay(user, cart):
-            res = []
+
             for store in cart.baskets.keys():
                 res.append(Purchase(cart.baskets.get(store).products, user, store, self.p_id))
                 self.p_id += 1
-            return res
+        return res
 
-    def cancel(self,purchases):
+    def cancel(self, purchases):
         self.external_payment_system.cancel(purchases)
