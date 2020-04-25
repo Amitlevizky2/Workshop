@@ -9,10 +9,13 @@ class UsersManagerInterface:
 
     def __init__(self):
         self.user_manager = UsersManager()
+        username = self.user_manager.add_guest_user()
+        self.user_manager.register(username, "admin")
+        self.user_manager.admins.append("admin")
 
     def register(self, username, new_username, password):
         logger.log("user %s called register with new_username:%s", username, new_username)
-        if self.user_manager.register(username, new_username, password):
+        if self.user_manager.register(username, new_username):
             self.security.add_user(new_username, password)
             return True
         else:
@@ -22,7 +25,7 @@ class UsersManagerInterface:
     def login(self, username: str, login_username: str, password) -> bool:
         logger.log("user %s called login with login_username:%s", username, login_username)
         if self.security.verify_password(login_username, password):
-            return self.user_manager.login(username, login_username, password)
+            return self.user_manager.login(username, login_username)
         else:
             return False
 
