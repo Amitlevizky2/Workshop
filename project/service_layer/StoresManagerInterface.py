@@ -1,3 +1,5 @@
+import jsonpickle
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.stores_managment.Product import Product
@@ -45,7 +47,9 @@ class StoresManagerInterface:
             " product price:%d product categories:%s,key words:%s, amount:%d",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
 
-        if store_id in self.users_manager.get_managed_stores(user_name):
+        managed_stores = jsonpickle.decode(self.users_manager.get_managed_stores(user_name))
+
+        if store_id in managed_stores:
             return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
                                                             product_categories, key_words, amount)
         return False
@@ -76,6 +80,7 @@ class StoresManagerInterface:
                 owner) and store_id in self.users_manager.get_managed_stores(manager):
             return self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
         return False
+
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(

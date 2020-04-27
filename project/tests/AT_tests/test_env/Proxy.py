@@ -114,7 +114,7 @@ class Proxy:
             return True
 
     def get_purchase_history(self):
-        if self.real != None:
+        if self.real is not  None:
             return self.real.get_purchase_history()
         else:
             if not self.out:
@@ -135,10 +135,9 @@ class Proxy:
             return True
 
     def add_product(self, store_id, product, amount):
-        if self.real != None:
+        if self.real is not None:
             return self.real.add_product(store_id, product, amount)
         else:
-
             return True
 
     def buy(self):

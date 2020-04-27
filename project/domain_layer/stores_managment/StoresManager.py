@@ -44,8 +44,8 @@ class StoresManager:
             search_in_store = self.get_store(store_id).search(search_term, categories, key_words)
             if search_in_store is not None and len(search_in_store) > 0:
                 search_result[store_id] = search_in_store
-        jsonpickle.encode(search_result)
-        return search_result
+        serach_json = jsonpickle.encode(search_result)
+        return serach_json
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():

@@ -11,7 +11,7 @@ class TestCart(TestCase):
         # baskets = {store_id, basket}
         self.cart = Cart()
         date_str = '04-10-2020'
-        dt = timedelta(days=10)
+        dt = timedelta(days=100000)
         date_object = datetime.strptime(date_str, '%m-%d-%Y')
         self.product_orange = Product("orange", 2, "food", None, 100)
         self.product_orange.discount.append(Discount(date_object, date_object + dt, 50))

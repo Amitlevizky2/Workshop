@@ -1,3 +1,5 @@
+import jsonpickle
+
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.UsersManager import UsersManager
 from project import logger
@@ -45,7 +47,7 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
     def add_product(self, username, store_id, product, quantity):
-        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, product.name, quantity)
+        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, jsonpickle.decode(product).name, quantity)
         return self.user_manager.add_product(username, store_id, product, quantity)
 
     def remove_product(self, username, store_id, product, quantity):

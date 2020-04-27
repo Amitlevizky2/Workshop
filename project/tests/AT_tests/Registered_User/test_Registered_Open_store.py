@@ -16,7 +16,8 @@ class test_Open_store(unittest.TestCase):
 
     def test_open_happy(self):
         result1 = self.service.Open_store("apple")
-        self.assertIn(result1, self.service.get_managed_stores())
+        managed_stores = self.service.get_managed_stores()
+        self.assertIn(result1, managed_stores)
 
     def test_open_bad(self):
         self.service.logout()

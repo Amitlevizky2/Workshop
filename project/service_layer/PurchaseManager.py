@@ -1,3 +1,5 @@
+import jsonpickle
+
 from project.domain_layer.external_managment.PaymentSystem import PaymentSystem
 from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
@@ -24,16 +26,22 @@ class PurchaseManager:
         return self.payment_system.connect()
 
     def buy(self, user):
-        purchases = self.payment_system.pay(user, self.user_manager.view_cart(user))
+        purchases = jsonpickle.decode(self.payment_system.pay(user, self.user_manager.view_cart(user)))
         if len(purchases) > 0:
             if self.shipment_system.ship():
                 for purchase in purchases:
                     self.store_manager.buy(self.user_manager.view_cart(user))
-                    self.store_manager.add_purchase_to_store(purchase.store_id, purchase)
-                    self.user_manager.add_purchase(user, purchase)
+                    self.store_manager.add_purchase_to_store(int(purchase.store_id), jsonpickle.encode(purchase))
+                    self.user_manager.add_purchase(user, jsonpickle.encode(purchase))
                 self.user_manager.remove_cart(user)
                 return True
             else:
                 self.payment_system.cancel(purchases)
 
         return False
+
+    def pay(self, user, cart):
+        return True
+
+    def connect(self):
+        return True
