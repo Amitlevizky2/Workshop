@@ -17,7 +17,7 @@ class purchase_History(unittest.TestCase):
         # product = res_dec
         first_store_id = list(res_dec)[0]
         encoded_product = jsonpickle.encode(res_dec.get(first_store_id)[0])
-        self.service.add_product(int(first_store_id), encoded_product, 2)#TODO
+        self.service.add_product(first_store_id, encoded_product, 2)#TODO
         self.service.buy()
 
     def test_purchase_happy(self):
