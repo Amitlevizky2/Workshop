@@ -78,4 +78,4 @@ class Adapter:
 
 
     def add_new_store_manager(self, user, store_id):
-        return self.store_manager_interface.appoint_manager_to_store(store_id, self.username, user)
+        return self.store_manager_interface.appoint_manager_to_store(int(store_id), self.username, user)
