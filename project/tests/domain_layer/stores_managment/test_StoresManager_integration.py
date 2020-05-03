@@ -173,11 +173,11 @@ class test_StoresManager(unittest.TestCase):
     def test_add_discount_to_product(self):
         self.test_add_product_to_store()
         self.assertTrue(
-            self.store_manager.add_discount_to_product(self.idx - 1, self.products[-1][0], "moshe" + str(self.idx - 1),
+            self.store_manager.add_visible_discount_to_product(self.idx - 1, self.products[-1][0], "moshe" + str(self.idx - 1),
                                                        datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
                                                        10))
         self.assertFalse(
-            self.store_manager.add_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
+            self.store_manager.add_visible_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
                                                        datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
                                                        10))
 
