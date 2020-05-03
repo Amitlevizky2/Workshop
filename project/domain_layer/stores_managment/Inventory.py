@@ -32,7 +32,7 @@ class Inventory:
     def buy_product(self, product_name, amount):
         if product_name not in self.products.keys():
             return False
-        if amount > self.products.get(product_name).amount  or amount < 0:
+        if amount > self.products.get(product_name).amount or amount < 0:
             return False
         self.products.get(product_name).amount -= amount
         return True
@@ -48,6 +48,9 @@ class Inventory:
 
     def add_discount_to_product(self, product_name, discount):
         if product_name in self.products.keys():
-            self.products[product_name].discount.append(discount)
+            self.products[product_name].add_discount(discount)
             return True
         return False
+
+    def edit_product_discount(self, product_name, discount_id):
+        pass
