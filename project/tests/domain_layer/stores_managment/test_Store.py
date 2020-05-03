@@ -1,7 +1,8 @@
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.Product import Product, Discount
+from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.ProductDiscount import ProductDiscount, VisibleProductDiscount, ConditionalProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 import datetime
 
@@ -29,7 +30,8 @@ class TestStore(unittest.TestCase):
                                          "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
                                          "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
                                          "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
-        self.discount = Discount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
+        self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
+        self.new_discount = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10, [])
 
     def test_appoint_owner_one(self):
         # There is no such owner

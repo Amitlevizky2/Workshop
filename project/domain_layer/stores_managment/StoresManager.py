@@ -2,7 +2,8 @@ import logging
 from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.Product import Product, Discount
+from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.ProductDiscount import ProductDiscount, VisibleProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.stores_managment.NullStore import NullStore
@@ -134,7 +135,7 @@ class StoresManager:
         store = self.get_store(store_id)
 
         return store.add_discount_to_product(product_name, username,
-                                             Discount(start_date, end_date, percent))
+                                             VisibleProductDiscount(start_date, end_date, percent))
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)

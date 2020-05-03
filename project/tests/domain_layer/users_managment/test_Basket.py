@@ -1,7 +1,8 @@
 from datetime import timedelta, datetime
 from unittest import TestCase
 
-from project.domain_layer.stores_managment.Product import Product, Discount
+from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.ProductDiscount import ProductDiscount, VisibleProductDiscount
 from project.domain_layer.users_managment.Basket import Basket
 
 
@@ -13,13 +14,13 @@ class TestBasket(TestCase):
         dt = timedelta(days=10)
         date_object = datetime.strptime(date_str, '%m-%d-%Y')
         self.product_orange = Product("orange", 2, "food", None, 100)
-        self.product_orange.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_orange.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.product_apple = Product("apple", 2, "food", None, 100)
-        self.product_apple.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_apple.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.product_petunia = Product("petunia", 5, "food", None, 100)
-        self.product_petunia.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_petunia.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.product_begonia = Product("begonia", 15, "food", None, 100)
-        self.product_begonia.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_begonia.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
 
     def test_get_total(self):
         self.basket.products.clear()
