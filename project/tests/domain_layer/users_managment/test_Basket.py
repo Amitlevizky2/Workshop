@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from unittest import TestCase
 
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.ProductDiscount import ProductDiscount, VisibleProductDiscount
+from project.domain_layer.stores_managment.ProductDiscount import Discount, VisibleProductDiscount
 from project.domain_layer.users_managment.Basket import Basket
 
 

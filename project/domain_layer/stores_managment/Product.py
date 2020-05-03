@@ -16,11 +16,14 @@ class Product:
                self.key_words == other.key_words and \
                self.rate == other.rate
 
-    def get_price(self):
+    def get_price_after_discount(self):
         price_after_discount = self.price
         for discount in self.discount:
             price_after_discount = price_after_discount * discount.discount
         return price_after_discount
+
+    def get_price_before_discount(self):
+        return self.price
 
     def add_discount(self, discount):
         self.discount.append(discount)

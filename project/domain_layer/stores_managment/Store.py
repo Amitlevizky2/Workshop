@@ -11,6 +11,7 @@ class Store:
         self.inventory = Inventory()
         self.sale_policy = None
         self.discount_policy = None
+        self.store_discounts = []
         self.store_owners = [store_owner]
         self.store_managers = {}  # {manager_name:functions}
         self.sales = []
@@ -280,6 +281,10 @@ class Store:
     def edit_discount(self, product_name, permitted_username, discount_id):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "edit_product_discount")):
             return self.inventory.edit_product_discount(product_name, discount_id)
+
+    def add_store_discount(self, permitted_username, discount):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_store_discount")):
+            self.store_discounts.append(discount)
 
     def is_owner(self, username):
         if username in self.store_owners:

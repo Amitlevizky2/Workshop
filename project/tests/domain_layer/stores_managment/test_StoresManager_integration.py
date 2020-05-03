@@ -2,9 +2,8 @@ import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.ProductDiscount import ProductDiscount, VisibleProductDiscount
+from project.domain_layer.stores_managment.ProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
