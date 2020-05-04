@@ -2,6 +2,7 @@ import logging
 from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Conditions import ProductCondition
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Discount import VisibleProductDiscount, ConditionalProductDiscount
 from project.domain_layer.stores_managment.Store import Store
@@ -136,10 +137,11 @@ class StoresManager:
         return store.add_visible_discount_to_product(product_name, username,
                                                      VisibleProductDiscount(start_date, end_date, percent))
 
-    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, conditions):
+    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, amount_to_apply):
         store = self.get_store(store_id)
-        return store.add_visible_discount_to_product(product_name, username,
-                                                     ConditionalProductDiscount(start_date, end_date, percent, conditions))
+        condition = ProductCondition(amount_to_apply, percent)
+        return store.add_conditional_discount_to_product(product_name, username,
+                                                     ConditionalProductDiscount(start_date, end_date, percent, condition))
 
     def edit_visible_discount_to_product(self, store_id, product_name, username, discount_id, start_date, end_date, percent):
         store = self.get_store(store_id)

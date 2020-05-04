@@ -106,8 +106,8 @@ class StoresManagerInterface:
     def add_visible_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
         return self.stores_manager.add_visible_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
 
-    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, conditions):
-        return self.stores_manager.add_conditional_discount_to_product(store_id, product_name, username, start_date, end_date, percent, conditions)
+    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, amount_to_apply):
+        return self.stores_manager.add_conditional_discount_to_product(store_id, product_name, username, start_date, end_date, percent, amount_to_apply)
 
     def edit_visible_discount(self, store_id, product_name, username, discount_id, start_date=None, end_date=None, percent=None):
         self.stores_manager.edit_visible_discount_to_product(store_id, product_name, username, discount_id, start_date, end_date,
