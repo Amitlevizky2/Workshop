@@ -275,16 +275,34 @@ class Store:
 
     def add_discount_to_product(self, product_name, permitted_username,  discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_discount_to_product")):
-            return self.inventory.add_discount_to_product(product_name, discount)
+            return self.inventory.add_visible_discount_to_product(product_name, discount)
         return False
 
-    def edit_discount(self, product_name, permitted_username, discount_id):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "edit_product_discount")):
-            return self.inventory.edit_product_discount(product_name, discount_id)
+    def add_visible_discount_to_product(self, product_name, permitted_username, discount):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_visible_discount_to_product")):
+            return self.inventory.add_visible_discount_to_product(product_name, discount)
+        return False
 
-    def add_store_discount(self, permitted_username, discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_store_discount")):
-            self.store_discounts.append(discount)
+    def add_conditional_discount_to_product(self, product_name, permitted_username, discount):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_discount_to_product")):
+            return self.inventory.add_conditional_discount_to_product(product_name, discount)
+        return False
+
+    def edit_visible_discount(self, product_name, permitted_username, discount_id, start_date=None,
+                              end_date=None, percent=None):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username,
+                                                                      getattr(Store, "edit_product_discount")):
+            return self.inventory.edit_visible_product_discount(product_name, discount_id, start_date, end_date,
+                                                                percent)
+        return False
+
+    def edit_conditional_discount(self, product_name, permitted_username, discount_id, start_date, end_date,
+                                  percent, condition):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username,
+                                                                      getattr(Store, "edit_product_discount")):
+            return self.inventory.edit_conditional_product_discount(product_name, discount_id, start_date,
+                                                                    end_date, percent, condition)
+        return False
 
     def is_owner(self, username):
         if username in self.store_owners:

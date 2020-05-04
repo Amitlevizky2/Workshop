@@ -9,8 +9,9 @@ class Basket:
     def get_total(self):
         total = 0
         for product in self.products.values():
-            total += product[0].get_price_after_discount() * (product[1])
+            total += product[0].get_price_after_discount(product[1])
         self.total = total
+
         return self.total
 
     # check += ???????

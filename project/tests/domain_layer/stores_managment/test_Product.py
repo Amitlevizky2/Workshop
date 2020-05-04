@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.ProductDiscount import VisibleProductDiscount
+from project.domain_layer.stores_managment.Discount import VisibleProductDiscount
 
 
 class test_Product(unittest.TestCase):
@@ -11,5 +11,5 @@ class test_Product(unittest.TestCase):
         dt = timedelta(days=10)
         date_object = datetime.strptime(date_str, '%m-%d-%Y')
         self.product = Product("apple", 2, "food", None, 1)
-        self.product.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
-        self.assertEqual(1, self.product.get_price_after_discount())
+        self.product.visible_discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
+        self.assertEqual(1, self.product.get_price_after_discount(1))

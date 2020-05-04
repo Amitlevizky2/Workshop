@@ -23,7 +23,7 @@ class Inventory:
     def update_product(self, product_name, attribute, updated):
         if product_name in self.products.keys():
             if attribute == "discount":
-                self.products.get(product_name).discount.append(updated)
+                self.products.get(product_name).visible_discount.append(updated)
             else:
                 setattr(self.products.get(product_name), attribute, updated)
             return True
@@ -46,11 +46,22 @@ class Inventory:
             return True
         return False
 
-    def add_discount_to_product(self, product_name, discount):
+    def add_visible_discount_to_product(self, product_name, discount):
         if product_name in self.products.keys():
-            self.products[product_name].add_discount(discount)
+            self.products[product_name].add_visible_discount(discount)
             return True
         return False
 
-    def edit_product_discount(self, product_name, discount_id):
-        pass
+    def add_conditional_discount_to_product(self, product_name, discount):
+        if product_name in self.products.keys():
+            self.products[product_name].add_conditional_product_discount(discount)
+            return True
+        return False
+
+    def edit_visible_product_discount(self, product_name, discount_id, start_date, end_date, percent):
+        if product_name in self.products.keys():
+            self.products[product_name].edit_visible_discount(discount_id, start_date, end_date, percent)
+
+    def edit_conditional_product_discount(self, product_name, discount_id, start_date, end_date, percent, condition):
+        if product_name in self.products.keys():
+            self.products[product_name].edit_conditional_product_discount(discount_id, start_date, end_date, percent, condition)

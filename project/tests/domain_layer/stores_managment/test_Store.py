@@ -2,7 +2,7 @@ import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.ProductDiscount import VisibleProductDiscount, ConditionalProductDiscount
+from project.domain_layer.stores_managment.Discount import VisibleProductDiscount, ConditionalProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 import datetime
 
@@ -14,7 +14,7 @@ class TestStore(unittest.TestCase):
                                      "Amit": [Store.add_product],
                                      "Hadar": [],
                                      "Lielle": [Store.remove_product],
-                                     "Noa": [Store.add_discount_to_product],
+                                     "Noa": [Store.add_visible_discount_to_product],
                                      "Evgeny": [Store.update_product]}
 
         self.standard_users = ["Avishay",
@@ -270,11 +270,11 @@ class TestStore(unittest.TestCase):
         self.assertTrue(self.store.remove_product("Banana", "Lielle"))
 
     def test_add_discount_to_product(self):
-        self.assertTrue(self.store.add_discount_to_product("Banana", "test owner", self.discount))
-        self.assertTrue(self.store.add_discount_to_product("Banana", "test owner", self.discount))
-        self.assertFalse(self.store.add_discount_to_product("Banana", "Lielle", self.discount))
-        self.assertTrue(self.store.add_discount_to_product("Banana", "Noa", self.discount))
-        self.assertFalse(self.store.add_discount_to_product("not real product", "test owner", self.discount))
+        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
+        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
+        self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.discount))
+        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.discount))
+        self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.discount))
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
             self.store.appoint_owner(users[i], users[i + 1])

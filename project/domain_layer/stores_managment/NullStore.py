@@ -45,5 +45,5 @@ class NullStore(Store):
         return False
 
 
-    def add_discount_to_product(self, product_name, username, discount):
+    def add_visible_discount_to_product(self, product_name, username, discount):
         return False

@@ -76,6 +76,7 @@ class StoresManagerInterface:
                 owner) and store_id in self.users_manager.get_managed_stores(manager):
             return self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
         return False
+
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(
@@ -102,8 +103,19 @@ class StoresManagerInterface:
     def remove_product(self, store_id, product_name, username):
         return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
 
-    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+    def add_visible_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+        return self.stores_manager.add_visible_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+
+    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, conditions):
+        return self.stores_manager.add_conditional_discount_to_product(store_id, product_name, username, start_date, end_date, percent, conditions)
+
+    def edit_visible_discount(self, store_id, product_name, username, discount_id, start_date=None, end_date=None, percent=None):
+        self.stores_manager.edit_visible_discount_to_product(store_id, product_name, username, discount_id, start_date, end_date,
+                                                            percent)
+
+    def edit_conditional_discount(self, store_id, product_name, username, discount_id, start_date=None, end_date=None, percent=None, conditions=None):
+        self.stores_manager.edit_conditional_discount_to_product(store_id, product_name, username, discount_id, start_date, end_date,
+                                                            percent, conditions)
 
     def update_product(self, store_id, username, product_name, attribute, updated):
         return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)

@@ -3,7 +3,7 @@ from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.ProductDiscount import VisibleProductDiscount, ConditionalProductDiscount
+from project.domain_layer.stores_managment.Discount import VisibleProductDiscount, ConditionalProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.stores_managment.NullStore import NullStore
@@ -133,13 +133,22 @@ class StoresManager:
 
     def add_visible_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
         store = self.get_store(store_id)
-        return store.add_discount_to_product(product_name, username,
-                                             VisibleProductDiscount(start_date, end_date, percent))
+        return store.add_visible_discount_to_product(product_name, username,
+                                                     VisibleProductDiscount(start_date, end_date, percent))
 
     def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, conditions):
         store = self.get_store(store_id)
-        return store.add_discount_to_product(product_name, username,
-                                             ConditionalProductDiscount(start_date, end_date, percent, conditions))
+        return store.add_visible_discount_to_product(product_name, username,
+                                                     ConditionalProductDiscount(start_date, end_date, percent, conditions))
+
+    def edit_visible_discount_to_product(self, store_id, product_name, username, discount_id, start_date, end_date, percent):
+        store = self.get_store(store_id)
+        return store.edit_visible_discount(product_name, username, discount_id, start_date, end_date, percent)
+
+    def edit_conditional_discount_to_product(self, store_id, product_name, discount_id, username, start_date, end_date, percent,
+                                             conditions):
+        store = self.get_store(store_id)
+        return store.edit_conditional_discount(product_name, username, discount_id, start_date, end_date, percent, conditions)
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
@@ -148,3 +157,6 @@ class StoresManager:
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
         return store.remove_owner(owner, to_remove)
+
+
+
