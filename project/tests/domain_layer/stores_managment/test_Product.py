@@ -2,7 +2,9 @@ import unittest
 from datetime import datetime, timedelta
 
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount
+from project.domain_layer.stores_managment.Conditions import ProductCondition
+from project.domain_layer.stores_managment.Discount import Discount, VisibleProductDiscount, ConditionalProductDiscount
+
 
 
 class test_Product(unittest.TestCase):
@@ -13,3 +15,26 @@ class test_Product(unittest.TestCase):
         self.product = Product("apple", 2, "food", None, 1)
         self.product.visible_discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.assertEqual(1, self.product.get_price_after_discount(1))
+
+    def test_product_condition_discount(self):
+        date_str = '04-10-2020'
+        dt = timedelta(days=10000)
+        date_object = datetime.strptime(date_str, '%m-%d-%Y')
+        self.product = Product("apple", 100, "food", None, 10)
+        discount_con = ProductCondition(2, 50)
+        self.product.conditional_product_discount.append(ConditionalProductDiscount(date_object, date_object+dt, 50,discount_con ))
+        self.assertNotEqual(self.product.get_price_before_discount(),self.product.get_price_after_discount(10))
+        self.assertEqual(self.product.get_price_after_discount(10), 750)
+
+    def test_product_both_discounts(self):
+        date_str = '04-10-2020'
+        dt = timedelta(days=10000)
+        date_object = datetime.strptime(date_str, '%m-%d-%Y')
+        self.product = Product("apple", 100, "food", None, 10)
+        discount_con = ProductCondition(2, 50)
+        self.product.visible_discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
+        self.product.conditional_product_discount.append(ConditionalProductDiscount(date_object, date_object+dt, 50,discount_con ))
+        self.assertNotEqual(self.product.get_price_before_discount(),self.product.get_price_after_discount(10))
+        self.assertEqual(self.product.get_price_after_discount(10), 375)
+
+

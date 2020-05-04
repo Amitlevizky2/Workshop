@@ -269,12 +269,19 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.remove_product("Banana", "Ron"))
         self.assertTrue(self.store.remove_product("Banana", "Lielle"))
 
-    def test_add_discount_to_product(self):
+    def test_add_visible_discount_to_product(self):
         self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
         self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
         self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.discount))
         self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.discount))
         self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.discount))
+
+    def test_add_visible_discount_to_product(self):
+        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.new_discount))
+        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.new_discount))
+        self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.new_discount))
+        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.new_discount))
+        self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.new_discount))
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
