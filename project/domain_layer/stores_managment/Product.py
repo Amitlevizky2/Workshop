@@ -26,7 +26,7 @@ class Product:
         price_after_conditional_product_discount = price_after_visible_discount
 
         for discount in self.conditional_product_discount:
-            price_after_conditional_product_discount = discount.commit_discount(price_after_conditional_product_discount, amount_to_buy)
+            price_after_conditional_product_discount -= discount.commit_discount(price_after_discount, amount_to_buy)
 
         return price_after_conditional_product_discount
 

@@ -65,8 +65,8 @@ class ConditionalProductDiscount(Discount):
         self.discount_condition = discount_condition
 
     def commit_discount(self, original_price, amount):
-        num_prods_to_red = int(amount / self.discount_condition[1])
-        return original_price - num_prods_to_red*(1-self.discount)
+        num_prods_to_red = int(amount / self.discount_condition.amount_to_apply)
+        return num_prods_to_red*((1-self.discount_condition.percent)*original_price)
 
     def edit_discount(self, start_date=None, end_date=None, percent=None, discount_condition=None):
         if start_date is not None and end_date is not None:
