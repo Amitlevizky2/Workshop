@@ -50,20 +50,23 @@ class test_StoresManager(unittest.TestCase):
     def test_search(self):
         self.test_add_product_to_store()
         # regular search
-        self.assertIn(self.idx - 1, self.store_manager.search("iphone").keys())
+        iphone_search = jsonpickle.decode(self.store_manager.search("iphone")).keys()
+        self.assertIn(str(self.idx - 1), iphone_search)
 
         # by category
-        self.assertIn(self.idx - 2, self.store_manager.search("", categories=["food"]).keys())
-        self.assertIn(self.idx - 3, self.store_manager.search("", categories=["food"]).keys())
+        food_search = jsonpickle.decode(self.store_manager.search("", categories=["food"])).keys()
+        self.assertIn(str(self.idx - 2), food_search)
+        self.assertIn(str(self.idx - 3), food_search)
 
         # by key words
-
-        self.assertIn(self.idx - 1, self.store_manager.search("", key_words=["fruits"]).keys())
-        self.assertIn(self.idx - 2, self.store_manager.search("", key_words=["fruits"]).keys())
-        self.assertNotIn(self.idx - 3, self.store_manager.search("", key_words=["fruits"]).keys())
+        fruits_search = jsonpickle.decode(self.store_manager.search("", key_words=["fruits"])).keys()
+        self.assertIn(str(self.idx - 1), fruits_search)
+        self.assertIn(str(self.idx - 2), fruits_search)
+        self.assertNotIn(str(self.idx - 3), fruits_search)
 
         # search for non - existing product
-        self.assertTrue(len(self.store_manager.search("not real product")) == 0)
+        not_real = jsonpickle.decode(self.store_manager.search("not real product"))
+        self.assertTrue(len(not_real) == 0)
 
     def test_add_product_to_store(self):
         # check when store does not exit

@@ -49,8 +49,10 @@ class test_StoresManager(unittest.TestCase):
                                                   20))
 
     def test_search(self):
-        self.assertEqual(len(self.store_manager.search("Banana")), 5)
-        self.assertEqual(len(self.store_manager.search(categories=["fruit"])), 4)
+        banana_search = jsonpickle.decode(self.store_manager.search("Banana"))
+        self.assertEqual(len(banana_search), 5)
+        fruit_search = jsonpickle.decode(self.store_manager.search(categories=["fruit"]))
+        self.assertEqual(len(fruit_search), 4)
 
     def test_get_store(self):
         self.assertTrue(isinstance(self.store_manager.get_store(7), NullStore))

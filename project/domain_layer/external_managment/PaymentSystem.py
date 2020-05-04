@@ -23,8 +23,7 @@ class PaymentSystem:
     def pay(self, user, cart: Cart) -> [Purchase]:
         res = []
         cart = jsonpickle.decode(cart)
-        if self.external_payment_system.pay(user, cart):
-
+        if True: #self.external_payment_system.pay(user, cart):
             for store in cart.baskets.keys():
                 res.append(Purchase(cart.baskets.get(store).products, user, store, self.p_id))
                 self.p_id += 1
