@@ -2,6 +2,7 @@ from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Inventory import Inventory
 from project.domain_layer.stores_managment.Product import Product
 from project import logger
+from project.domain_layer.users_managment import Basket
 
 
 class Store:
@@ -10,8 +11,7 @@ class Store:
         self.name = name
         self.inventory = Inventory()
         self.sale_policy = None
-        self.discount_policy = None
-        self.store_discounts = []
+        self.discounts = {}  # {discount_id: Discount}
         self.store_owners = [store_owner]
         self.store_managers = {}  # {manager_name:functions}
         self.sales = []
@@ -308,4 +308,16 @@ class Store:
         if username in self.store_owners:
             return True
         return False
+
+    def calculate_basket_price(self, basket: Basket):
+        product_price_dict = {}
+        for product in basket.products.values():
+            product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price)  #{product_name, (amount, updated_price)}
+
+        for discount in self.discounts.values():
+            discount.commit_discount(product_price_dict)
+
+        return product_price_dict  # {product_name, (Product, amount, updated_price)}
+
+
 

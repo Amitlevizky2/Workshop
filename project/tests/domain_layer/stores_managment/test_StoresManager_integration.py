@@ -2,8 +2,8 @@ import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
@@ -14,13 +14,40 @@ class test_StoresManager(unittest.TestCase):
     def setUp(self) -> None:
         self.store_manager = StoresManager()
         self.idx = 0
+        self.store_id = self.store_manager.open_store("test store", "test owner")
         self.products = [
             ("t-shirt", 20, ["cloth"], ["green"], 7),
             ("apple", 1, ["food", "green"], ["vegetable"], 10),
             ("orange", 1, ["food", "orange"], ["fruits"], 10),
             ("iphone", 5000, ["electronics", "bad and expensive phone "], ["fruits"], 10)
         ]
+
+        self.store_manager.get_store(self.store_id).inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 10),
+                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
+                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
+                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
+                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10),
+                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10),
+                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
+                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
+                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+
         self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
+        self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 30)
+
+        self.store_manager.get_store(self.store_id).discounts[self.discount.id] = self.discount
+        self.store_manager.get_store(self.store_id).discounts[self.discount1.id] = self.discount1
+
+        self.discount.products_in_discount["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
+        self.discount.products_in_discount["Tomato"] = self.store_manager.get_store(self.store_id).inventory.products["Tomato"]
+        self.discount1.products_in_discount["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
+        self.discount.products_in_discount["Carrot"] = self.store_manager.get_store(self.store_id).inventory.products["Carrot"]
+        self.discount.products_in_discount["Keyboard"] = self.store_manager.get_store(self.store_id).inventory.products["Keyboard"]
+
+        self.basket = Basket(self.store_manager.get_store(self.store_id).store_id)
+        self.basket.products["Apple"] = (self.store_manager.get_store(self.store_id).inventory.products["Apple"], 10)
+        self.basket.products["Keyboard"] = (self.store_manager.get_store(self.store_id).inventory.products["Keyboard"], 5)
+        self.basket.products["Carrot"] = (self.store_manager.get_store(self.store_id).inventory.products["Carrot"], 1)
 
     def test_update_product(self):
         self.test_add_product_to_store()
@@ -180,6 +207,11 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_visible_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
                                                        datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
                                                        10))
+
+    def test_calculate_basket_price(self):
+        store = self.store_manager.get_store(self.store_id)
+        view_cart_dict = self.store_manager.calculate_basket_price(self.basket)
+        x = 5
 
 if __name__ == '__main__':
     unittest.main()

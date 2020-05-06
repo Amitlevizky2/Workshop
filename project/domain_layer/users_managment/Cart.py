@@ -30,6 +30,10 @@ class Cart:
     def view(self):
         return self.baskets
 
+    # def get_total_cart(self):
+    #     for basket in self.baskets:
+
+
     def remove_product(self, store_id, product, quantity):
         basket = self.get_basket(store_id)
         if basket is not None:

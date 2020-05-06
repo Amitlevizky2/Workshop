@@ -3,9 +3,11 @@ from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Conditions import ProductCondition
+from project.domain_layer.stores_managment.Discounts.ConditionalProductDiscount import ConditionalProductDiscount
+from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount, ConditionalProductDiscount
 from project.domain_layer.stores_managment.Store import Store
+from project.domain_layer.users_managment import Basket
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.stores_managment.NullStore import NullStore
 
@@ -159,6 +161,10 @@ class StoresManager:
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
         return store.remove_owner(owner, to_remove)
+
+    def calculate_basket_price(self, basket: Basket):
+        store = self.get_store(basket.store_id)
+        return store.calculate_basket_price(basket)
 
 
 

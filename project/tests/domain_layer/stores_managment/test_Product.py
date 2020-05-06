@@ -1,8 +1,9 @@
 import unittest
 from datetime import datetime, timedelta
 
+from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount
+
 
 
 class test_Product(unittest.TestCase):

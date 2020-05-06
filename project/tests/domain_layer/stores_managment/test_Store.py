@@ -1,10 +1,14 @@
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Discounts.ConditionalProductDiscount import ConditionalProductDiscount
+from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount, ConditionalProductDiscount
+
 from project.domain_layer.stores_managment.Store import Store
 import datetime
+
+from project.domain_layer.users_managment.Basket import Basket
 
 
 class TestStore(unittest.TestCase):
@@ -30,8 +34,24 @@ class TestStore(unittest.TestCase):
                                          "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
                                          "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
                                          "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+
         self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
-        self.new_discount = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10, [])
+        self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 30)
+        self.discount2 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 20, 2, 2)
+
+        self.store.discounts[self.discount.id] = self.discount
+        self.store.discounts[self.discount1.id] = self.discount1
+
+        self.discount.products_in_discount["Apple"] = self.store.inventory.products["Apple"]
+        self.discount.products_in_discount["Tomato"] = self.store.inventory.products["Tomato"]
+        self.discount1.products_in_discount["Apple"] = self.store.inventory.products["Apple"]
+        self.discount.products_in_discount["Carrot"] = self.store.inventory.products["Carrot"]
+        self.discount.products_in_discount["Keyboard"] = self.store.inventory.products["Keyboard"]
+
+        self.basket = Basket(self.store.store_id)
+        self.basket.products["Apple"] = (self.store.inventory.products["Apple"], 10)
+        self.basket.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 5)
+        self.basket.products["Carrot"] = (self.store.inventory.products["Carrot"], 1)
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -275,6 +295,10 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.discount))
         self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.discount))
         self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.discount))
+
+    def test_basket_discount(self):
+        view_cart_dict = self.store.calculate_basket_price(self.basket)
+        x = 5
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
