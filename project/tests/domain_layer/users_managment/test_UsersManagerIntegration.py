@@ -3,7 +3,7 @@ import datetime
 from unittest import TestCase
 
 
-from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket

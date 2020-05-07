@@ -2,10 +2,16 @@ import logging
 from project import logger
 
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment import Discount
 from project.domain_layer.stores_managment.Conditions import ProductCondition
-from project.domain_layer.stores_managment.Discounts.ConditionalProductDiscount import ConditionalProductDiscount
-from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import CompositeDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import ConditionalProductDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalStoreDiscount import ConditionalStoreDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
+from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.PurchasesPolicies import PurchasePolicy
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseCompositePolicy import PurchaseCompositePolicy
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import Basket
 from project.domain_layer.users_managment.Cart import Cart
@@ -134,25 +140,63 @@ class StoresManager:
             return store.remove_product(product_name, username)
         return False
 
-    def add_visible_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+    def add_visible_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int):
         store = self.get_store(store_id)
-        return store.add_visible_discount_to_product(product_name, username,
+        return store.add_visible_discount_to_product(username,
                                                      VisibleProductDiscount(start_date, end_date, percent))
 
-    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, amount_to_apply):
+    def add_conditional_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int, min_amount: int, num_prods_to_apply: int):
         store = self.get_store(store_id)
-        condition = ProductCondition(amount_to_apply, percent)
-        return store.add_conditional_discount_to_product(product_name, username,
-                                                     ConditionalProductDiscount(start_date, end_date, percent, condition))
+        return store.add_conditional_discount_to_product(username,
+                                                     ConditionalProductDiscount(start_date, end_date, percent, min_amount, num_prods_to_apply))
 
-    def edit_visible_discount_to_product(self, store_id, product_name, username, discount_id, start_date, end_date, percent):
+    def add_conditional_discount_to_store(self, store_id: int, username: str, start_date, end_date, percent: int, min_price: int):
         store = self.get_store(store_id)
-        return store.edit_visible_discount(product_name, username, discount_id, start_date, end_date, percent)
+        return store.add_conditional_discount_to_store(username,
+                                                       ConditionalStoreDiscount(start_date, end_date, percent, min_price))
 
-    def edit_conditional_discount_to_product(self, store_id, product_name, discount_id, username, start_date, end_date, percent,
-                                             conditions):
+    def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
-        return store.edit_conditional_discount(product_name, username, discount_id, start_date, end_date, percent, conditions)
+        return store.add_product_to_discount(permitted_user, discount_id, product_name)
+
+    def remove_product_from_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
+        store = self.get_store(store_id)
+        return store.remove_product_from_discount(permitted_user, discount_id, product_name)
+
+    def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator: LogicOperator, discounts_products_dict: dict, discounts_to_apply_id: list):
+        store = self.get_store(store_id)
+        tup_list = []
+        discounts_to_apply_list = []
+
+        for discount_id in discounts_products_dict.keys():
+            if discount_id not in store.discounts.keys():
+                return False
+            discount: Discount = store.discounts[discount_id]
+            products_to_check_list = discounts_products_dict[discount_id]
+            tup_list.append((discount, products_to_check_list))
+
+        for discount_id in discounts_to_apply_id:
+            if discount_id not in store.discounts.keys():
+                return False
+            discount = store.discounts[discount_id]
+            discounts_to_apply_list.append(discount)
+
+        return store.add_composite_discount(username,
+                                                       CompositeDiscount(start_date, end_date, logic_operator, tup_list, discounts_to_apply_list))
+
+    def edit_visible_discount_to_product(self, store_id: int, username:str, discount_id:int, start_date, end_date, percent: int):
+        store = self.get_store(store_id)
+        return store.edit_visible_discount(username, discount_id, start_date, end_date, percent)
+
+    def edit_conditional_discount_to_product(self, store_id: int, discount_id: int, username: str, start_date, end_date, percent: int,
+                                             min_amount: int, nums_to_apply: int):
+        store = self.get_store(store_id)
+        return store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_amount, nums_to_apply)
+
+    def edit_conditional_discount_to_store(self, store_id: int, discount_id: int, username: str, start_date, end_date, percent: int,
+                                             min_price: int):
+        store = self.get_store(store_id)
+        return store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_price)
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
@@ -166,5 +210,38 @@ class StoresManager:
         store = self.get_store(basket.store_id)
         return store.calculate_basket_price(basket)
 
+    def add_purchase_store_policy(self, store_id: int, permitted_user: str, min_amount_products: int, max_amount_products: int):
+        store = self.get_store(store_id)
+        return store.add_purchase_store_policy(permitted_user, min_amount_products, max_amount_products)
 
+    def add_purchase_product_policy(self, store_id: int, permitted_user: str, min_amount_products: int, max_amount_products: int):
+        store = self.get_store(store_id)
+        return store.add_purchase_product_policy(permitted_user, min_amount_products, max_amount_products)
 
+    def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id, logic_operator: LogicOperator):
+        store = self.get_store(store_id)
+        policies = []
+
+        for purch_policy_id in purchase_policies_id:
+            if purch_policy_id not in store.purchase_policies.keys():
+                return False
+            policy: PurchasePolicy = store.purchase_policies[purch_policy_id]
+            policies.append(policy)
+
+        return store.add_purchase_composite_policy(permitted_user, policies, logic_operator)
+
+    def add_policy_to_purchase_composite_policy(self, store_id: int, permitted_user: str, composite_id:int, policy_id: int):
+        store = self.get_store(store_id)
+        return store.add_policy_to_purchase_composite_policy(permitted_user, composite_id ,policy_id)
+
+    def add_product_to_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
+        store = self.get_store(store_id)
+        return store.add_product_to_purchase_product_policy(policy_id, permitted_user, product_name)
+
+    def remove_purchase_policy(self, store_id: int, permitted_user: str, policy_id):
+        store = self.get_store(store_id)
+        return store.remove_product_from_purchase_product_policy(policy_id, permitted_user)
+
+    def remove_product_from_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
+        store = self.get_store(store_id)
+        return store.remove_product_from_purchase_product_policy(policy_id, permitted_user, product_name)

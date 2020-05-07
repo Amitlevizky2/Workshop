@@ -1,0 +1,66 @@
+import datetime
+from datetime import datetime
+from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
+from project.domain_layer.stores_managment.Product import Product
+
+
+class ConditionalStoreDiscount(Discount):
+    def __init__(self, start_date, end_date, percent, min_price):
+        super().__init__(start_date, end_date, percent)
+        # self.products_in_discount = {}  # {product_name: bool}
+        self.min_price = min_price
+
+    def commit_discount(self, product_price_dict: dict):
+        total_basket_price = self.basket_total_price(product_price_dict)
+        if self.start < datetime.today() < self.end and total_basket_price >= self.min_price:
+            to_add_discount = "Store Discount" + str(self.id)
+            price = self.calculate_conditional_discount(total_basket_price)
+            discount_as_product = Product(to_add_discount, (-price), "none", "none", 1)
+            new_product_tup = (discount_as_product, 1,
+                               price, price)
+
+            product_price_dict[to_add_discount] = new_product_tup
+            x = 5
+
+    def get_product_object(self, product):
+        return product[0]
+
+    def get_product_amount(self, product):
+        return product[1]
+
+    def get_product_updated_price(self, product):
+        new_price = product[2] - self.calculate_conditional_discount()
+        return new_price
+
+    def calculate_conditional_discount(self, total_basket_price):
+        return total_basket_price * self.discount
+
+    #  {product_name, (Product, amount, updated_price, original_price)}
+    def basket_total_price(self, product_price_dict: dict):
+        total_amount = 0
+        for product_tup in product_price_dict.values():
+            total_amount += self.get_product_amount(product_tup) * self.get_product_object(product_tup).original_price
+        return total_amount
+
+    def edit_discount(self, start_date, end_date, percent, min_price):
+        is_edited = False
+        if start_date is not None and end_date is not None:
+            if start_date > end_date:
+                return False
+        if start_date is not None and start_date > datetime.today():
+            self.start = start_date
+            is_edited = True
+        if end_date is not None and end_date > self.start and end_date > datetime.today():
+            self.end = end_date
+            is_edited = True
+        if percent is not None and 0 < percent < 100:
+            self.discount = percent / 100
+            is_edited = True
+        if min_price is not None and 0 < min_price:
+            self.min_price = min_price
+            is_edited = True
+
+        return is_edited
+
+    def is_in_discount(self, product_name: str, product_price_dict: dict):
+        return self.basket_total_price(product_price_dict) > self.min_price and self.start < datetime.today() < self.end

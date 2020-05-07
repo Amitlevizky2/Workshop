@@ -2,7 +2,7 @@ import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.Discounts.VisibleProductDiscount import VisibleProductDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager

@@ -1,6 +1,6 @@
 import datetime
 
-from project.domain_layer.stores_managment.Discounts.DiscountPolicy import Discount
+from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 
 
 class ConditionalDiscount(Discount):
@@ -14,8 +14,7 @@ class ConditionalDiscount(Discount):
     def is_approved(self, original_price, amount):
         pass
 
-    def undu_discount(self):
-        pass
+
 
     def edit_discount(self):
         pass
