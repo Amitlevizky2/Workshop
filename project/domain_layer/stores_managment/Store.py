@@ -468,7 +468,7 @@ class Store:
         is_approved = True
         description = ""
         for policy in self.purchase_policies.values():
-            p_approved, outcome = policy.is_approved(basket)
+            p_approved, outcome = policy.is_approved(basket.products)
             if not p_approved:
                 description += outcome
                 is_approved = False
