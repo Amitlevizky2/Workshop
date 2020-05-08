@@ -77,5 +77,6 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(self.store_manager.get_sales_history(0, "some owner", True)[0], "hi,i'm a admin view purchase")
 
 
+
 if __name__ == '__main__':
     unittest.main()
