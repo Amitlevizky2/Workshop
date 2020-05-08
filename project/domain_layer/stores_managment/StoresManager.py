@@ -164,7 +164,7 @@ class StoresManager:
         return store.remove_product_from_discount(permitted_user, discount_id, product_name)
 
     def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator: LogicOperator, discounts_products_dict: dict, discounts_to_apply_id: list):
-        store = self.get_store(store_id)
+        store = self.get_store(store_id)  #                                                                                {dicount_id, [product_names]}
         tup_list = []
         discounts_to_apply_list = []
 
@@ -173,7 +173,7 @@ class StoresManager:
                 return False
             discount: Discount = store.discounts[discount_id]
             products_to_check_list = discounts_products_dict[discount_id]
-            tup_list.append((discount, products_to_check_list))
+            tup_list.append((discount, products_to_check_list))  # (Discount, (products_names))
 
         for discount_id in discounts_to_apply_id:
             if discount_id not in store.discounts.keys():
@@ -277,7 +277,8 @@ class StoresManager:
         baskets = cart.baskets
         cart_price = 0
         cart_discription_dict = {}
-        for basket in baskets:
+
+        for basket in baskets.values():
             updated_dict_basket = self.get_updated_basket(basket)
             cart_price += self.get_total_basket_price(updated_dict_basket.values())
             cart_discription_dict[basket.store_id] = (self.get_basket_description(updated_dict_basket.values()))
