@@ -36,8 +36,8 @@ class test_StoresManager(unittest.TestCase):
         self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
         self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 30)
 
-        self.purchase_store = PurchaseStorePolicy(0,10,0)
-        self.purchase_store1 = PurchaseStorePolicy(9, 10, 1)
+        self.purchase_store = PurchaseStorePolicy(0,10,2)
+        self.purchase_store1 = PurchaseStorePolicy(9, 10, 3)
 
         self.purchase = PurchaseProductPolicy(0,5,0)
         self.purchase1 = PurchaseProductPolicy(3,6,1)
