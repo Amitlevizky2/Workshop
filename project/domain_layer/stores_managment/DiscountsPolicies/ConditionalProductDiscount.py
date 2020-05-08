@@ -94,10 +94,13 @@ class ConditionalProductDiscount(Discount):
         return False
 
     def is_in_discount(self, product_name: str, product_price_dict: dict):
-        is_valid = self.is_product_in_conditions(product_price_dict[product_name])
-        return product_name in self.products_in_discount and \
-               product_name in product_price_dict.keys() and \
-               is_valid
+        if product_name in product_price_dict.keys():
+            is_valid = self.is_product_in_conditions(product_price_dict[product_name])
+            return product_name in self.products_in_discount and \
+                   is_valid
+        else:
+            return False
+
 
     def get_discount_type(self):
         return self.discount_type
