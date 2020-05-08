@@ -52,3 +52,4 @@ class Cart:
 
     def clear_cart(self):
         self.baskets = {}
+

@@ -7,9 +7,10 @@ class PurchaseProductPolicy(PurchasePolicy):
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
         self.id = id
-        self.products_int_policy = {}  # {product_name, bool}
+        self.products_in_policy = {}  # {product_name, bool}
         self.MAX_SIZE = 100000
         self.MIN_SIZE = 0
+        self.purchase_type = "Purchase Product Policy"
 
     def is_approved(self, product_price_dict: dict):    # {product_name, (Product, amount, updated_price, original)}
         outcome_description = ""
@@ -45,11 +46,19 @@ class PurchaseProductPolicy(PurchasePolicy):
         return desc
 
     def add_product(self, product_name: str):
-        self.products_int_policy[product_name] = True
+        self.products_in_policy[product_name] = True
         return True
 
     def remove_product(self, product_name):
-        if product_name in self.products_int_policy.keys():
-            del self.products_int_policy[product_name]
+        if product_name in self.products_in_policy.keys():
+            del self.products_in_policy[product_name]
             return True
         return False
+
+    def get_type(self):
+        return self.purchase_type
+
+    def get_products_in_policy(self):
+        return self.products_in_policy.keys()
+
+

@@ -8,6 +8,7 @@ class PurchaseCompositePolicy(PurchasePolicy):
         self.logic_operator = logic_operator
         self.purchase_policies = purchase_policies
         self.id = id
+        self.purchase_type = "Purchase Composite Policy"
 
     def is_approved(self, product_price_dict: dict):
         outcome_description = ""
@@ -85,3 +86,6 @@ class PurchaseCompositePolicy(PurchasePolicy):
 
             outcome_description = outcome_description + temp_description
         return is_approved, outcome_description
+
+    def get_type(self):
+        return self.purchase_type

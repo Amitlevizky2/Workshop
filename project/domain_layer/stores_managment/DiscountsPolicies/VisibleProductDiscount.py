@@ -6,6 +6,7 @@ from datetime import date, datetime
 class VisibleProductDiscount(Discount):
     def __init__(self, start_date, end_date, percent):
         super().__init__(start_date, end_date, percent)
+        self.discount_type = "Visible Discount"
         # self.products_in_discount = {}  # {product_name: bool}
 
     def commit_discount(self, product_price_dict: dict):  # {product_name, (Product, amount, updated_price, original)}
@@ -57,3 +58,6 @@ class VisibleProductDiscount(Discount):
     def is_in_discount(self, product_name: str, product_price_dict: dict):
         return product_name in self.products_in_discount and \
                product_name in product_price_dict.keys()
+
+    def get_discount_type(self):
+        return self.discount_type

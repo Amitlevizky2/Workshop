@@ -283,25 +283,33 @@ class Store:
 
     def add_visible_discount_to_product(self, permitted_username, discount: Discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_visible_discount_to_product")):
-            self.discounts[discount.id] = discount
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
             return True
         return False
 
     def add_conditional_discount_to_product(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_product")):
-            self.discounts[discount.id] = discount
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
             return True
         return False
 
     def add_conditional_discount_to_store(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_store")):
-            self.discounts[discount.id] = discount
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
             return True
         return False
 
     def add_composite_discount(self, permitted_username: str, discount: Discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_composite_discount")):
-            self.discounts[discount.id] = discount
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
             return True
         return False
 
@@ -334,7 +342,7 @@ class Store:
             return True
         return False
 
-    def calculate_basket_price(self, basket: Basket):
+    def get_updated_basket(self, basket: Basket):
         product_price_dict = {}
         for product in basket.products.values():
             product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price)  #{product_name, (amount, updated_price)}
@@ -432,13 +440,47 @@ class Store:
             return False, "User dont have permission\n"
 
         self.purchase_policies[policy_id].add_product(product_name)
+        return True, "Policy has been added"
 
     def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
         if policy_id not in self.purchase_policies.keys():
-            return False
-        if not self.check_permission(permitted_user,getattr(Store,"remove_product_from_purchase_product_policy")):
-            return False
+            return False, "policy is not exist for this store\n"
+        if not self.check_permission(permitted_user,getattr(Store, "remove_product_from_purchase_product_policy")):
+            return False, "User dont have permission\n"
         self.purchase_policies[policy_id].remove_product(product_name)
+        return True, "Policy removed\n"
+
+    def get_discounts(self):
+        return self.discounts
+
+    def get_discount_by_id(self, discount_id):
+        if discount_id in self.discounts.keys():
+            return self.discounts[discount_id]
+
+    def get_purchase_policies(self):
+        return self.purchase_policies
+
+    def get_purchase_policy_by_id(self, purchase_policy_id: int):
+        if purchase_policy_id in self.purchase_policies.keys():
+            return self.purchase_policies[purchase_policy_id]
+
+    def check_basket_validity(self, basket: Basket):
+        is_approved = True
+        description = ""
+        for policy in self.purchase_policies.values():
+            p_approved, outcome = policy.is_approved(basket)
+            if not p_approved:
+                description += outcome
+                is_approved = False
+
+        return is_approved, description
+
+
+
+
+
+
+
 
 
 

@@ -9,6 +9,7 @@ class ConditionalStoreDiscount(Discount):
         super().__init__(start_date, end_date, percent)
         # self.products_in_discount = {}  # {product_name: bool}
         self.min_price = min_price
+        self.discount_type = "Conditional Store Discount"
 
     def commit_discount(self, product_price_dict: dict):
         total_basket_price = self.basket_total_price(product_price_dict)
@@ -64,3 +65,6 @@ class ConditionalStoreDiscount(Discount):
 
     def is_in_discount(self, product_name: str, product_price_dict: dict):
         return self.basket_total_price(product_price_dict) > self.min_price and self.start < datetime.today() < self.end
+
+    def get_discount_type(self):
+        return self.discount_type

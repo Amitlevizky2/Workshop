@@ -206,10 +206,6 @@ class StoresManager:
         store = self.get_store(store_id)
         return store.remove_owner(owner, to_remove)
 
-    def calculate_basket_price(self, basket: Basket):
-        store = self.get_store(basket.store_id)
-        return store.calculate_basket_price(basket)
-
     def add_purchase_store_policy(self, store_id: int, permitted_user: str, min_amount_products: int, max_amount_products: int):
         store = self.get_store(store_id)
         return store.add_purchase_store_policy(permitted_user, min_amount_products, max_amount_products)
@@ -245,3 +241,54 @@ class StoresManager:
     def remove_product_from_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
         store = self.get_store(store_id)
         return store.remove_product_from_purchase_product_policy(policy_id, permitted_user, product_name)
+
+    def get_discounts(self, store_id):
+        store = self.get_store(store_id)
+        return store.get_discounts()
+
+    def get_discount_details(self, store_id: int, discount_id: int):
+        store = self.get_store(store_id)
+        return store.get_discount_by_id(discount_id)
+
+    def get_purchases_policies(self, store_id):
+        store = self.get_store(store_id)
+        return store.get_purchase_policies()
+
+    def get_purchase_by_id(self, store_id: int, purchase_policy_id: int):
+        store = self.get_store(store_id)
+        return store.get_purchase_policy_by_id(purchase_policy_id)
+
+    def check_basket_validity(self, cart: Cart):
+        baskets = cart.baskets
+
+        is_approved = True
+        description = ""
+
+        for basket in baskets:
+            store = self.get_store(basket.store_id)
+            p_approved, outcome = store.check_basket_validity(basket)
+            if not p_approved:
+                description += outcome
+                is_approved = False
+
+        return is_approved, description
+
+    def calculate_cart_price(self, cart: Cart):
+        baskets = cart.baskets
+        cart_price = 0
+        for basket in baskets:
+            updated_dict_basket = self.get_updated_basket(basket)
+            cart_price += self.get_total_basket_price(updated_dict_basket.values())
+
+        return cart_price
+
+    def get_updated_basket(self, basket: Basket):
+        store = self.get_store(basket.store_id)
+        return store.get_updated_basket(basket)  # {product_name, (Product, amount, updated_price)}
+
+    def get_total_basket_price(self, updated_basket_dict):
+        price = 0
+        for product_tup in updated_basket_dict:
+            price += product_tup[2]
+        return price
+

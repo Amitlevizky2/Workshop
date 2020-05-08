@@ -7,9 +7,10 @@ class PurchaseStorePolicy(PurchasePolicy):
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
         self.id = id
-        self.products_int_policy = {}  # {product_name, bool}
+        # self.products_int_policy = {}  # {product_name, bool}
         self.MAX_SIZE = 100000
         self.MIN_SIZE = 0
+        self.purchase_type = "Purchase Store Policy"
 
     def is_approved(self, product_price_dict: dict):
         outcome_description = ""
@@ -31,7 +32,10 @@ class PurchaseStorePolicy(PurchasePolicy):
             max_string = "no max limit"
         else:
             max_string = str(self.max_amount_products)
-        desc = "You have {} products in your basket and you can only buy minimum {} and maximum {} products in this store\n".format\
-            (str_basket_size, min_string, max_string)
+        desc = "You have {} products in your basket and you can only buy minimum {} and maximum {} products in this store\n".\
+            format(str_basket_size, min_string, max_string)
         return desc
+
+    def get_type(self):
+        return self.purchase_type
 

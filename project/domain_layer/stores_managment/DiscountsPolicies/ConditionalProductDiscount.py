@@ -10,6 +10,7 @@ class ConditionalProductDiscount(Discount):
         self.min_amount = min_amount
         self.num_prods_to_apply = num_prods_to_apply
         # self.products_in_discount = {}  # {product: bool}
+        self.discount_type = "Conditional Product Discount"
 
     def commit_discount(self, product_price_dict: dict):
         if self.start < datetime.today() < self.end:
@@ -97,4 +98,7 @@ class ConditionalProductDiscount(Discount):
         return product_name in self.products_in_discount and \
                product_name in product_price_dict.keys() and \
                is_valid
+
+    def get_discount_type(self):
+        return self.discount_type
 

@@ -10,6 +10,7 @@ class CompositeDiscount(Discount):                                    #[(Discoun
         self.logic_operator = logic_operator
         # self.products_in_discount = {}  # {product: bool}
         self.cond_prod_tup_list = cond_prod_tup_list
+        self.discount_type = "Composite Discount"
 
     def commit_discount(self, product_price_dict: dict):
         if self.start < datetime.today() < self.end:
@@ -62,4 +63,7 @@ class CompositeDiscount(Discount):                                    #[(Discoun
 
     def edit_discount(self):
         pass
+
+    def get_discount_type(self):
+        return self.discount_type
 
