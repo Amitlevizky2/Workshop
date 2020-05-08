@@ -273,22 +273,31 @@ class StoresManager:
 
         return is_approved, description
 
-    def calculate_cart_price(self, cart: Cart):
+    def get_cart_description(self, cart: Cart):
         baskets = cart.baskets
         cart_price = 0
+        cart_discription_dict = {}
         for basket in baskets:
             updated_dict_basket = self.get_updated_basket(basket)
             cart_price += self.get_total_basket_price(updated_dict_basket.values())
+            cart_discription_dict[basket.store_id] = (self.get_basket_description(updated_dict_basket.values()))
 
-        return cart_price
+        return cart_price, cart_discription_dict
 
     def get_updated_basket(self, basket: Basket):
         store = self.get_store(basket.store_id)
-        return store.get_updated_basket(basket)  # {product_name, (Product, amount, updated_price)}
+        return store.get_updated_basket(basket)  # {product_name, (Product, amount, updated_price, policy)}
 
     def get_total_basket_price(self, updated_basket_dict):
         price = 0
         for product_tup in updated_basket_dict:
             price += product_tup[2]
         return price
+
+    def get_basket_description(self, product_tup_list):
+        basket_dict = {}
+        for product_tup in product_tup_list:
+            basket_dict[product_tup[0].name] = [product_tup[1], product_tup[2], product_tup[3]]
+        return basket_dict
+
 

@@ -350,7 +350,7 @@ class Store:
         for discount in self.discounts.values():
             discount.commit_discount(product_price_dict)
 
-        return product_price_dict  # {product_name, (Product, amount, updated_price)}
+        return product_price_dict  # {product_name, (Product, amount, updated_price, original_price)}
 
     def add_product_to_discount(self, permitted_user: str, discount_id: int, product_name: str):
         is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user,
