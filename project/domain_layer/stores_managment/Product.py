@@ -1,7 +1,6 @@
 class Product:
     def __init__(self, name, price, categories, key_words, amount):
         self.name = name
-        self.price_after_discounts = price
         self.original_price = price
         self.categories = categories
         self.key_words = key_words
