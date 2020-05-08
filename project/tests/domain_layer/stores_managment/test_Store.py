@@ -297,7 +297,7 @@ class TestStore(unittest.TestCase):
         # Just checking that the product is not exist
         self.assertNotIn("Macbook", self.store.inventory.products)
         # Amitush, you have the permission to add product, use it!
-        self.assertTrue(self.store.add_product("Amit", p.name, p.price, p.categories, p.key_words, p.amount))
+        self.assertTrue(self.store.add_product("Amit", p.name, p.original_price, p.categories, p.key_words, p.amount))
         # Let's see if you did it well
         self.assertIn("Macbook", self.store.inventory.products)
 
@@ -353,7 +353,7 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.remove_product("Banana", "Ron"))
         self.assertTrue(self.store.remove_product("Banana", "Lielle"))
 
-    def test_add_discount_to_product(self):
+    def test_add_visible_discount_to_product(self):
         self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
         self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
         self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.discount))
@@ -361,21 +361,21 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.discount))
 
     def test_basket_discount(self):
-        view_cart_dict = self.store.calculate_basket_price(self.basket)
+        view_cart_dict = self.store.get_updated_basket(self.basket)
         x = 5
 
     def test_basket_conditional_discount(self):
         self.basket2 = Basket(self.store.store_id)
         self.basket2.products["Orange"] = (self.store.inventory.products["Orange"], 4)
-        cart2 = self.store.calculate_basket_price(self.basket2)
+        cart2 = self.store.get_updated_basket(self.basket2)
         self.assertEqual(72, cart2["Orange"][2])
 
     def test_basket_and_Composite_discount(self):
-        view_cart_dict = self.store.calculate_basket_price(self.basket1)
+        view_cart_dict = self.store.get_updated_basket(self.basket1)
         x=5
 
     def test_basket_or_Composite_discount(self):
-        view_cart_dict = self.store.calculate_basket_price(self.basket1)
+        view_cart_dict = self.store.get_updated_basket(self.basket1)
         x=5
 
     def test_basket_xor_Composite_discount(self):

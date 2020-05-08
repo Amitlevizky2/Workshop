@@ -264,9 +264,9 @@ class test_StoresManager(unittest.TestCase):
         self.assertTrue(legal)
         self.assertFalse(ilegal)
         self.assertFalse(some_legal)
-        #self.assertEqual(2, self.basket_legal_pruchace.products.__len__())
-        # self.assertEqual(0,self.basket_ilegal_pruchace.products.__len__())
-        # self.assertEqual(1,self.basket_some_legal_pruchace.products.__len__())
+        self.assertEqual(2, self.basket_legal_pruchace.products.__len__())
+        self.assertEqual(0,self.basket_ilegal_pruchace.products.__len__())
+        self.assertEqual(1,self.basket_some_legal_pruchace.products.__len__())
 
     def test_purchase_policy_store(self):
         some_legal = True
@@ -290,6 +290,7 @@ class test_StoresManager(unittest.TestCase):
         self.assertTrue(legal)
         self.assertFalse(ilegal)
         self.assertFalse(some_legal)
+
 
 if __name__ == '__main__':
     unittest.main()
