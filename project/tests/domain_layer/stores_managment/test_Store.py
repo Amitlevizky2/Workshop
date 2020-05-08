@@ -20,7 +20,7 @@ class TestStore(unittest.TestCase):
                                      "Amit": [Store.add_product],
                                      "Hadar": [],
                                      "Lielle": [Store.remove_product],
-                                     "Noa": [Store.add_visible_discount_to_product],
+                                     "Noa": [Store.add_visible_product_discount],
                                      "Evgeny": [Store.update_product]}
 
         self.standard_users = ["Avishay",
@@ -48,7 +48,7 @@ class TestStore(unittest.TestCase):
 
         self.tup_disc_prod_name_list = []
         self.tup_disc_prod_name_list.append((self.discount3, ["Apple", "Carrot", "Keyboard"]))
-        self.tup_disc_prod_name_list.append((self.discount4, ["Apple", "Orange"]))
+        self.tup_disc_prod_name_list.append((self.discount4, ["Apple", "Carrot"]))
         self.tup_disc_prod_name_list.append((self.discount5, ["Tomato"]))
 
         self.discount9 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 30)
@@ -66,9 +66,9 @@ class TestStore(unittest.TestCase):
         self.store.discounts[2] = self.discount2
         self.store.discounts[3] = self.discount3
         self.store.discounts[4] = self.discount4
-        # self.store.discounts[5] = self.discount5
-        # self.store.discounts[6] = self.discount6
-        # self.store.discounts[7] = self.discount7
+        self.store.discounts[5] = self.discount5
+        self.store.discounts[6] = self.discount6
+        self.store.discounts[7] = self.discount7
         self.store.discounts[8] = self.discount8
 
 
@@ -100,6 +100,8 @@ class TestStore(unittest.TestCase):
         self.basket.products["Apple"] = (self.store.inventory.products["Apple"], 10)
         self.basket.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 5)
         self.basket.products["Carrot"] = (self.store.inventory.products["Carrot"], 1)
+        self.basket.products["Orange"] = (self.store.inventory.products["Orange"],3)
+        self.basket.products["Tomato"] = (self.store.inventory.products["Tomato"],3)
 
         self.basket1 = Basket(self.store.store_id)
         self.basket1.products["Apple"] = (self.store.inventory.products["Apple"], 10)
@@ -353,12 +355,6 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.remove_product("Banana", "Ron"))
         self.assertTrue(self.store.remove_product("Banana", "Lielle"))
 
-    def test_add_visible_discount_to_product(self):
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
-        self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.discount))
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.discount))
-        self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.discount))
 
     def test_basket_discount(self):
         view_cart_dict = self.store.get_updated_basket(self.basket)

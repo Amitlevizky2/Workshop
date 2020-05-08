@@ -281,13 +281,15 @@ class Store:
             return self.inventory.remove_product(product_name)
         return False
 
-    def add_visible_discount_to_product(self, permitted_username, discount: Discount):
+    def add_visible_product_discount(self, permitted_username, discount: Discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_visible_discount_to_product")):
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             return True
         return False
+
+
 
     def add_conditional_discount_to_product(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_product")):
