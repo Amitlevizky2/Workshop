@@ -52,8 +52,8 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.get_store(self.store_id).discounts[self.discount1.id] = self.discount1
 
 
-        self.purchase.products_int_policy["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
-        self.purchase1.products_int_policy["Iphone"] = self.store_manager.get_store(self.store_id).inventory.products["Iphone"]
+        self.purchase.products_in_policy["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
+        self.purchase1.products_in_policy["Iphone"] = self.store_manager.get_store(self.store_id).inventory.products["Iphone"]
 
         self.discount.products_in_discount["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
         self.discount.products_in_discount["Tomato"] = self.store_manager.get_store(self.store_id).inventory.products["Tomato"]
