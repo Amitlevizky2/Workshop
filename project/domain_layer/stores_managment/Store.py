@@ -433,6 +433,14 @@ class Store:
 
         self.purchase_policies[policy_id].add_product(product_name)
 
+    def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
+        if policy_id not in self.purchase_policies.keys():
+            return False
+        if not self.check_permission(permitted_user,getattr(Store,"remove_product_from_purchase_product_policy")):
+            return False
+        self.purchase_policies[policy_id].remove_product(product_name)
+
+
 
 
 
