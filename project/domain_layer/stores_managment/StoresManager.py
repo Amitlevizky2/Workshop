@@ -61,7 +61,10 @@ class StoresManager:
 
             return self.stores.get(store_id)
         else:
-            logger.error("%d store id doesn't exist", store_id)
+            if store_id is None:
+                logger.error("store is none")
+            else:
+                logger.error("%d store id doesn't exist", store_id)
             return NullStore()
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
@@ -128,7 +131,8 @@ class StoresManager:
         return True
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
-        return self.get_store(store_id).get_sales_history(user, is_admin)
+        result = self.get_store(store_id).get_sales_history(user, is_admin)
+        return result
 
     def get_store_products(self, store_id):
         return self.get_store(store_id).get_store_products()
@@ -140,9 +144,9 @@ class StoresManager:
             return store.remove_product(product_name, username)
         return False
 
-    def add_visible_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int):
+    def add_visible_product_discount(self, store_id: int, username: str, start_date, end_date, percent: int):
         store = self.get_store(store_id)
-        return store.add_visible_discount_to_product(username,
+        return store.add_visible_product_discount(username,
                                                      VisibleProductDiscount(start_date, end_date, percent))
 
     def add_conditional_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int, min_amount: int, num_prods_to_apply: int):
@@ -215,20 +219,23 @@ class StoresManager:
         return store.add_purchase_product_policy(permitted_user, min_amount_products, max_amount_products)
 
     def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id, logic_operator: LogicOperator):
+        if purchase_policies_id is None or logic_operator is None:
+            return False, "The parameters are not valid"
+
         store = self.get_store(store_id)
         policies = []
 
         for purch_policy_id in purchase_policies_id:
             if purch_policy_id not in store.purchase_policies.keys():
-                return False
+                return False, "Wrong policy id was inserted \n"
             policy: PurchasePolicy = store.purchase_policies[purch_policy_id]
             policies.append(policy)
 
         return store.add_purchase_composite_policy(permitted_user, policies, logic_operator)
 
-    def add_policy_to_purchase_composite_policy(self, store_id: int, permitted_user: str, composite_id:int, policy_id: int):
+    def add_policy_to_purchase_composite_policy(self, store_id: int, permitted_user: str, composite_id: int, policy_id: int):
         store = self.get_store(store_id)
-        return store.add_policy_to_purchase_composite_policy(permitted_user, composite_id ,policy_id)
+        return store.add_policy_to_purchase_composite_policy(permitted_user, composite_id, policy_id)
 
     def add_product_to_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
         store = self.get_store(store_id)
@@ -236,7 +243,7 @@ class StoresManager:
 
     def remove_purchase_policy(self, store_id: int, permitted_user: str, policy_id):
         store = self.get_store(store_id)
-        return store.remove_product_from_purchase_product_policy(policy_id, permitted_user)
+        return store.remove_purchase_policy(policy_id, permitted_user)
 
     def remove_product_from_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
         store = self.get_store(store_id)
@@ -258,15 +265,17 @@ class StoresManager:
         store = self.get_store(store_id)
         return store.get_purchase_policy_by_id(purchase_policy_id)
 
-    def check_basket_validity(self, cart: Cart):
+    def check_cart_validity(self, cart: Cart):
         baskets = cart.baskets
 
         is_approved = True
         description = ""
 
-        for basket in baskets:
+        for basket in baskets.values():
             store = self.get_store(basket.store_id)
+            description += "\n" + store.name + "\n"
             p_approved, outcome = store.check_basket_validity(basket)
+
             if not p_approved:
                 description += outcome
                 is_approved = False
@@ -280,7 +289,7 @@ class StoresManager:
 
         for basket in baskets.values():
             updated_dict_basket = self.get_updated_basket(basket)
-            cart_price += self.get_total_basket_price(updated_dict_basket.values())
+            cart_price += self.get_total_basket_price(updated_dict_basket)
             cart_discription_dict[basket.store_id] = (self.get_basket_description(updated_dict_basket.values()))
 
         return cart_price, cart_discription_dict
@@ -290,9 +299,9 @@ class StoresManager:
         return store.get_updated_basket(basket)  # {product_name, (Product, amount, updated_price, policy)}
 
     def get_total_basket_price(self, updated_basket_dict):
-        price = 0
-        for product_tup in updated_basket_dict:
-            price += product_tup[2]
+        price = 0.0
+        for product in updated_basket_dict.values():
+            price += float(product[2])
         return price
 
     def get_basket_description(self, product_tup_list):

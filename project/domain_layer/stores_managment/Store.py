@@ -248,6 +248,7 @@ class Store:
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, getattr(Store, "get_sales_history")) or is_admin:
             return self.sales
+        return False
 
     def update_product(self, user, product_name, attribute, updated):
         if self.check_permission(user, getattr(Store, "update_product")):
@@ -347,7 +348,7 @@ class Store:
     def get_updated_basket(self, basket: Basket):
         product_price_dict = {}
         for product in basket.products.values():
-            product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price)  #{product_name, (amount, updated_price)}
+            product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price * product[1])  #{product_name, (amount, updated_price)}
 
         for discount in self.discounts.values():
             discount.commit_discount(product_price_dict)
@@ -381,7 +382,7 @@ class Store:
         if min_amount_products is None and max_amount_products is None:
             return False, "The parameters are not valid"
         if not self.check_permission(permitted_user, getattr(Store, "add_purchase_store_policy")):
-            return False, "User dont have permission\n"
+            return False, "User dont have permission \n"
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
@@ -397,9 +398,9 @@ class Store:
         MIN_SIZE = 0
 
         if min_amount_products is None and max_amount_products is None:
-            return False, "The parameters are not valid"
+            return False, "The parameters are not valid \n"
         if not self.check_permission(permitted_user, getattr(Store, "add_purchase_product_policy")):
-            return False, "User dont have permission\n"
+            return False, "User dont have permission \n"
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
@@ -411,15 +412,16 @@ class Store:
         return True, "Policy as been added"
 
     def add_purchase_composite_policy(self, permitted_user: str, policies: list, logic_operator: LogicOperator):
-        if policies is None or logic_operator is None:
-            return False, "The parameters are not valid"
 
         if not self.check_permission(permitted_user, getattr(Store, "add_purchase_composite_policy")):
             return False, "User dont have permission\n"
 
         self.purchases_idx += 1
 
-        policy = PurchaseCompositePolicy(policies, self.purchases_idx)
+        for policy in policies:
+            del self.purchase_policies[policy.id]
+
+        policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx)
         self.purchase_policies[self.purchases_idx] = policy
 
         return True, "Policy as been added"
@@ -442,15 +444,18 @@ class Store:
             return False, "User dont have permission\n"
 
         self.purchase_policies[policy_id].add_product(product_name)
-        return True, "Policy has been added"
+        return True, "Product has been added to policy"
 
     def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
+        if policy_id is None:
+            return False, "No such policy \n"
+
         if policy_id not in self.purchase_policies.keys():
             return False, "policy is not exist for this store\n"
         if not self.check_permission(permitted_user,getattr(Store, "remove_product_from_purchase_product_policy")):
             return False, "User dont have permission\n"
         self.purchase_policies[policy_id].remove_product(product_name)
-        return True, "Policy removed\n"
+        return True, product_name + " has been removed from policy \n"
 
     def get_discounts(self):
         return self.discounts
@@ -463,8 +468,16 @@ class Store:
         return self.purchase_policies
 
     def get_purchase_policy_by_id(self, purchase_policy_id: int):
+        if purchase_policy_id is None:
+            return False, "No such policy \n"
+
+        if purchase_policy_id not in self.purchase_policies.keys():
+            return False, "No such policy \n"
+
         if purchase_policy_id in self.purchase_policies.keys():
             return self.purchase_policies[purchase_policy_id]
+
+
 
     def check_basket_validity(self, basket: Basket):
         is_approved = True
@@ -477,6 +490,15 @@ class Store:
 
         return is_approved, description
 
+    def remove_purchase_policy(self, policy_id, permitted_user):
+        if policy_id is None or permitted_user is None:
+            return False, "The parameters are not valid \n"
+
+        if policy_id not in self.purchase_policies.keys():
+            return False, "No such policy in this store \n"
+
+        del self.purchase_policies[policy_id]
+        return True, "Policy has been removed \n"
 
 
 

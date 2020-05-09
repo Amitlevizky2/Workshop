@@ -38,11 +38,11 @@ class PurchaseCompositePolicy(PurchasePolicy):
             p_is_approved, temp_desc = purchase_policy.is_approved(product_price_dict)
 
             if p_is_approved:
-                outcome_description = outcome_description + " " + str(
-                    purchase_policy.id) + " Policy approved\n"
+                outcome_description = outcome_description + "Policy " + str(
+                    purchase_policy.id) + " approved\n"
             else:
-                outcome_description = outcome_description + " " + str(
-                    purchase_policy.id) + " Policy not approved\n"
+                outcome_description = outcome_description + "Policy " + str(
+                    purchase_policy.id) + " not approved\n"
 
             is_approved = is_approved and p_is_approved
             outcome_description = outcome_description + temp_desc
