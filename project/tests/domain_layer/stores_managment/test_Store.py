@@ -427,8 +427,7 @@ class TestStore(unittest.TestCase):
         view_cart_dict = self.store.get_updated_basket(self.basket)
         self.assertEqual(60, view_cart_dict["Orange"][2])
 
-    def test_add_purchase_store_policy(self):
-        pass
+
 
 
 
