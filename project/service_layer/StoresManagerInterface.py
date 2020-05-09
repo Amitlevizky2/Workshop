@@ -116,29 +116,35 @@ class StoresManagerInterface:
     def remove_owner(self, store_id, owner, to_remove):
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
 
-    def add_purchase_store_policy(self, store_id: int = None, permitted_user: str = None, min_amount_products: int = None, max_amount_products: int = None):
+    def add_purchase_store_policy(self, store_id: int = None, permitted_user: str = None,
+                                  min_amount_products: int = None, max_amount_products: int = None):
         return self.stores_manager.add_purchase_store_policy(store_id, permitted_user, min_amount_products, max_amount_products)
 
-    def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None, min_amount_products: int = None,
+    def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None,
+                                    min_amount_products: int = None,
                                     max_amount_products: int = None):
         return self.stores_manager.add_purchase_product_policy(store_id, permitted_user, min_amount_products, max_amount_products)
 
-    def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None, purchase_policies_id = None,
+    def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
+                                      purchase_policies_id = None,
                                       logic_operator: LogicOperator = None):
         return self.add_purchase_composite_policy(store_id, permitted_user, purchase_policies_id, logic_operator)
 
-    def add_policy_to_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None, composite_id: int = None,
+    def add_policy_to_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
+                                                composite_id: int = None,
                                                 policy_id: int = None):
         return self.stores_manager.add_policy_to_purchase_composite_policy(store_id, permitted_user, composite_id, policy_id)
 
-    def add_product_to_purchase_product_policy(self, store_id: int = None, policy_id: int = None, permitted_user: str = None,
+    def add_product_to_purchase_product_policy(self, store_id: int = None, policy_id: int = None,
+                                               permitted_user: str = None,
                                                product_name: str = None):
         return self.stores_manager.add_product_to_purchase_product_policy(store_id, policy_id, permitted_user, product_name)
 
     def remove_purchase_policy(self, store_id: int = None, permitted_user: str = None, policy_id: int = None):
         return self.stores_manager.remove_purchase_policy(store_id, permitted_user, policy_id)
 
-    def remove_product_from_purchase_product_policy(self, store_id: int = None, policy_id: int = None, permitted_user: str = None,
+    def remove_product_from_purchase_product_policy(self, store_id: int = None, policy_id: int = None,
+                                                    permitted_user: str = None,
                                                     product_name: str = None):
         return self.stores_manager.remove_product_from_purchase_product_policy(store_id, policy_id, permitted_user, product_name)
 
@@ -160,29 +166,36 @@ class StoresManagerInterface:
     def get_updated_basket(self, basket = None):
         return self.stores_manager.get_updated_basket(basket)
 
-    def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date = None, end_date = None, percent: int = None):
+    def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
+                                        end_date = None, percent: int = None):
         return self.stores_manager.add_visible_product_discount(store_id, username, start_date, end_date, percent)
 
-    def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date = None, end_date = None, percent: int = None,
+    def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
+                                            end_date = None, percent: int = None,
                                             min_amount: int = None, num_prods_to_apply: int = None):
         return self.stores_manager.add_conditional_discount_to_product(store_id, username, start_date, end_date, percent, min_amount, num_prods_to_apply)
 
-    def add_conditional_discount_to_store(self, store_id: int = None, username: str = None, start_date = None, end_date = None, percent: int = None,
+    def add_conditional_discount_to_store(self, store_id: int = None, username: str = None, start_date = None,
+                                          end_date = None, percent: int = None,
                                           min_price: int = None):
         return self.stores_manager.add_conditional_discount_to_store(store_id, username, start_date, end_date, percent, min_price)
 
-    def add_product_to_discount(self, store_id: int = None, permitted_user: str = None, discount_id: int = None, product_name: str = None):
+    def add_product_to_discount(self, store_id: int = None, permitted_user: str = None, discount_id: int = None,
+                                product_name: str = None):
         return self.stores_manager.add_product_to_discount(store_id, permitted_user, discount_id, product_name)
 
-    def remove_product_from_discount(self, store_id: int = None, permitted_user: str = None, discount_id: int = None, product_name: str = None):
+    def remove_product_from_discount(self, store_id: int = None, permitted_user: str = None,
+                                     discount_id: int = None, product_name: str = None):
         return self.stores_manager.remove_product_from_discount(store_id, permitted_user, discount_id, product_name)
 
-    def add_composite_discount(self, store_id: int = None, username: str = None, start_date = None, end_date = None, logic_operator: LogicOperator = None,
+    def add_composite_discount(self, store_id: int = None, username: str = None, start_date = None,
+                               end_date = None, logic_operator: LogicOperator = None,
                                discounts_products_dict: dict = None, discounts_to_apply_id: list = None):  # discounts_products_dict = {discount_id, [products_names]}
         return self.stores_manager.add_composite_discount(store_id, username, start_date, end_date, logic_operator,
                                                           discounts_products_dict, discounts_to_apply_id)
 
-    def edit_visible_discount_to_product(self, store_id: int = None, username: str = None, discount_id: int = None, start_date = None, end_date = None,
+    def edit_visible_discount_to_product(self, store_id: int = None, username: str = None,
+                                         discount_id: int = None, start_date = None, end_date = None,
                                          percent: int = None):
         return self.stores_manager.edit_visible_discount_to_product(store_id, username, discount_id, start_date, end_date, percent)
 
