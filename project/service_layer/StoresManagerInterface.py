@@ -1,4 +1,5 @@
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
@@ -128,3 +129,50 @@ class StoresManagerInterface:
 
     def remove_owner(self, store_id, owner, to_remove):
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
+
+    def add_purchase_store_policy(self, store_id: int = None, permitted_user: str = None, min_amount_products: int = None, max_amount_products: int = None):
+        return self.stores_manager.add_purchase_store_policy(store_id, permitted_user, min_amount_products, max_amount_products)
+
+    def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None, min_amount_products: int = None,
+                                    max_amount_products: int = None):
+        return self.stores_manager.add_purchase_product_policy(store_id, permitted_user, min_amount_products, max_amount_products)
+
+    def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None, purchase_policies_id = None,
+                                      logic_operator: LogicOperator = None):
+        return self.add_purchase_composite_policy(store_id, permitted_user, purchase_policies_id, logic_operator)
+
+    def add_policy_to_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None, composite_id: int = None,
+                                                policy_id: int = None):
+        return self.stores_manager.add_policy_to_purchase_composite_policy(store_id, permitted_user, composite_id, policy_id)
+
+    def add_product_to_purchase_product_policy(self, store_id: int = None, policy_id: int = None, permitted_user: str = None,
+                                               product_name: str = None):
+        return self.stores_manager.add_product_to_purchase_product_policy(store_id, policy_id, permitted_user, product_name)
+
+    def remove_purchase_policy(self, store_id: int = None, permitted_user: str = None, policy_id: int = None):
+        return self.stores_manager.remove_purchase_policy(store_id, permitted_user, policy_id)
+
+    def remove_product_from_purchase_product_policy(self, store_id: int = None, policy_id: int = None, permitted_user: str = None,
+                                                    product_name: str = None):
+        return self.stores_manager.remove_product_from_purchase_product_policy(store_id, policy_id, permitted_user, product_name)
+
+    def get_discounts(self, store_id: int = None):
+        return self.stores_manager.get_discounts(store_id)
+
+    def get_discount_details(self, store_id: int = None, discount_id: int = None):
+        return self.stores_manager.get_discount_details(store_id, discount_id)
+
+    def get_purchases_policies(self, store_id: int = None):
+        return self.stores_manager.get_purchases_policies(store_id)
+
+    def get_purchase_policy_details(self, store_id: int = None, purchase_policy_id: int = None):
+        return self.stores_manager.get_purchase_by_id(store_id, purchase_policy_id)
+
+    def check_basket_validity(self, cart = None):  #NEED_TO_CHECK
+        return self.stores_manager.check_basket_validity(cart)
+
+    def get_cart_description(self, cart = None):  #NEED_TO_CHECK
+        return self.stores_manager.get_cart_description(cart)
+
+    def get_updated_basket(self, basket = None):
+        return self.stores_manager.get_updated_basket(basket)
