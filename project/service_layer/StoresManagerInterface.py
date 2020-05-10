@@ -1,3 +1,4 @@
+from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.stores_managment.Product import Product
@@ -76,6 +77,7 @@ class StoresManagerInterface:
                 owner) and store_id in self.users_manager.get_managed_stores(manager):
             return self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
         return False
+
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(
@@ -103,16 +105,24 @@ class StoresManagerInterface:
         return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
 
     def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date,
+                                                           percent)
 
     def update_product(self, store_id, username, product_name, attribute, updated):
         return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)
 
     def remove_manager(self, store_id, owner, to_remove):
         if self.stores_manager.remove_manager(store_id, owner, to_remove):
-            self.users_manager.remove_managed_store(to_remove,store_id)
+            self.users_manager.remove_managed_store(to_remove, store_id)
             return True
         return False
 
     def remove_owner(self, store_id, owner, to_remove):
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
+
+# implement
+    def get_product_from_store(self, store_id, product_name) -> Product:
+        pass
+
+    def bound_publisher(self, publisher: Publisher):
+        self.stores_manager.bound_publisher(publisher)

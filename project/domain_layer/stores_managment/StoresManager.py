@@ -1,6 +1,8 @@
 import logging
 from project import logger
 import jsonpickle
+
+from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product, Discount
 from project.domain_layer.stores_managment.Store import Store
@@ -10,6 +12,7 @@ from project.domain_layer.stores_managment.NullStore import NullStore
 
 class StoresManager:
     def __init__(self):
+        self.publisher = None
         self.stores = {}
         self.stores_idx = 0
 
@@ -145,3 +148,6 @@ class StoresManager:
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
         return store.remove_owner(owner, to_remove)
+
+    def bound_publisher(self, publisher: Publisher):
+        self.publisher = publisher

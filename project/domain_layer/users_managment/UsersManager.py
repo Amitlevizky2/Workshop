@@ -1,10 +1,8 @@
-from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
 from project import logger
 import jsonpickle
-from project.service_layer.Security import Security
 
 
 class UsersManager:
@@ -12,6 +10,7 @@ class UsersManager:
     incremental_id = 0
 
     def __init__(self):
+        self.publisher = None
         self.reg_user_list = {}
         self.guest_user_list = {}
         # maybe dictionary {id, username}
@@ -127,3 +126,16 @@ class UsersManager:
     def remove_managed_store(self, username, store_id):
         user = self.find_reg_user(username)
         return user.remove_managed_store(store_id)
+
+    def add_notification(self, loggedout_username, message):
+        self.find_reg_user(loggedout_username).add_notification(message)
+
+    def have_notifications(self, username):
+        return self.find_reg_user(username).have_notifications()
+
+    def get_user_notifications(self, username):
+        return self.find_reg_user(username).get_notifications()
+
+    def is_store_manager(self, username):
+        reg_user = self.find_reg_user(username)
+        return reg_user.is_store_manager()

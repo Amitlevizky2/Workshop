@@ -9,6 +9,7 @@ class RegisteredUser(User):
         self.purchase_history = []
         self.loggedin = False
         self.managed_stores = []
+        self.notifications = []
 
     def logout(self):
         self.loggedin = False
@@ -29,3 +30,20 @@ class RegisteredUser(User):
     def remove_managed_store(self, store_id):
         if store_id in self.managed_stores:
             self.managed_stores.remove(store_id)
+
+    def add_notification(self, message):
+        self.notifications.append(message)
+
+    def have_notifications(self):
+        return self.notifications.__len__() > 0
+
+    def clear_notifications(self):
+        self.notifications.clear()
+
+    def get_notifications(self):
+        messages = self.notifications
+        # self.notifications.clear()
+        return messages
+
+    def is_store_manager(self):
+        return self.managed_stores.__len__() > 0
