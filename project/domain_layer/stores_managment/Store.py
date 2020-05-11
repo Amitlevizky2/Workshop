@@ -483,8 +483,6 @@ class Store:
         if purchase_policy_id in self.purchase_policies.keys():
             return self.purchase_policies[purchase_policy_id].get_description()
 
-
-
     def check_basket_validity(self, basket: Basket):
         is_approved = True
         description = ""

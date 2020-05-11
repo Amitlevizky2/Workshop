@@ -330,3 +330,8 @@ class StoresManager:
         store = self.get_store(store_id)
         description = store.get_inventory_description()
         return description
+
+    def get_store_description_by_id(self, store_id):
+        store = self.get_store(store_id)
+        description = store.get_description()
+        return description

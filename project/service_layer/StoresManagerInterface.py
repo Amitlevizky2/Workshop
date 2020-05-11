@@ -211,4 +211,8 @@ class StoresManagerInterface:
                                            min_price: int = None):
         return self.edit_conditional_discount_to_store(store_id, discount_id, username, start_date, end_date, percent, min_price)
 
+    def get_store_description(self, store_id):
+        return self.stores_manager.get_store_description_by_id(store_id)
 
+    def get_inventory_description(self, store_id):
+        return self.stores_manager.get_inventory_description(store_id)
