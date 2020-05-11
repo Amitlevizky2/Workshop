@@ -67,3 +67,9 @@ class Product:
 
     def get_price_by_amount(self, amount):
         return amount * self.original_price
+
+    def reduce_amount(self, to_reduce):
+        if to_reduce > self.amount:
+            return False
+        self.amount -= to_reduce
+        x=5

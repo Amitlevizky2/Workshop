@@ -61,4 +61,21 @@ class PurchaseProductPolicy(PurchasePolicy):
     def get_products_in_policy(self):
         return self.products_in_policy.keys()
 
+    def get_description(self):
+        min_string = ""
+        max_string = ""
+        if self.min_amount_products == self.MIN_SIZE:
+            min_string = "no min limit"
+        else:
+            min_string = str(self.min_amount_products)
+
+        if self.min_amount_products == self.MAX_SIZE:
+            max_string = "no max limit"
+        else:
+            max_string = str(self.max_amount_products)
+
+        return [self.id, self.purchase_type, min_string, max_string, self.products_in_policy]
+
+
+
 

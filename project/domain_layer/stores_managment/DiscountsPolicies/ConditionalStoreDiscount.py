@@ -54,7 +54,7 @@ class ConditionalStoreDiscount(Discount):
         if end_date is not None and end_date > self.start and end_date > datetime.today():
             self.end = end_date
             is_edited = True
-        if percent is not None and 0 < percent < 100:
+        if percent is not None and 0 <= percent <= 100:
             self.discount = percent / 100
             is_edited = True
         if min_price is not None and 0 < min_price:
@@ -68,3 +68,6 @@ class ConditionalStoreDiscount(Discount):
 
     def get_discount_type(self):
         return self.discount_type
+
+    def get_description(self):
+        return [self.id, self.discount_type, self.start, self.end, self.discount, self.min_price]

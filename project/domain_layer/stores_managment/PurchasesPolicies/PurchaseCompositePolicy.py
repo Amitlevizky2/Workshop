@@ -89,3 +89,9 @@ class PurchaseCompositePolicy(PurchasePolicy):
 
     def get_type(self):
         return self.purchase_type
+
+    def get_description(self):
+        policies_description = []
+        for policy in self.purchase_policies:
+            policies_description.append(policy.get_description())
+        return [self.id, self.purchase_type, policies_description]

@@ -101,7 +101,8 @@ class ConditionalProductDiscount(Discount):
         else:
             return False
 
-
     def get_discount_type(self):
         return self.discount_type
 
+    def get_description(self):
+        return [self.id, self.discount_type, self.start, self.end, self.discount, self.products_in_discount]

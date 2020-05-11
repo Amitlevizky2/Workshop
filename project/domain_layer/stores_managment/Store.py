@@ -458,14 +458,20 @@ class Store:
         return True, product_name + " has been removed from policy \n"
 
     def get_discounts(self):
-        return self.discounts
+        discount_description = []
+        for discount in self.discounts.values():
+            discount_description.append(discount.get_description())
+        return discount_description
 
     def get_discount_by_id(self, discount_id):
         if discount_id in self.discounts.keys():
-            return self.discounts[discount_id]
+            return self.discounts[discount_id].get_description()
 
     def get_purchase_policies(self):
-        return self.purchase_policies
+        purchase_policies_description = []
+        for policy in self.purchase_policies.values():
+            purchase_policies_description.append(policy.get_description())
+        return purchase_policies_description
 
     def get_purchase_policy_by_id(self, purchase_policy_id: int):
         if purchase_policy_id is None:
@@ -475,7 +481,7 @@ class Store:
             return False, "No such policy \n"
 
         if purchase_policy_id in self.purchase_policies.keys():
-            return self.purchase_policies[purchase_policy_id]
+            return self.purchase_policies[purchase_policy_id].get_description()
 
 
 
@@ -500,20 +506,21 @@ class Store:
         del self.purchase_policies[policy_id]
         return True, "Policy has been removed \n"
 
+    def get_description(self):
+        id = self.store_id
+        inventory_description = self.get_inventory_description()
+        discount_description = self.get_discounts()
+        purchase_policies_description = self.get_purchase_policies()
+        store_owners = self.store_owners
+        store_managers = self.store_managers.keys()
 
+        description = [id, inventory_description, discount_description,
+                       purchase_policies_description, store_owners, store_managers]
 
+        return description
 
-
-
-
-
-
-
-
-
-
-
-
+    def get_inventory_description(self):
+        return self.inventory.get_description()
 
 
 

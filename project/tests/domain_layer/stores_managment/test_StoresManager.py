@@ -182,20 +182,26 @@ class test_StoresManager(unittest.TestCase):
 
     def test_get_discounts(self):
         discounts = self.store_manager.get_discounts(1)
-        self.assertDictEqual(self.store_manager.stores[1].discounts, discounts)
-
-    def test_get_discount_details(self):
-        discount = self.store_manager.get_discount_details(1, 7)
-        self.assertEqual("Composite Discount", discount.discount_type)
+        self.assertEqual(len(discounts), 7)
 
     def test_get_purchases_policies(self):
+        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 89)
+        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+
+        self.store_manager.add_purchase_composite_policy(1, "test_owner1", [1, 2], LogicOperator.AND)
+
         purchases = self.store_manager.get_purchases_policies(1)
-        self.assertDictEqual(self.store_manager.stores[1].purchase_policies, purchases)
+        self.assertEqual(2, len(purchases))
 
     def test_get_purchase_by_id(self):
         self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
-        self.assertEqual(self.store_manager.get_purchase_by_id(1, 1).get_type(),
-                         "Purchase Product Policy")
+        description = self.store_manager.get_purchase_by_id(1, 1)
+        is_id = description[0] == 1
+        is_type = "Purchase Product Policy" == description[1]
+        is_min_amount = '3' == description[2]
+        is_max_amount = '8' == description[3]
+        self.assertTrue(is_id and is_type and is_min_amount and is_max_amount)
 
         is_approved, descr = self.store_manager.get_purchase_by_id(6, 1)
 
@@ -259,6 +265,16 @@ class test_StoresManager(unittest.TestCase):
         updated = self.store_manager.get_updated_basket(cart.baskets[1])
         price = self.store_manager.get_total_basket_price(updated)
         x = 5
+
+    def test_stores_details(self):
+        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
+        stores_description = self.store_manager.get_stores_description()
+        x=5
+
+    def test_buy(self):
+        cart = self.init_cart()
+        is_apply = self.store_manager.buy(cart)
+        x=5
 
 
 
@@ -352,7 +368,7 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_purchase_store_policy(store.store_id, "test_owner" + str_id, 1, 10)
             self.store_manager.add_purchase_store_policy(store.store_id, "test_owner" + str_id, 5, 6)
             x=5
-        return [p for p in self.store_manager.get_purchases_policies(1).keys()]
+        return [p for p in self.store_manager.get_store(1).purchase_policies.keys()]
 
 
 if __name__ == '__main__':

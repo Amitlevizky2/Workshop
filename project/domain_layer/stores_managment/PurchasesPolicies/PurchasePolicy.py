@@ -13,3 +13,7 @@ class PurchasePolicy(ABC):
     def get_type(self):  # {Product, (amount, updated_price, original_price)}
         pass
 
+    @abstractmethod
+    def get_description(self):
+        pass
+

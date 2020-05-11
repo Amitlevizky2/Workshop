@@ -122,12 +122,21 @@ class StoresManager:
         return self.stores_idx - 1
 
     def buy(self, cart: Cart):
+        if not self.check_cart_validity(cart):
+            return False
+
+        price, description = self.get_cart_description(cart)
+
+        #  if user dont have enough money according to 'price' will return false
+
+        #  user will also get a description for his purchase
 
         for store in cart.baskets.keys():
             basket = cart.get_basket(store)
             for product in basket.products.keys():
                 if not self.get_store(store).buy_product(product, basket.products.get(product)[1]):
                     return False
+            self.get_store(basket.store_id).sales.append(description[basket.store_id])
         return True
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
@@ -200,7 +209,7 @@ class StoresManager:
     def edit_conditional_discount_to_store(self, store_id: int, discount_id: int, username: str, start_date, end_date, percent: int,
                                              min_price: int):
         store = self.get_store(store_id)
-        return store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_price)
+        return store.edit_conditional_discount_to_store(username, discount_id, start_date, end_date, percent, min_price)
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
@@ -251,7 +260,8 @@ class StoresManager:
 
     def get_discounts(self, store_id):
         store = self.get_store(store_id)
-        return store.get_discounts()
+        description = store.get_discounts()
+        return description
 
     def get_discount_details(self, store_id: int, discount_id: int):
         store = self.get_store(store_id)
@@ -310,4 +320,13 @@ class StoresManager:
             basket_dict[product_tup[0].name] = [product_tup[1], product_tup[2], product_tup[3]]
         return basket_dict
 
+    def get_stores_description(self):
+        stores_description = {}  #  {store_name: [store_details]}
+        for store in self.stores.values():
+            stores_description[store.name] = store.get_description()
+        return stores_description
 
+    def get_inventory_description(self, store_id: int):
+        store = self.get_store(store_id)
+        description = store.get_inventory_description()
+        return description

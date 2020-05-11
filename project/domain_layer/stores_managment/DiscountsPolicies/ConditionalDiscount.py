@@ -14,7 +14,5 @@ class ConditionalDiscount(Discount):
     def is_approved(self, original_price, amount):
         pass
 
-
-
     def edit_discount(self):
         pass

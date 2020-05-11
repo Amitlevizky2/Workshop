@@ -54,10 +54,12 @@ class VisibleProductDiscount(Discount):
         if percent is not None and is_valid_percent(percent):
             self.discount = 1 - percent / 100
 
-
     def is_in_discount(self, product_name: str, product_price_dict: dict):
         return product_name in self.products_in_discount and \
                product_name in product_price_dict.keys()
 
     def get_discount_type(self):
         return self.discount_type
+
+    def get_description(self):
+        return [self.id, self.discount_type, self.start, self.end, self.discount, self.products_in_discount]

@@ -67,3 +67,13 @@ class CompositeDiscount(Discount):                                    #[(Discoun
     def get_discount_type(self):
         return self.discount_type
 
+    def get_description(self):
+        discounts_to_apply_description = []
+        for discount in self.discounts_to_apply:
+            discounts_to_apply_description.append(discount.get_description())
+
+        discount_to_check_and_products_description = {}
+        for tup in self.cond_prod_tup_list:
+            discount_to_check_and_products_description[tup[0].id] = tup[1]
+
+        return [self.id, self.discount_type, self.start, self.end, self.logic_operator, discount_to_check_and_products_description, discounts_to_apply_description]
