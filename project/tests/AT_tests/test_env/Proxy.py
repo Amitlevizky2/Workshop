@@ -191,7 +191,7 @@ class Proxy:
 
     def add_new_store_manager(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_manager(user, int(store_id))
+            return self.real.add_new_store_manager(user, store_id)
         else:
             if self.appoint:
                 self.appoint = not self.appoint

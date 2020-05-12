@@ -9,7 +9,8 @@ class test_addStoremanager(unittest.TestCase):
         self.service.register("new manager", "new pass")
         self.service.register("owner", "pass")
         self.service.login("owner", "pass")
-        self.store_id = self.service.Open_store("my store") 
+        self.store_id = self.service.Open_store("my store")
+
 
     def test_add_new_manager_success(self):
         self.service.add_new_store_manager("new manager", self.store_id)
