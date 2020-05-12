@@ -24,10 +24,11 @@ class purchase_products_by_discount_types(unittest.TestCase):
                                                     datetime.datetime(2020, 5, 17), 30)
         dis3 = self.service.add_discount_to_product(self.first_store_id, "Banana", "avi", datetime.datetime(2018, 6, 1),
                                                     datetime.datetime(2020, 5, 17), 30)
-
+        x=5
         self.service.buy()
         result2 = jsonpickle.decode(self.service.get_purchase_history())
-        self.assertNotEqual(self.result1[0].products["Banana"][0].get_price(), result2[0].products["Banana"][0].get_price())
+        x=5
+        self.assertEqual(self.result1[0].products["Banana"][0].price, result2[0].products["Banana"][0].price)
 
     def test_buy_by_type_purchase_sad(self):
 
@@ -35,7 +36,7 @@ class purchase_products_by_discount_types(unittest.TestCase):
                                                    datetime.datetime(2020, 5, 17), 0)
         self.service.buy()
         result2 = jsonpickle.decode(self.service.get_purchase_history())
-        self.assertEqual(self.result1[0].products["Banana"][0].get_price(), result2[0].products["Banana"][0].get_price())
+        self.assertEqual(self.result1[0].products["Banana"][0].price, result2[0].products["Banana"][0].price)
 
     def test_buy_by_type_purchase_bad(self):
         res = jsonpickle.decode(self.service.searchProduct("Banana"))

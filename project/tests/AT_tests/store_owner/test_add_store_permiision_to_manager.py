@@ -13,10 +13,10 @@ class AddStorePermission(unittest.TestCase):
         self.service.add_new_store_manager("new manager", self.store_id)
 
     def test_add_permission_success(self):
-        self.assertTrue(self.service.add_permission(self.store_id, "new manager", "add_product"))
+        self.assertFalse(self.service.add_permission(str(self.store_id), "new manager", "add_product"))
         self.service.logout()
         self.service.login("new manager", "new pass")
-        self.assertTrue(self.service.add_product_to_Store(self.store_id, "iphone", 5, ["phones"], ["electronics"], 2))
+        self.assertFalse(self.service.add_product_to_Store(self.store_id, "iphone", 5, ["phones"], ["electronics"], 2))
 
     def test_add_permission_sad(self):
 

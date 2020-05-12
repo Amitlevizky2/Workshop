@@ -238,7 +238,7 @@ class Proxy:
 
     def view_store_history(self, store_id):
         if self.real != None:
-            return self.real.view_store_history(int(store_id))
+            return self.real.view_store_history(store_id)
         else:
             if self.out:
                 return None

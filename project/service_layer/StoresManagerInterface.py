@@ -66,7 +66,7 @@ class StoresManagerInterface:
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint owner %s to store no.%d", owner, to_appoint, store_id)
-        if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
+        if str(store_id) in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
                 to_appoint):
             if self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint):
                 self.users_manager.add_managed_store(to_appoint, store_id)
@@ -76,8 +76,8 @@ class StoresManagerInterface:
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s add %s permission to %s in store no.%d", owner, permission, manager, store_id)
-        if store_id in self.users_manager.get_managed_stores(
-                owner) and store_id in self.users_manager.get_managed_stores(manager):
+        if str(store_id) in self.users_manager.get_managed_stores(
+                owner) and str(store_id) in self.users_manager.get_managed_stores(manager):
             return self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
         return False
 
@@ -101,14 +101,14 @@ class StoresManagerInterface:
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
         if self.users_manager.check_if_registered(user) and (
-                store_id in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)):
+                str(store_id) in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)):
             return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))
 
     def remove_product(self, store_id, product_name, username):
         return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
 
     def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+        return self.stores_manager.add_visible_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
 
     def update_product(self, store_id, username, product_name, attribute, updated):
         return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)

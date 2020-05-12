@@ -22,7 +22,12 @@ class MyTestCase(unittest.TestCase):
         self.service.buy()
         self.result1 = jsonpickle.decode(self.service.get_purchase_history())
     def test_browse_happy(self):
+        result = jsonpickle.decode(self.service.get_purchase_history())
+        self.assertIn("Banana", result[0].products)
 
+    def test_browse_sad(self):
+        result = jsonpickle.decode(self.service.get_purchase_history())
+        self.assertNotIn("apple", result[0].products)
 
 
 

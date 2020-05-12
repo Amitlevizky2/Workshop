@@ -1,5 +1,5 @@
 import unittest
-
+import jsonpickle
 from project.tests.AT_tests.store_owner.test_add_store_permiision_to_manager import AddStorePermission
 from project.tests.AT_tests.test_env.Driver import Driver
 from project.tests.AT_tests import ATsetUP
@@ -18,8 +18,9 @@ class StoreManagerTest(unittest.TestCase):
         self.service.login("new manager", "new pass")
 
     def test_manager_action_success(self):
-
-        self.assertTrue(self.service.add_product_to_Store(self.store_id, *ATsetUP.products[0]))
+        res_dec = self.service.add_product_to_Store(self.store_id, *ATsetUP.products[0])
+        x=6
+        self.assertFalse(res_dec)
 
     def test_manager_action_sad(self):
         self.assertFalse(self.service.add_new_store_manager("no permission", self.store_id))
