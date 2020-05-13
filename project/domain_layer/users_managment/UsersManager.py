@@ -1,3 +1,4 @@
+from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
@@ -8,6 +9,7 @@ from project.service_layer.Security import Security
 
 class UsersManager:
     security = Security()
+    store_manager = StoresManager()
     incremental_id = 0
 
     def __init__(self):
@@ -96,6 +98,16 @@ class UsersManager:
     def get_cart(self, username):
         user = self.find_user(username)
         return user.get_cart()
+
+    def view_cart_after_discount(self, username: str):
+        updated_baskets_list = []
+        baskets = self.get_cart(username).baskets
+
+        for basket in baskets.values():
+            basket_prices = self.store_manager.calculate_basket_price(basket)
+            updated_baskets_list.append(basket_prices)
+
+        return updated_baskets_list
 
     def view_purchases_admin(self, username, admin):
         if admin in self.admins:

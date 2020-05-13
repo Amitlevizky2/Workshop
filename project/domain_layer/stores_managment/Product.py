@@ -1,7 +1,7 @@
 class Product:
     def __init__(self, name, price, categories, key_words, amount):
         self.name = name
-        self.price = price
+        self.original_price = price
         self.categories = categories
         self.key_words = key_words
         self.rate = 0
@@ -11,27 +11,28 @@ class Product:
 
     def __eq__(self, other):
         return self.name == other.name and \
-               self.price == other.price and \
+               self.original_price == other.price and \
                self.categories == other.categories and \
-               self.price == other.price and \
+               self.original_price == other.price and \
                self.key_words == other.key_words and \
                self.rate == other.rate
 
     def get_price_after_discount(self, amount_to_buy):
-        price_after_discount = self.price
-        for discount in self.visible_discount:
-            price_after_discount = discount.commit_discount(price_after_discount, amount_to_buy)
-
-        price_after_visible_discount = price_after_discount * amount_to_buy
-        price_after_conditional_product_discount = price_after_visible_discount
-
-        for discount in self.conditional_product_discount:
-            price_after_conditional_product_discount -= discount.commit_discount(price_after_discount, amount_to_buy)
-
-        return price_after_conditional_product_discount
+        return self.price_after_discounts
+        # price_after_discount = self.original_price
+        # for discount in self.visible_discount:
+        #     price_after_discount = discount.commit_discount(price_after_discount, amount_to_buy)
+        #
+        # price_after_visible_discount = price_after_discount * amount_to_buy
+        # price_after_conditional_product_discount = price_after_visible_discount
+        #
+        # for discount in self.conditional_product_discount:
+        #     price_after_conditional_product_discount -= discount.commit_discount(price_after_discount, amount_to_buy)
+        #
+        # return price_after_conditional_product_discount
 
     def get_price_before_discount(self):
-        return self.price
+        return self.original_price
 
     def add_visible_discount(self, discount):
         self.visible_discount.append(discount)
@@ -63,3 +64,12 @@ class Product:
             cur_disc.edit_product_discount(start_date, end_date, percent, conditions)
             return True
         return False
+
+    def get_price_by_amount(self, amount):
+        return amount * self.original_price
+
+    def reduce_amount(self, to_reduce):
+        if to_reduce > self.amount:
+            return False
+        self.amount -= to_reduce
+        x=5

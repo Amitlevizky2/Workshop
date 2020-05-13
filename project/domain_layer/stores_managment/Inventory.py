@@ -34,7 +34,7 @@ class Inventory:
             return False
         if amount > self.products.get(product_name).amount or amount < 0:
             return False
-        self.products.get(product_name).amount -= amount
+        self.products[product_name].reduce_amount(amount)
         return True
 
     def get_products(self):
@@ -65,3 +65,9 @@ class Inventory:
     def edit_conditional_product_discount(self, product_name, discount_id, start_date, end_date, percent, condition):
         if product_name in self.products.keys():
             self.products[product_name].edit_conditional_product_discount(discount_id, start_date, end_date, percent, condition)
+
+    def get_description(self):
+        products = {}
+        for product in self.products.values():
+            products[product.name] = [product.amount, product.original_price]
+        return products

@@ -1,10 +1,16 @@
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import CompositeDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import ConditionalProductDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
+from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount, ConditionalProductDiscount
+
 from project.domain_layer.stores_managment.Store import Store
 import datetime
+
+from project.domain_layer.users_managment.Basket import Basket
 
 
 class TestStore(unittest.TestCase):
@@ -14,14 +20,14 @@ class TestStore(unittest.TestCase):
                                      "Amit": [Store.add_product],
                                      "Hadar": [],
                                      "Lielle": [Store.remove_product],
-                                     "Noa": [Store.add_visible_discount_to_product],
+                                     "Noa": [Store.add_visible_product_discount],
                                      "Evgeny": [Store.update_product]}
 
         self.standard_users = ["Avishay",
                                "Alex",
                                "Ron"]
 
-        self.store.inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 10),
+        self.store.inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 30),
                                          "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
                                          "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
                                          "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
@@ -30,8 +36,87 @@ class TestStore(unittest.TestCase):
                                          "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
                                          "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
                                          "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
-        self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
-        self.new_discount = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10, [])
+
+        self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5)
+        self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5)
+        self.discount2 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5, 2, 2)
+        self.discount3 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5, 7, 1)
+
+        self.discount4 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5, 6, 3)
+
+        self.discount5 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 100, 3, 1)
+
+        self.tup_disc_prod_name_list = []
+        self.tup_disc_prod_name_list.append((self.discount3, ["Apple", "Carrot", "Keyboard"]))
+        self.tup_disc_prod_name_list.append((self.discount4, ["Apple", "Tomato"]))
+
+        self.discount9 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 30)
+        self.discount6 = CompositeDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), LogicOperator.AND,
+            self.tup_disc_prod_name_list, [self.discount, self.discount9])
+
+        self.discount7 = CompositeDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), LogicOperator.OR,
+            self.tup_disc_prod_name_list, [self.discount, self.discount9])
+
+        self.discount8 = CompositeDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), LogicOperator.XOR,
+            self.tup_disc_prod_name_list, [self.discount, self.discount9])
+
+        # self.store.discounts[0] = self.discount
+        # self.store.discounts[1] = self.discount1
+        # self.store.discounts[2] = self.discount2
+        # self.store.discounts[3] = self.discount3
+        # self.store.discounts[4] = self.discount4
+        # self.store.discounts[5] = self.discount5
+        # self.store.discounts[6] = self.discount6
+        # self.store.discounts[7] = self.discount7
+        # self.store.discounts[8] = self.discount8
+
+
+        self.discount.products_in_discount["Apple"] = self.store.inventory.products["Apple"]
+        self.discount.products_in_discount["Tomato"] = self.store.inventory.products["Tomato"]
+        self.discount.products_in_discount["Carrot"] = self.store.inventory.products["Carrot"]
+        self.discount.products_in_discount["Keyboard"] = self.store.inventory.products["Keyboard"]
+        self.discount.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
+        self.discount1.products_in_discount["Apple"] = self.store.inventory.products["Apple"]
+        self.discount2.products_in_discount["Orange"] = self.store.inventory.products["Orange"]
+        self.discount3.products_in_discount["Apple"] = self.store.inventory.products["Apple"]
+        self.discount3.products_in_discount["Carrot"] = self.store.inventory.products["Carrot"]
+        self.discount3.products_in_discount["Keyboard"] = self.store.inventory.products["Keyboard"]
+        self.discount4.products_in_discount["Apple"] = self.store.inventory.products["Apple"]
+        self.discount5.products_in_discount["Tomato"] = self.store.inventory.products["Tomato"]
+        self.discount5.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
+        self.discount6.products_in_discount["Iphone"] = self.store.inventory.products["Iphone"]
+        self.discount6.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
+        self.discount7.products_in_discount["Iphone"] = self.store.inventory.products["Iphone"]
+        self.discount7.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
+        self.discount8.products_in_discount["Iphone"] = self.store.inventory.products["Iphone"]
+        self.discount8.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
+        self.discount9.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
+
+
+
+
+        self.basket = Basket(self.store.store_id)
+        self.basket.products["Apple"] = (self.store.inventory.products["Apple"], 10)
+        self.basket.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 5)
+        self.basket.products["Carrot"] = (self.store.inventory.products["Carrot"], 1)
+        self.basket.products["Orange"] = (self.store.inventory.products["Orange"],3)
+        self.basket.products["Tomato"] = (self.store.inventory.products["Tomato"],4)
+
+        self.basket1 = Basket(self.store.store_id)
+        self.basket1.products["Apple"] = (self.store.inventory.products["Apple"], 10)
+        self.basket1.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 10)
+        self.basket1.products["Carrot"] = (self.store.inventory.products["Carrot"], 10)
+        self.basket1.products["Banana"] = (self.store.inventory.products["Banana"], 10)
+        self.basket1.products["Orange"] = (self.store.inventory.products["Orange"], 10)
+        self.basket1.products["Cucumber"] = (self.store.inventory.products["Cucumber"], 10)
+        self.basket1.products["Iphone"] = (self.store.inventory.products["Iphone"], 10)
+        self.basket1.products["Hard Disk"] = (self.store.inventory.products["Hard Disk"], 10)
+        self.basket1.products["Tomato"] = (self.store.inventory.products["Tomato"], 10)
+
+
+
+
+
 
     def test_appoint_owner_one(self):
         # There is no such owner
@@ -213,7 +298,7 @@ class TestStore(unittest.TestCase):
         # Just checking that the product is not exist
         self.assertNotIn("Macbook", self.store.inventory.products)
         # Amitush, you have the permission to add product, use it!
-        self.assertTrue(self.store.add_product("Amit", p.name, p.price, p.categories, p.key_words, p.amount))
+        self.assertTrue(self.store.add_product("Amit", p.name, p.original_price, p.categories, p.key_words, p.amount))
         # Let's see if you did it well
         self.assertIn("Macbook", self.store.inventory.products)
 
@@ -269,19 +354,61 @@ class TestStore(unittest.TestCase):
         self.assertFalse(self.store.remove_product("Banana", "Ron"))
         self.assertTrue(self.store.remove_product("Banana", "Lielle"))
 
-    def test_add_visible_discount_to_product(self):
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.discount))
-        self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.discount))
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.discount))
-        self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.discount))
 
-    def test_add_visible_discount_to_product(self):
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.new_discount))
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "test owner", self.new_discount))
-        self.assertFalse(self.store.add_visible_discount_to_product("Banana", "Lielle", self.new_discount))
-        self.assertTrue(self.store.add_visible_discount_to_product("Banana", "Noa", self.new_discount))
-        self.assertFalse(self.store.add_visible_discount_to_product("not real product", "test owner", self.new_discount))
+    def test_basket_visible_discount(self):
+        self.store.discounts[0] = self.discount
+        self.store.discounts[5] = self.discount5
+        view_cart_dict = self.store.get_updated_basket(self.basket)
+        self.assertEqual(56, view_cart_dict["Tomato"][2])
+
+    def test_basket_conditional_discount(self):
+        self.store.discounts[2] = self.discount2
+        self.basket2 = Basket(self.store.store_id)
+        self.basket2.products["Orange"] = (self.store.inventory.products["Orange"], 4)
+        cart2 = self.store.get_updated_basket(self.basket2)
+        self.assertEqual(78, cart2["Orange"][2])
+
+    def test_basket_and_Composite_discount(self):
+        self.store.discounts[3] = self.discount3
+        self.store.discounts[4] = self.discount4
+        self.store.discounts[6] = self.discount6
+        self.store.discounts[9] = self.discount9
+        self.basket2 = Basket(self.store.store_id)
+        self.basket2.products["Apple"] = (self.store.inventory.products["Apple"], 10)
+        self.basket2.products["Carrot"] = (self.store.inventory.products["Carrot"], 10)
+        self.basket2.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 10)
+        self.basket2.products["Tomato"] = (self.store.inventory.products["Tomato"], 10)
+        self.basket2.products["Hard Disk"] = (self.store.inventory.products["Hard Disk"], 10)
+        cart = self.store.get_updated_basket(self.basket2)
+        self.assertEqual(140, cart["Hard Disk"][2])
+
+    def test_basket_or_Composite_discount(self):
+        self.store.discounts[3] = self.discount3
+        self.store.discounts[4] = self.discount4
+        self.store.discounts[7] = self.discount7
+        self.store.discounts[9] = self.discount9
+        self.basket2 = Basket(self.store.store_id)
+        self.basket2.products["Apple"] = (self.store.inventory.products["Apple"], 10)
+        #self.basket2.products["Carrot"] = (self.store.inventory.products["Carrot"], 10)
+        self.basket2.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 10)
+        self.basket2.products["Tomato"] = (self.store.inventory.products["Tomato"], 10)
+        self.basket2.products["Hard Disk"] = (self.store.inventory.products["Hard Disk"], 10)
+        cart = self.store.get_updated_basket(self.basket2)
+        self.assertEqual(140, cart["Hard Disk"][2])
+
+    def test_basket_xor_Composite_discount(self):
+        self.store.discounts[3] = self.discount3
+        self.store.discounts[4] = self.discount4
+        self.store.discounts[8] = self.discount8
+        self.store.discounts[9] = self.discount9
+        self.basket2 = Basket(self.store.store_id)
+        self.basket2.products["Apple"] = (self.store.inventory.products["Apple"], 10)
+        #self.basket2.products["Carrot"] = (self.store.inventory.products["Carrot"], 10)
+        self.basket2.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 10)
+        self.basket2.products["Tomato"] = (self.store.inventory.products["Tomato"], 10)
+        self.basket2.products["Hard Disk"] = (self.store.inventory.products["Hard Disk"], 10)
+        cart = self.store.get_updated_basket(self.basket2)
+        self.assertEqual(140, cart["Hard Disk"][2])
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
@@ -290,6 +417,19 @@ class TestStore(unittest.TestCase):
     def appoint_users_to_managers(self):
         for i in range(0, len(self.standard_users)):
             self.store.appoint_manager("test owner", self.standard_users[i])
+
+    def test_remove_product_from_discount(self):
+        self.discount2.id = 0
+        self.store.discounts[0] = self.discount2
+        view_cart_dict = self.store.get_updated_basket(self.basket)
+        self.assertEqual(59, view_cart_dict["Orange"][2])
+        self.store.remove_product_from_discount("test owner", self.discount2.id, "Orange")
+        view_cart_dict = self.store.get_updated_basket(self.basket)
+        self.assertEqual(60, view_cart_dict["Orange"][2])
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

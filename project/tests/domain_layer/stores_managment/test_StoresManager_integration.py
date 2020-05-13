@@ -2,25 +2,81 @@ import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
-
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy import PurchaseStorePolicy
 
 class test_StoresManager(unittest.TestCase):
     def setUp(self) -> None:
         self.store_manager = StoresManager()
         self.idx = 0
+        self.store_id = self.store_manager.open_store("test store", "test owner")
         self.products = [
             ("t-shirt", 20, ["cloth"], ["green"], 7),
             ("apple", 1, ["food", "green"], ["vegetable"], 10),
             ("orange", 1, ["food", "orange"], ["fruits"], 10),
             ("iphone", 5000, ["electronics", "bad and expensive phone "], ["fruits"], 10)
         ]
+
+        self.store_manager.get_store(self.store_id).inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 10),
+                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
+                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
+                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
+                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10),
+                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10),
+                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
+                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
+                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+
         self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 10)
+        self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 30)
+
+        self.purchase_store = PurchaseStorePolicy(0,10,2)
+        self.purchase_store1 = PurchaseStorePolicy(9, 10, 3)
+
+        self.purchase = PurchaseProductPolicy(0,5,0)
+        self.purchase1 = PurchaseProductPolicy(3,6,1)
+
+        self.store_manager.get_store(self.store_id).purchase_policies[self.purchase_store.id] = self.purchase_store
+        self.store_manager.get_store(self.store_id).purchase_policies[self.purchase_store1.id] = self.purchase_store1
+
+        self.store_manager.get_store(self.store_id).purchase_policies[self.purchase.id] = self.purchase
+        self.store_manager.get_store(self.store_id).purchase_policies[self.purchase1.id] = self.purchase1
+
+        self.store_manager.get_store(self.store_id).discounts[self.discount.id] = self.discount
+        self.store_manager.get_store(self.store_id).discounts[self.discount1.id] = self.discount1
+
+
+        self.purchase.products_in_policy["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
+        self.purchase1.products_in_policy["Iphone"] = self.store_manager.get_store(self.store_id).inventory.products["Iphone"]
+
+        self.discount.products_in_discount["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
+        self.discount.products_in_discount["Tomato"] = self.store_manager.get_store(self.store_id).inventory.products["Tomato"]
+        self.discount1.products_in_discount["Apple"] = self.store_manager.get_store(self.store_id).inventory.products["Apple"]
+        self.discount.products_in_discount["Carrot"] = self.store_manager.get_store(self.store_id).inventory.products["Carrot"]
+        self.discount.products_in_discount["Keyboard"] = self.store_manager.get_store(self.store_id).inventory.products["Keyboard"]
+
+        self.basket_legal_pruchace = Basket(self.store_manager.get_store(self.store_id).store_id)
+        self.basket_ilegal_pruchace = Basket(self.store_manager.get_store(self.store_id).store_id)
+        self.basket_some_legal_pruchace = Basket(self.store_manager.get_store(self.store_id).store_id)
+        self.basket_legal_pruchace.products["Apple"] = (self.store_manager.get_store(self.store_id).inventory.products["Apple"],5)
+        self.basket_legal_pruchace.products["Iphone"] = (self.store_manager.get_store(self.store_id).inventory.products["Iphone"],5)
+        self.basket_ilegal_pruchace.products["Apple"] = (self.store_manager.get_store(self.store_id).inventory.products["Apple"], 6)
+        self.basket_ilegal_pruchace.products["Iphone"] = (self.store_manager.get_store(self.store_id).inventory.products["Iphone"], 2)
+        self.basket_some_legal_pruchace.products["Apple"] = ( self.store_manager.get_store(self.store_id).inventory.products["Apple"], 4)
+        self.basket_some_legal_pruchace.products["Iphone"] = (self.store_manager.get_store(self.store_id).inventory.products["Iphone"], 2)
+
+
+        self.basket = Basket(self.store_manager.get_store(self.store_id).store_id)
+        self.basket.products["Apple"] = (self.store_manager.get_store(self.store_id).inventory.products["Apple"], 10)
+        self.basket.products["Keyboard"] = (self.store_manager.get_store(self.store_id).inventory.products["Keyboard"], 5)
+        self.basket.products["Carrot"] = (self.store_manager.get_store(self.store_id).inventory.products["Carrot"], 1)
+
 
     def test_update_product(self):
         self.test_add_product_to_store()
@@ -180,6 +236,61 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_visible_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
                                                        datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
                                                        10))
+
+    def test_calculate_basket_price(self):
+        store = self.store_manager.get_store(self.store_id)
+        view_cart_dict = self.store_manager.calculate_basket_price(self.basket)
+        x = 5
+
+    def test_purchase_policy_product(self):
+        some_legal = True
+        ilegal = True
+        legal = True
+
+        for pur in self.store_manager.get_store(self.store_id).purchase_policies.values():
+            is_approved, reason = pur.is_approved(self.basket_legal_pruchace.products)
+            if not is_approved:
+                legal = False
+
+        for pur in self.store_manager.get_store(self.store_id).purchase_policies.values():
+            is_approved, reason = pur.is_approved(self.basket_ilegal_pruchace.products)
+            if not is_approved:
+                ilegal = False
+
+        for pur in self.store_manager.get_store(self.store_id).purchase_policies.values():
+            is_approved, reason = pur.is_approved(self.basket_some_legal_pruchace.products)
+            if not is_approved:
+                some_legal = False
+        self.assertTrue(legal)
+        self.assertFalse(ilegal)
+        self.assertFalse(some_legal)
+        self.assertEqual(2, self.basket_legal_pruchace.products.__len__())
+        self.assertEqual(0,self.basket_ilegal_pruchace.products.__len__())
+        self.assertEqual(1,self.basket_some_legal_pruchace.products.__len__())
+
+    def test_purchase_policy_store(self):
+        some_legal = True
+        ilegal = True
+        legal = True
+
+        for pur in self.store_manager.get_store(self.store_id).purchase_policies.values():
+            is_approved, reason = pur.is_approved(self.basket_legal_pruchace.products)
+            if not is_approved:
+                legal = False
+
+        for pur in self.store_manager.get_store(self.store_id).purchase_policies.values():
+            is_approved, reason = pur.is_approved(self.basket_ilegal_pruchace.products)
+            if not is_approved:
+                ilegal = False
+
+        for pur in self.store_manager.get_store(self.store_id).purchase_policies.values():
+            is_approved, reason = pur.is_approved(self.basket_some_legal_pruchace.products)
+            if not is_approved:
+                some_legal = False
+        self.assertTrue(legal)
+        self.assertFalse(ilegal)
+        self.assertFalse(some_legal)
+
 
 if __name__ == '__main__':
     unittest.main()
