@@ -61,8 +61,9 @@ def exit_room(sid, username):
 def login(sid, message):
     json_msg = get_json_obj(message)
     answer = users_manager.login(json_msg['username'], json_msg['login_username'], json_msg['password'])
-    if answer is True:
+    if answer is not False:
         exchange_username(json_msg['username'], answer, sid)
+        answer = True
     return json.dumps({
         'loggedin': answer
     })
@@ -72,9 +73,13 @@ def login(sid, message):
 def logout(sid, message):
     json_msg = get_json_obj(message)
     answer = users_manager.logout(json_msg['username'])
+    logged_out = True
+    # if user is not logged out
     if not answer == json_msg['username']:
         exchange_username(json_msg['username'], answer, sid)
+        logged_out = False
     return json.dumps({
+        'logged_out': logged_out,
         'username': answer
     })
 
