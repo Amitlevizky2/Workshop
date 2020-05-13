@@ -206,7 +206,7 @@ class StoresManager:
         return store.add_composite_discount(username,
                                                        CompositeDiscount(start_date, end_date, logic_operator, tup_list, discounts_to_apply_list))
 
-    def edit_visible_discount_to_product(self, store_id: int, username:str, discount_id:int, start_date, end_date, percent: int):
+    def edit_visible_discount_to_product(self, store_id: int, username: str, discount_id:int, start_date, end_date, percent: int):
         store = self.get_store(store_id)
         return store.edit_visible_discount(username, discount_id, start_date, end_date, percent)
 
