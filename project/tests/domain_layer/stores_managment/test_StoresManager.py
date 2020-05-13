@@ -109,23 +109,23 @@ class test_StoresManager(unittest.TestCase):
     def test_add_purchase_composite_policy(self):
         policies_id = self.init_purchases_policies()
 
-        is_approved, descr = self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, LogicOperator.AND)
+        is_approved, descr = self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
         self.assertTrue(is_approved, descr)
-        is_approved, descr = self.store_manager.add_purchase_composite_policy(1, "test_owner1", [9], LogicOperator.AND)
+        is_approved, descr = self.store_manager.add_purchase_composite_policy(1, "test_owner1", [9], "and")
         self.assertFalse(is_approved, descr)
-        is_approved, descr = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, LogicOperator.XOR)
+        is_approved, descr = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, "xor")
         self.assertTrue(is_approved, descr)
-        is_approved, descr = self.store_manager.add_purchase_composite_policy(3, "test_owner3", policies_id, LogicOperator.OR)
+        is_approved, descr = self.store_manager.add_purchase_composite_policy(3, "test_owner3", policies_id, "or")
         self.assertTrue(is_approved, descr)
         is_approved, descr = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, None)
         self.assertFalse(is_approved, descr)
-        is_approved, descr = self.store_manager.add_purchase_composite_policy(2, "test_owner5", None, LogicOperator.OR)
+        is_approved, descr = self.store_manager.add_purchase_composite_policy(2, "test_owner5", None, "or")
         self.assertFalse(is_approved, descr)
 
     def test_add_policy_to_purchase_composite_policy(self):
         policies_id = self.init_purchases_policies()
         self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
-        self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, LogicOperator.AND)
+        self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
 
         is_approved, descr = self.store_manager.add_policy_to_purchase_composite_policy(
             1, "test_owner1", 5, 4)
@@ -189,7 +189,7 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 89)
         self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
 
-        self.store_manager.add_purchase_composite_policy(1, "test_owner1", [1, 2], LogicOperator.AND)
+        self.store_manager.add_purchase_composite_policy(1, "test_owner1", [1, 2], "xor")
 
         purchases = self.store_manager.get_purchases_policies(1)
         self.assertEqual(2, len(purchases))
@@ -224,7 +224,7 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
 
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], LogicOperator.AND)
+        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "and")
 
         cart = self.init_cart()
         is_approved, descr = self.store_manager.check_cart_validity(cart)
@@ -235,7 +235,7 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
 
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], LogicOperator.OR)
+        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "or")
 
         cart = self.init_cart()
         is_approved, descr = self.store_manager.check_cart_validity(cart)
@@ -246,7 +246,7 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
 
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], LogicOperator.XOR)
+        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "xor")
 
         cart = self.init_cart()
         is_approved, descr = self.store_manager.check_cart_validity(cart)
@@ -330,7 +330,7 @@ class test_StoresManager(unittest.TestCase):
             #                                    self.tup_disc_prod_name_list, [self.discount, self.discount5])
 
             self.store_manager.add_composite_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-                                                      LogicOperator.AND, {4: ["Apple", "Carrot", "Keyboard"],
+                                                      "and", {4: ["Apple", "Carrot", "Keyboard"],
                                                                           5: ["Apple", "Orange"],
                                                                           6: ["Tomato"]}, [1])
 

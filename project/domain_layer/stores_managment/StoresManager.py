@@ -16,6 +16,8 @@ from project.domain_layer.users_managment.Cart import Cart
 
 
 def get_logic_operator(logic_operator_str: str):
+    if logic_operator_str is None:
+        return None
     if logic_operator_str.upper() == "OR":
         return LogicOperator.OR
     elif logic_operator_str.upper() == "AND":
