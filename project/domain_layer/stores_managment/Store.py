@@ -1,7 +1,14 @@
 from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment import Discount
+from project.domain_layer.stores_managment.DiscountsPolicies import ConditionalStoreDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.Inventory import Inventory
 from project.domain_layer.stores_managment.Product import Product
 from project import logger
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseCompositePolicy import PurchaseCompositePolicy
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy import PurchaseStorePolicy
+from project.domain_layer.users_managment import Basket
 
 
 class Store:
@@ -9,9 +16,10 @@ class Store:
         self.store_id = store_id
         self.name = name
         self.inventory = Inventory()
-        self.sale_policy = None
-        self.discount_policy = None
-        self.store_discounts = []
+        self.discounts = {}  # {discount_id: Discount}
+        self.discount_idx = 0
+        self.purchase_policies = {}  # {purchase_policy_id: PurchasePolicy}
+        self.purchases_idx = 0
         self.store_owners = [store_owner]
         self.store_managers = {}  # {manager_name:functions}
         self.sales = []
@@ -240,6 +248,7 @@ class Store:
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, getattr(Store, "get_sales_history")) or is_admin:
             return self.sales
+        return False
 
     def update_product(self, user, product_name, attribute, updated):
         if self.check_permission(user, getattr(Store, "update_product")):
@@ -273,39 +282,244 @@ class Store:
             return self.inventory.remove_product(product_name)
         return False
 
-    def add_discount_to_product(self, product_name, permitted_username,  discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_discount_to_product")):
-            return self.inventory.add_visible_discount_to_product(product_name, discount)
-        return False
-
-    def add_visible_discount_to_product(self, product_name, permitted_username, discount):
+    def add_visible_product_discount(self, permitted_username, discount: Discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_visible_discount_to_product")):
-            return self.inventory.add_visible_discount_to_product(product_name, discount)
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
+            return True
         return False
 
-    def add_conditional_discount_to_product(self, product_name, permitted_username, discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_discount_to_product")):
-            return self.inventory.add_conditional_discount_to_product(product_name, discount)
+
+
+    def add_conditional_discount_to_product(self, permitted_username, discount):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_product")):
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
+            return True
         return False
 
-    def edit_visible_discount(self, product_name, permitted_username, discount_id, start_date=None,
-                              end_date=None, percent=None):
+    def add_conditional_discount_to_store(self, permitted_username, discount):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_store")):
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
+            return True
+        return False
+
+    def add_composite_discount(self, permitted_username: str, discount: Discount):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_composite_discount")):
+            self.discount_idx += 1
+            discount.id = self.discount_idx
+            self.discounts[self.discount_idx] = discount
+            return True
+        return False
+
+    def edit_visible_discount(self, permitted_username, discount_id, start_date,
+                              end_date, percent):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username,
-                                                                      getattr(Store, "edit_product_discount")):
-            return self.inventory.edit_visible_product_discount(product_name, discount_id, start_date, end_date,
-                                                                percent)
+                                                                      getattr(Store, "edit_visible_discount")):
+            discount = self.discounts[discount_id]
+            return discount.edit_discount(start_date, end_date, percent)
         return False
 
-    def edit_conditional_discount(self, product_name, permitted_username, discount_id, start_date, end_date,
-                                  percent, condition):
+    def edit_conditional_discount_to_product(self, permitted_username: str, discount_id: int, start_date, end_date,
+                                  percent, min_amount: int, nums_to_apply: int):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username,
-                                                                      getattr(Store, "edit_product_discount")):
-            return self.inventory.edit_conditional_product_discount(product_name, discount_id, start_date,
-                                                                    end_date, percent, condition)
+                                                                      getattr(Store, "edit_conditional_discount_to_product")):
+            discount: Discount = self.discounts[discount_id]
+            return discount.edit_discount(discount_id, start_date, end_date, percent, min_amount, nums_to_apply)
+        return False
+
+    def edit_conditional_discount_to_store(self, permitted_username: str, discount_id: int, start_date, end_date,
+                                  percent: int, min_price: int):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username,
+                                                                      getattr(Store, "edit_conditional_discount_to_store")):
+            discount: ConditionalStoreDiscount = self.discounts[discount_id]
+            return discount.edit_discount(discount_id, start_date, end_date, percent, min_price,)
         return False
 
     def is_owner(self, username):
         if username in self.store_owners:
             return True
         return False
+
+    def get_updated_basket(self, basket: Basket):
+        product_price_dict = {}
+        for product in basket.products.values():
+            product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price * product[1])  #{product_name, (amount, updated_price)}
+
+        for discount in self.discounts.values():
+            discount.commit_discount(product_price_dict)
+
+        return product_price_dict  # {product_name, (Product, amount, updated_price, original_price)}
+
+    def add_product_to_discount(self, permitted_user: str, discount_id: int, product_name: str):
+        is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user,
+                                                                      getattr(Store, "add_product_to_discount"))
+        is_in_inventory = product_name in self.inventory.products.keys()
+        discount: Discount = self.discounts[discount_id]
+        if is_permitted and is_in_inventory:
+            discount.add_product(product_name)
+            return True
+        return False
+
+    def remove_product_from_discount(self, permitted_user, discount_id, product_name):
+        is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user,
+                                                                      getattr(Store, "remove_product_from_discount"))
+        is_in_inventory = product_name in self.inventory.products.keys()
+        discount: Discount = self.discounts[discount_id]
+        if is_permitted and is_in_inventory:
+            discount.remove_product(product_name)
+            return True
+        return False
+
+    def add_purchase_store_policy(self, permitted_user, min_amount_products, max_amount_products):
+        MAX_SIZE = 100000
+        MIN_SIZE = 0
+
+        if min_amount_products is None and max_amount_products is None:
+            return False, "The parameters are not valid"
+        if not self.check_permission(permitted_user, getattr(Store, "add_purchase_store_policy")):
+            return False, "User dont have permission \n"
+
+        min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
+        max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
+        self.purchases_idx += 1
+
+        policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx)
+        self.purchase_policies[self.purchases_idx] = policy
+
+        return True, "Policy as Been Added"
+
+    def add_purchase_product_policy(self, permitted_user, min_amount_products, max_amount_products):
+        MAX_SIZE = 100000
+        MIN_SIZE = 0
+
+        if min_amount_products is None and max_amount_products is None:
+            return False, "The parameters are not valid \n"
+        if not self.check_permission(permitted_user, getattr(Store, "add_purchase_product_policy")):
+            return False, "User dont have permission \n"
+
+        min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
+        max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
+        self.purchases_idx += 1
+
+        policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx)
+        self.purchase_policies[self.purchases_idx] = policy
+
+        return True, "Policy as been added"
+
+    def add_purchase_composite_policy(self, permitted_user: str, policies: list, logic_operator: LogicOperator):
+
+        if not self.check_permission(permitted_user, getattr(Store, "add_purchase_composite_policy")):
+            return False, "User dont have permission\n"
+
+        self.purchases_idx += 1
+
+        for policy in policies:
+            del self.purchase_policies[policy.id]
+
+        policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx)
+        self.purchase_policies[self.purchases_idx] = policy
+
+        return True, "Policy as been added"
+
+    def add_policy_to_purchase_composite_policy(self, permitted_user: str, composite_id, policy_id: int):
+        if composite_id not in self.purchase_policies.keys() or policy_id not in self.purchase_policies.keys():
+            return False, "One of the policies is not exist for this store"
+
+        if not self.check_permission(permitted_user, getattr(Store, "add_policy_to_purchase_composite_policy")):
+            return False, "User dont have permission\n"
+
+        self.purchase_policies[composite_id].add_policy(self.purchase_policies[policy_id])
+        return True, "Policy as been added"
+
+    def add_product_to_purchase_product_policy(self, policy_id, permitted_user: str, product_name: str):
+        if policy_id not in self.purchase_policies.keys():
+            return False, "policy is not exist for this store"
+
+        if not self.check_permission(permitted_user, getattr(Store, "add_product_to_purchase_product_policy")):
+            return False, "User dont have permission\n"
+
+        self.purchase_policies[policy_id].add_product(product_name)
+        return True, "Product has been added to policy"
+
+    def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
+        if policy_id is None:
+            return False, "No such policy \n"
+
+        if policy_id not in self.purchase_policies.keys():
+            return False, "policy is not exist for this store\n"
+        if not self.check_permission(permitted_user,getattr(Store, "remove_product_from_purchase_product_policy")):
+            return False, "User dont have permission\n"
+        self.purchase_policies[policy_id].remove_product(product_name)
+        return True, product_name + " has been removed from policy \n"
+
+    def get_discounts(self):
+        discount_description = []
+        for discount in self.discounts.values():
+            discount_description.append(discount.get_description())
+        return discount_description
+
+    def get_discount_by_id(self, discount_id):
+        if discount_id in self.discounts.keys():
+            return self.discounts[discount_id].get_description()
+
+    def get_purchase_policies(self):
+        purchase_policies_description = []
+        for policy in self.purchase_policies.values():
+            purchase_policies_description.append(policy.get_description())
+        return purchase_policies_description
+
+    def get_purchase_policy_by_id(self, purchase_policy_id: int):
+        if purchase_policy_id is None:
+            return False, "No such policy \n"
+
+        if purchase_policy_id not in self.purchase_policies.keys():
+            return False, "No such policy \n"
+
+        if purchase_policy_id in self.purchase_policies.keys():
+            return self.purchase_policies[purchase_policy_id].get_description()
+
+    def check_basket_validity(self, basket: Basket):
+        is_approved = True
+        description = ""
+        for policy in self.purchase_policies.values():
+            p_approved, outcome = policy.is_approved(basket.products)
+            if not p_approved:
+                description += outcome
+                is_approved = False
+
+        return is_approved, description
+
+    def remove_purchase_policy(self, policy_id, permitted_user):
+        if policy_id is None or permitted_user is None:
+            return False, "The parameters are not valid \n"
+
+        if policy_id not in self.purchase_policies.keys():
+            return False, "No such policy in this store \n"
+
+        del self.purchase_policies[policy_id]
+        return True, "Policy has been removed \n"
+
+    def get_description(self):
+        id = self.store_id
+        inventory_description = self.get_inventory_description()
+        discount_description = self.get_discounts()
+        purchase_policies_description = self.get_purchase_policies()
+        store_owners = self.store_owners
+        store_managers = self.store_managers.keys()
+
+        description = [id, inventory_description, discount_description,
+                       purchase_policies_description, store_owners, store_managers]
+
+        return description
+
+    def get_inventory_description(self):
+        return self.inventory.get_description()
+
+
+
 

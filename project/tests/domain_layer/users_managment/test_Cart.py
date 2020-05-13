@@ -1,8 +1,8 @@
 from datetime import timedelta, datetime
 from unittest import TestCase
 
+from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Discount import VisibleProductDiscount
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
 
