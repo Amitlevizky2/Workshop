@@ -1,21 +1,35 @@
+import jsonpickle
+
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.UsersManager import UsersManager
 from project import logger
+from project.service_layer.Security import Security
 
 
 class UsersManagerInterface:
+    security = Security()
 
     def __init__(self):
         self.user_manager = UsersManager()
+        username = self.user_manager.add_guest_user()
+        self.user_manager.register(username, "admin")
+        self.user_manager.admins.append("admin")
 
     def register(self, username, new_username, password):
-        logger.log("user %s called register with new_username:%s, password:%s", username, new_username, password)
-        return self.user_manager.register(username, new_username,password)
+        logger.log("user %s called register with new_username:%s", username, new_username)
+        if self.user_manager.register(username, new_username):
+            self.security.add_user(new_username, password)
+            return True
+        else:
+            return False
 
     ##EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password) -> bool:
-        logger.log("user %s called login with login_username:%s, password:%s", username, login_username, password)
-        return self.user_manager.login(username, login_username, password)
+        logger.log("user %s called login with login_username:%s", username, login_username)
+        if self.security.verify_password(login_username, password):
+            return self.user_manager.login(username, login_username)
+        else:
+            return False
 
     def add_guest_user(self):
         return self.user_manager.add_guest_user()
@@ -33,7 +47,7 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
     def add_product(self, username, store_id, product, quantity):
-        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, product.name, quantity)
+        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, jsonpickle.decode(product).name, quantity)
         return self.user_manager.add_product(username, store_id, product, quantity)
 
     def remove_product(self, username, store_id, product, quantity):

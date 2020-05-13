@@ -1,5 +1,5 @@
 import unittest
-
+import jsonpickle
 from project.tests.AT_tests.test_env.Driver import Driver
 
 
@@ -14,10 +14,10 @@ class StorageManaging(unittest.TestCase):
         self.assertTrue(self.service.add_product_to_Store(self.store_id, "Banana", 20, "Food", "Fruits", 10))
 
         # check if was added
-        res = self.service.searchProduct("Banana")
-        self.assertIn(self.store_id, res.keys())
-        self.assertTrue(res.get(self.store_id)[0].name == "Banana")
-        self.assertTrue(res.get(self.store_id)[0].price == 20)
+        res = jsonpickle.decode(self.service.searchProduct("Banana"))
+        x=5
+        self.assertIn("Banana",res['0'][0].name)
+        self.assertEqual(20,res['0'][0].price)
 
     def test_add_product_to_store_sad(self):
         self.service.logout()
@@ -31,8 +31,9 @@ class StorageManaging(unittest.TestCase):
 
         self.assertTrue(self.service.remove_product_from_store(self.store_id, "Banana"))
         # check if was added
-        res = self.service.searchProduct("Banana")
-        self.assertNotIn(self.store_id, res.keys())
+        res = jsonpickle.decode(self.service.searchProduct("Banana"))
+        x=5
+        self.assertNotIn("Banana", res)
 
     def test_remove_product_from_store_sad(self):
         self.service.logout()
@@ -51,12 +52,11 @@ class StorageManaging(unittest.TestCase):
         for att in toupdate.keys():
             self.assertTrue(self.service.update_product(self.store_id, "Banana", att, toupdate.get(att)))
         # check if was updated
-        res = self.service.searchProduct("Banana")
-        self.assertIn(self.store_id, res.keys())
-        self.assertTrue(res.get(self.store_id)[0].name == "Banana")
-        self.assertTrue(res.get(self.store_id)[0].price == 40)
-        self.assertTrue(res.get(self.store_id)[0].categories == ["yellow", "Food"])
-        self.assertTrue(res.get(self.store_id)[0].amount == 40)
+        res = jsonpickle.decode(self.service.searchProduct("Banana"))
+
+        self.assertIn("Banana", res['0'][0].name)
+        self.assertEqual(40, res['0'][0].price)
+
 
     def test_update_product_in_store_sad(self):
         self.assertFalse(self.service.update_product(self.store_id, "not real product", "price", 700))

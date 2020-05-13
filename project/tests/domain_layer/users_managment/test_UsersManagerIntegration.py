@@ -1,7 +1,8 @@
 from datetime import timedelta, datetime
 from unittest import TestCase
 
-from project.domain_layer.stores_managment.Product import Product, Discount
+from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.ProductDiscount import VisibleProductDiscount
 from project.domain_layer.users_managment.UsersManager import UsersManager
 
 
@@ -12,28 +13,28 @@ class TestUsersManagerIntegration(TestCase):
         dt = timedelta(days=10)
         date_object = datetime.strptime(date_str, '%m-%d-%Y')
         self.product_orange = Product("orange", 2, "food", None, 100)
-        self.product_orange.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_orange.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.product_apple = Product("apple", 2, "food", None, 100)
-        self.product_apple.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_apple.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.product_petunia = Product("petunia", 5, "food", None, 100)
-        self.product_petunia.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_petunia.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
         self.product_begonia = Product("begonia", 15, "food", None, 100)
-        self.product_begonia.discount.append(Discount(date_object, date_object + dt, 50))
+        self.product_begonia.discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
 
     # test register and assert that cart is transferred
     def test_register(self):
         guest_user_name = self.users_manager.add_guest_user()
         guest_cart = self.users_manager.get_cart(guest_user_name)
-        self.assertTrue(self.users_manager.register(guest_user_name, "lielle", "12345"))
+        self.assertTrue(self.users_manager.register(guest_user_name, "lielle"))
         self.assertEqual(guest_cart, self.users_manager.get_cart("lielle"))
         guest_user_name = self.users_manager.add_guest_user()
-        self.assertFalse(self.users_manager.register(guest_user_name, "lielle", "12345"))
+        self.assertFalse(self.users_manager.register(guest_user_name, "lielle"))
 
     def test_login(self):
         guest_user_name = self.users_manager.add_guest_user()
-        self.users_manager.register(guest_user_name, "registered1", "7777777")
+        self.users_manager.register(guest_user_name, "registered1")
         registered1 = self.users_manager.find_reg_user("registered1")
-        login_un = self.users_manager.login(guest_user_name, registered1.username, "7777777")
+        login_un = self.users_manager.login(guest_user_name, registered1.username)
         self.assertEqual(self.users_manager.find_reg_user(login_un).loggedin, registered1.loggedin)
 
     def test_view_cart(self):

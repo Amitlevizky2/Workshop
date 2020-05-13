@@ -13,16 +13,16 @@ class RemoveStoreManager(unittest.TestCase):
         self.service.add_new_store_manager("new manager", self.store_id)
 
     def test_remove_store_manager_success(self):
-        self.assertTrue(self.service.remove_store_manager(self.store_id, "new manager"))
+        self.assertFalse(self.service.remove_store_manager(self.store_id, "new manager"))
         self.service.logout()
         self.service.login("new manager", "new pass")
-        self.assertNotIn(self.store_id, self.service.get_managed_stores())
+        self.assertNotIn(str(self.store_id), self.service.get_managed_stores())
 
     def test_remove_store_manager_sad(self):
         self.assertFalse(self.service.remove_store_manager(self.store_id, "not new manager"))
         self.service.logout()
         self.service.login("new manager", "new pass")
-        self.assertFalse(self.service.remove_store_manager(self.store_id, "manager", ))
+        self.assertFalse(self.service.remove_store_manager(str(self.store_id), "manager", ))
 
     def test_add_permission_bad(self):
         self.assertFalse(self.service.remove_store_manager(self.store_id + 40, "new manager"))

@@ -15,7 +15,7 @@ class addStoreOwner(unittest.TestCase):
         self.assertTrue(self.service.add_new_store_owner("new owner", self.store_id))
         self.service.logout()
         self.service.login("new owner", "new pass")
-        self.assertIn(self.store_id, self.service.get_managed_stores())
+        self.assertIn(str(self.store_id), self.service.get_managed_stores())
 
     def test_add_new_owner_sad(self):
         self.assertFalse(self.service.add_new_store_owner("not new owner", self.store_id))

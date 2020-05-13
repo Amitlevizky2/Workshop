@@ -114,7 +114,7 @@ class Proxy:
             return True
 
     def get_purchase_history(self):
-        if self.real != None:
+        if self.real is not  None:
             return self.real.get_purchase_history()
         else:
             if not self.out:
@@ -130,15 +130,14 @@ class Proxy:
 
     def add_discount_to_product(self, storedID, product_name, username, start_date, end_date, percent):
         if self.real != None:
-            return self.real.add_discount_to_product(storedID, product_name, username, start_date, end_date, percent)
+            return self.real.add_discount_to_product(int(storedID), product_name, username, start_date, end_date, percent)
         else:
             return True
 
     def add_product(self, store_id, product, amount):
-        if self.real != None:
-            return self.real.add_product(store_id, product, amount)
+        if self.real is not None:
+            return self.real.add_product(int(store_id), product, amount)
         else:
-
             return True
 
     def buy(self):
@@ -149,7 +148,7 @@ class Proxy:
 
     def remove_product_from_store(self, store_id, product_name):
         if self.real != None:
-            return self.real.remove_product_from_store(store_id, product_name)
+            return self.real.remove_product_from_store(int(store_id), product_name)
         else:
             self.remove = True
             if self.out:
@@ -160,7 +159,7 @@ class Proxy:
 
     def update_product(self, store_id, product_name, att, updated):
         if self.real != None:
-            return self.real.update_product(store_id, product_name, att, updated)
+            return self.real.update_product(int(store_id), product_name, att, updated)
         else:
             if updated is int and updated < 0:
                 return False
@@ -175,7 +174,7 @@ class Proxy:
 
     def add_new_store_owner(self, user, store_id):
         if self.real != None:
-            return self.real.add_new_store_owner(user, store_id)
+            return self.real.add_new_store_owner(user, int(store_id))
         else:
             if self.appoint:
                 self.appoint = not self.appoint
@@ -210,7 +209,7 @@ class Proxy:
     def add_permission(self, store_id, user, permission):
 
         if self.real != None:
-            return self.real.add_permission(store_id, user, permission)
+            return self.real.add_permission(int(store_id), user, permission)
 
         else:
 
@@ -224,7 +223,7 @@ class Proxy:
 
     def remove_store_manager(self, store_id, user):
         if self.real != None:
-            return self.real.remove_store_manager(store_id, user)
+            return self.real.remove_store_manager(int(store_id), user)
 
         else:
 

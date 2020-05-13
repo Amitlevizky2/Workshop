@@ -1,8 +1,9 @@
 import logging
 from project import logger
-
+import jsonpickle
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.Product import Product, Discount
+from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.ProductDiscount import VisibleProductDiscount, ConditionalProductDiscount
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.stores_managment.NullStore import NullStore
@@ -44,7 +45,8 @@ class StoresManager:
             search_in_store = self.get_store(store_id).search(search_term, categories, key_words)
             if search_in_store is not None and len(search_in_store) > 0:
                 search_result[store_id] = search_in_store
-        return search_result
+        serach_json = jsonpickle.encode(search_result)
+        return serach_json
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():
@@ -101,6 +103,7 @@ class StoresManager:
         return self.get_store(store_id).remove_permission_from_manager(owner, manager, permission)
 
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
+        purchase = jsonpickle.decode(purchase)
         return self.get_store(store_id).add_new_sale(purchase)
 
     def open_store(self, owner: str, store_name):
@@ -109,19 +112,19 @@ class StoresManager:
         return self.stores_idx - 1
 
     def buy(self, cart: Cart):
-
+        cart = jsonpickle.decode(cart)
         for store in cart.baskets.keys():
             basket = cart.get_basket(store)
             for product in basket.products.keys():
-                if not self.get_store(store).buy_product(product, basket.products.get(product)[1]):
+                if not self.get_store(int(store)).buy_product(product, basket.products.get(product)[1]):
                     return False
         return True
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
-        return self.get_store(store_id).get_sales_history(user, is_admin)
+        return jsonpickle.encode(self.get_store(store_id).get_sales_history(user, is_admin))
 
     def get_store_products(self, store_id):
-        return self.get_store(store_id).get_store_products()
+        return jsonpickle.encode(self.get_store(store_id).get_store_products())
 
     def remove_produce_from_store(self, store_id, product_name, username):
         store = self.get_store(store_id)
@@ -130,11 +133,15 @@ class StoresManager:
             return store.remove_product(product_name, username)
         return False
 
-    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+    def add_visible_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
         store = self.get_store(store_id)
-
         return store.add_discount_to_product(product_name, username,
-                                             Discount(start_date, end_date, percent))
+                                             VisibleProductDiscount(start_date, end_date, percent))
+
+    def add_conditional_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent, conditions):
+        store = self.get_store(store_id)
+        return store.add_discount_to_product(product_name, username,
+                                             ConditionalProductDiscount(start_date, end_date, percent, conditions))
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)

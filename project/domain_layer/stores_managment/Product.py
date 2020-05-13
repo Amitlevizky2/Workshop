@@ -1,14 +1,3 @@
-from functools import reduce
-import datetime
-
-
-class Discount(object):
-    def __init__(self, start_date, end_date, percent):
-        self.start = start_date
-        self.end = end_date
-        self.discount = 1 - percent / 100
-
-
 class Product:
     def __init__(self, name, price, categories, key_words, amount):
         self.name = name
@@ -27,7 +16,14 @@ class Product:
                self.key_words == other.key_words and \
                self.rate == other.rate
 
-    def get_price(self):
+    def get_price_after_discount(self):
+        price_after_discount = self.price
         for discount in self.discount:
-            self.price = self.price * discount.discount
+            price_after_discount = price_after_discount * discount.discount
+        return price_after_discount
+
+    def get_price_before_discount(self):
         return self.price
+
+    def add_discount(self, discount):
+        self.discount.append(discount)
