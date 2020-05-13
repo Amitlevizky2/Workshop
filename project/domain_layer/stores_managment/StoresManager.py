@@ -1,21 +1,29 @@
-import logging
 from project import logger
-
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment import Discount
-from project.domain_layer.stores_managment.Conditions import ProductCondition
 from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import CompositeDiscount
-from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import ConditionalProductDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import \
+    ConditionalProductDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalStoreDiscount import ConditionalStoreDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
+from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.PurchasesPolicies import PurchasePolicy
-from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseCompositePolicy import PurchaseCompositePolicy
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import Basket
 from project.domain_layer.users_managment.Cart import Cart
-from project.domain_layer.stores_managment.NullStore import NullStore
+
+
+def get_logic_operator(logic_operator_str: str):
+    if logic_operator_str.upper() == "OR":
+        return LogicOperator.OR
+    elif logic_operator_str.upper() == "AND":
+        return LogicOperator.AND
+    elif logic_operator_str.upper() == "XOR":
+        return LogicOperator.XOR
+    else:
+        return None
 
 
 class StoresManager:
@@ -176,10 +184,11 @@ class StoresManager:
         store = self.get_store(store_id)
         return store.remove_product_from_discount(permitted_user, discount_id, product_name)
 
-    def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator: LogicOperator, discounts_products_dict: dict, discounts_to_apply_id: list):
+    def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator_str: str, discounts_products_dict: dict, discounts_to_apply_id: list):
         store = self.get_store(store_id)  #                                                                                {dicount_id, [product_names]}
         tup_list = []
         discounts_to_apply_list = []
+        logic_operator: LogicOperator = get_logic_operator(logic_operator_str)
 
         for discount_id in discounts_products_dict.keys():
             if discount_id not in store.discounts.keys():
@@ -227,7 +236,8 @@ class StoresManager:
         store = self.get_store(store_id)
         return store.add_purchase_product_policy(permitted_user, min_amount_products, max_amount_products)
 
-    def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id, logic_operator: LogicOperator):
+    def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id, logic_operator_str: str):
+        logic_operator = get_logic_operator(logic_operator_str)
         if purchase_policies_id is None or logic_operator is None:
             return False, "The parameters are not valid"
 

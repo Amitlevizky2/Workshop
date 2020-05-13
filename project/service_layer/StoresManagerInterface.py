@@ -127,7 +127,7 @@ class StoresManagerInterface:
 
     def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
                                       purchase_policies_id = None,
-                                      logic_operator: LogicOperator = None):
+                                      logic_operator: str = None):
         return self.add_purchase_composite_policy(store_id, permitted_user, purchase_policies_id, logic_operator)
 
     def add_policy_to_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
@@ -189,7 +189,7 @@ class StoresManagerInterface:
         return self.stores_manager.remove_product_from_discount(store_id, permitted_user, discount_id, product_name)
 
     def add_composite_discount(self, store_id: int = None, username: str = None, start_date = None,
-                               end_date = None, logic_operator: LogicOperator = None,
+                               end_date = None, logic_operator: str = None,
                                discounts_products_dict: dict = None, discounts_to_apply_id: list = None):  # discounts_products_dict = {discount_id, [products_names]}
         return self.stores_manager.add_composite_discount(store_id, username, start_date, end_date, logic_operator,
                                                           discounts_products_dict, discounts_to_apply_id)
