@@ -1,8 +1,7 @@
-import jsonpickle
-
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.UsersManager import UsersManager
 from project import logger
+from project.service_layer import StoresManagerInterface
 from project.service_layer.Security import Security
 
 
@@ -11,9 +10,13 @@ class UsersManagerInterface:
 
     def __init__(self):
         self.user_manager = UsersManager()
+        self.stores_manager = None
         username = self.user_manager.add_guest_user()
         self.user_manager.register(username, "admin")
         self.user_manager.admins.append("admin")
+
+    def set_stores_manager(self, stores_manager: StoresManagerInterface):
+        self.stores_manager = stores_manager
 
     def register(self, username, new_username, password):
         logger.log("user %s called register with new_username:%s", username, new_username)
@@ -23,7 +26,7 @@ class UsersManagerInterface:
         else:
             return False
 
-    ##EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
+    # EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password) -> bool:
         logger.log("user %s called login with login_username:%s", username, login_username)
         if self.security.verify_password(login_username, password):
@@ -47,12 +50,17 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
     def add_product(self, username, store_id, product, quantity):
-        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, jsonpickle.decode(product).name, quantity)
+        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, product.name, quantity)
         return self.user_manager.add_product(username, store_id, product, quantity)
 
-    def remove_product(self, username, store_id, product, quantity):
-        logger.log("user %s called remove product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product.name, quantity)
-        return self.user_manager.remove_product(username,store_id, product, quantity)
+    def remove_product(self, username, store_id, product_name, quantity):
+        logger.log("user %s called remove product with store_id:%d, product_name:%s, quantity:%d", username, store_id,
+                   product_name, quantity)
+        product = self.get_product_from_store(store_id, product_name)
+        return self.user_manager.remove_product(username, store_id, product, quantity)
+
+    def get_product_from_store(self, store_id, product_name):
+        return self.stores_manager.get_product_from_store(store_id, product_name)
 
     def get_cart(self, username):
         return self.user_manager.get_cart(username)
@@ -61,7 +69,7 @@ class UsersManagerInterface:
         logger.log("admin %s called view_purchases_admin for user %s", admin, username)
         return self.user_manager.view_purchases_admin(username, admin)
 
-    def is_admin(self,username):
+    def is_admin(self, username):
         return self.user_manager.is_admin(username)
 
     def add_managed_store(self, username, store_id):
@@ -84,3 +92,6 @@ class UsersManagerInterface:
 
     def remove_cart(self, username):
         return self.user_manager.remove_cart(username)
+
+    def is_store_manager(self, username):
+        return self.user_manager.is_store_manager(username)
