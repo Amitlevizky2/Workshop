@@ -1,82 +1,50 @@
-import eventlet
-from eventlet import wsgi
-import socketio
+import os
 import json
 import jsonpickle
+from flask import Flask, jsonify, request
+from flask_socketio import SocketIO, join_room, leave_room
+from flask_cors import CORS
 
 from project.service_layer.Initializer import Initializer
 
-sio = socketio.Server(async_handlers=False)
+app = Flask(__name__)
+CORS(app)
+app.secret_key = os.environ.get('SECRET')
+app.config['WTF_CSRF_SECRET_KEY'] = "b'f\xfa\x8b{X\x8b\x9eM\x83l\x19\xad\x84\x08\xaa"
+sio = SocketIO(app, manage_session=False)
+
 initializer = Initializer()
 users_manager = initializer.get_users_manager_interface()
 stores_manager = initializer.get_stores_manager_interface()
-# purchase_manager = PurchaseManager(users_manager, stores_manager)
-
-# clients = { username, sid? }
-clients = {}
-app = socketio.WSGIApp(sio)
-
-"""
-on connect:
-1. assign the user with a new guest user name.
-2. save session?
-3. save session-guest user name
-4. create a room
-"""
 
 
-@sio.on('start')
-def establish_connection(sid, message):
+@app.route('/guest_user_name', methods=['POST', 'GET'])
+def guest_user_name():
     guest_username = users_manager.add_guest_user()
-    print('user name: ' + guest_username)
-    clients[guest_username] = sid
-    sio.save_session(sid, {'username': guest_username})
-    create_room(sid, guest_username)
-    return json.dumps({
+    return jsonify({
         'username': guest_username
     })
 
 
-@sio.on('disconnect')
-def disconnect(sid):
-    session = sio.get_session(sid)
-    username = session['username']
-    sio.emit('disconnect', room=username)
-    clients.pop(session['username'])
-    # print('disconnect ', sid)
-
-
-@sio.on('create room')
-def create_room(sid, username):
-    sio.enter_room(sid, room=username)
-
-
-@sio.on('exit room')
-def exit_room(sid, username):
-    sio.leave_room(sid, room=username)
-
-
 # username: str, login_username: str, password
-@sio.on('login')
-def login(sid, message):
-    json_msg = get_json_obj(message)
-    answer = users_manager.login(json_msg['username'], json_msg['login_username'], json_msg['password'])
-    if answer is not False:
-        exchange_username(json_msg['username'], answer, sid)
-        answer = True
-    return json.dumps({
-        'loggedin': answer
-    })
+@app.route('/login', methods=['POST'])
+def login():
+    message = request.get_json()
+    answer = users_manager.login(message['username'], message['new_username'], message['password'])
+    if answer is False:
+        return 'error', 400
+    return jsonify({
+        'user': answer
+    }), 201
 
 
-@sio.on('logout')
-def logout(sid, message):
-    json_msg = get_json_obj(message)
-    answer = users_manager.logout(json_msg['username'])
+@app.route('/logout', methods=['POST'])
+def logout():
+    message = request.get_json()
+    answer = users_manager.logout(message['username'])
     logged_out = True
-    # if user is not logged out
-    if not answer == json_msg['username']:
-        exchange_username(json_msg['username'], answer, sid)
+    # if user is not logged out --> still logged in
+    if not answer == message['username']:
         logged_out = False
     return json.dumps({
         'logged_out': logged_out,
@@ -84,79 +52,157 @@ def logout(sid, message):
     })
 
 
-@sio.on('register')
-def register(sid, message):
-    json_msg = get_json_obj(message)
-    answer = users_manager.register(json_msg['username'], json_msg['new_username'], json_msg['password'])
-    if answer is True:
-        exchange_username(json_msg['username'], json_msg['new_username'], sid)
-    return json.dumps({
+@app.route('/register', methods=['POST'])
+def register():
+    message = request.get_json()
+    answer = users_manager.register(message['username'], message['new_username'], message['password'])
+    return jsonify({
         'registered': answer
     })
 
 
-@sio.on('is manager')
-def is_manager(sid, message):
-    json_msg = get_json_obj(message)
-    answer = users_manager.is_store_manager(json_msg['username'])
-    return json.dumps({
+@app.route('/is_manager', methods=['POST'])
+def is_manager():
+    message = request.get_json()
+    answer = users_manager.is_store_manager(message['username'])
+    return jsonify({
         'manager': answer
     })
 
 
-@sio.on('add product')
-def add_product(sid, message):
-    json_msg = get_json_obj(message)
-    answer = users_manager.add_product(json_msg['username'], json_msg['store_id'], json_msg['product_name'],
-                                       json_msg['quantity'])
-    # return something?
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    message = request.get_json()
+    answer = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
+                                       message['quantity'])
+    if answer is True:
+        return 'done', 201
+    return 'error', 400
 
 
-@sio.on('get cart')
-def get_cart(sid, message):
-    json_msg = get_json_obj(message)
-    answer = users_manager.get_cart(json_msg['username'])
-    return answer
+@app.route('/remove_product', methods=['POST'])
+def remove_product():
+    message = request.get_json()
+    answer = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
+                                          message['quantity'])
+    if answer is True:
+        return 'removed', 201
+    return 'error', 400
 
 
-@sio.on('open store')
-def open_store(sid, message):
-    json_msg = get_json_obj(message)
-    answer = stores_manager.open_store(json_msg['username'], json_msg['store_name'])
-    return json.dumps({
+@app.route('/get_cart', methods=['POST'])
+def get_cart():
+    message = request.get_json()
+    answer = jsonpickle.decode(users_manager.get_cart(message['username']))
+    return jsonify({
+        'cart': answer
+    })
+
+
+# TODO: implement
+@app.route('/remove_cart', methods=['POST'])
+def remove_cart():
+    pass
+
+
+# TODO: implement
+@app.route('/view_cart', methods=['POST'])
+def view_cart():
+    pass
+
+
+@app.route('/add_managed_store', methods=['POST'])
+def add_managed_store():
+    message = request.get_json()
+    answer = users_manager.add_managed_store(message['username'], message['store_id'])
+    if answer is True:
+        return 'done', 201
+    return 'error', 400
+
+
+# TODO: implement
+@app.route('/remove_managed_store', methods=['POST'])
+def remove_managed_store():
+    pass
+
+
+@app.route('/get_managed_stores', methods=['POST'])
+def get_managed_stores():
+    message = request.get_json()
+    answer = users_manager.get_managed_stores(message['username'])
+    return jsonify({
+        'managed_stores': answer
+    })
+
+
+@app.route('/open_store', methods=['POST'])
+def open_store():
+    message = request.get_json()
+    answer = stores_manager.open_store(message['username'], message['store_name'])
+    return jsonify({
         'store_id': answer
     })
 
 
-@sio.on('search')
-def search(sid, message):
-    json_msg = get_json_obj(message)
-    answer = stores_manager.search_product(json_msg['product_name'])
-    return answer
+@app.route('/search', methods=['POST'])
+def search():
+    message = request.get_json()
+    answer = jsonpickle.decode(stores_manager.search_product(message['product_name']))
+    return jsonify({
+        "search_results": answer
+    })
 
 
-def exchange_username(old_username, new_username, sid):
-    clients.pop(old_username)
-    sio.close_room(old_username)
-    clients[new_username] = sid
-    create_room(sid, new_username)
-    session = sio.get_session(sid)
-    session['username'] = new_username
+@app.route('/view_user_purchases', methods=['POST'])
+def view_user_purchases():
+    message = request.get_json()
+    answer = jsonpickle.decode(users_manager.view_purchases(message['username']))
+    return jsonify({
+        "purchase_history": answer
+    })
+
+
+# TODO: implement
+@app.route('/add_purchase', methods=['POST'])
+def add_purchase():
+    pass
+
+
+# TODO: implement
+@app.route('/is_admin', methods=['POST'])
+def is_admin():
+    pass
+
+
+# TODO: implement
+@app.route('/view_purchases_admin', methods=['POST'])
+def view_purchases_admin():
+    pass
+
+
+@sio.on('create_room')
+def create_room(sid, username):
+    join_room(room=username, sid=sid)
+
+
+@sio.on('exit_room')
+def exit_room(sid, username):
+    leave_room(room=username, sid=sid)
 
 
 def send_notification(username, message):
     str_msg = jsonpickle.decode(message)
-    sio.emit('notification', json.dumps({
+    sio.send(jsonify({
         'message': str_msg
-    }), room=clients[username])
+    }), json=True, room=username)
 
 
-def get_json_obj(message):
-    return json.loads(message)
+if __name__ == "__main__":
+    app.run(debug=True)
 
-
-if __name__ == '__main__':
     """
+if __name__ == '__main__':
+    
 
       wsgi.server(eventlet.wrap_ssl(eventlet.listen(('', 5000)),
                                       certfile='cert.crt',
@@ -164,5 +210,16 @@ if __name__ == '__main__':
                                       server_side=True),
                     app)
 
-      """
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
+      
+    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)    
+    """
+
+"""
+def exchange_username(old_username, new_username, sid):
+    clients.pop(old_username)
+    sio.close_room(old_username)
+    clients[new_username] = sid
+    create_room(sid, new_username)
+    session = sio.get_session(sid)
+    session['username'] = new_username
+"""
