@@ -26,6 +26,7 @@ class UsersManagerInterface:
         else:
             return False
 
+# TODO: remove the return type hint. does not necessarily returns bool
     # EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password) -> bool:
         logger.log("user %s called login with login_username:%s", username, login_username)
@@ -37,6 +38,7 @@ class UsersManagerInterface:
     def add_guest_user(self):
         return self.user_manager.add_guest_user()
 
+# TODO: view_cart returns json object, not Cart.
     # look up via usr id change user list to map of ids and user
     def view_cart(self, username) -> Cart:
         logger.log("user %s called view_cart", username)
@@ -49,14 +51,23 @@ class UsersManagerInterface:
         logger.log("user %s called view_purchases", username)
         return self.user_manager.view_purchases(username)
 
-    def add_product(self, username, store_id, product, quantity):
-        logger.log("user %s called add prdouct with store_id:%d, product_name:%s, quantity:%d", username, store_id, product.name, quantity)
+# TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
+    def add_product(self, username, store_id, product_name, quantity):
+        logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product_name, quantity)
+        product = self.get_product_from_store(store_id, product_name)
         return self.user_manager.add_product(username, store_id, product, quantity)
 
-    def remove_product(self, username, store_id, product_name, quantity):
+    # TODO: remove_product receive actual product. change to product_name
+    def remove_product(self, username, store_id, product, quantity):
+        """
+        :param username:
+        :param store_id:
+        :param product:
+        :param quantity:
+        :return: True if product was removed. False otherwise.
+        """
         logger.log("user %s called remove product with store_id:%d, product_name:%s, quantity:%d", username, store_id,
-                   product_name, quantity)
-        product = self.get_product_from_store(store_id, product_name)
+                   product.name, quantity)
         return self.user_manager.remove_product(username, store_id, product, quantity)
 
     def get_product_from_store(self, store_id, product_name):
@@ -73,6 +84,11 @@ class UsersManagerInterface:
         return self.user_manager.is_admin(username)
 
     def add_managed_store(self, username, store_id):
+        """
+        :param username:
+        :param store_id:
+        :return:
+        """
         return self.user_manager.add_managed_store(username, store_id)
 
     def remove_managed_store(self, username, store_id):

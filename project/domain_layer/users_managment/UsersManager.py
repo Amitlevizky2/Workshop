@@ -45,6 +45,10 @@ class UsersManager:
         else:
             return False
 
+# TODO: if login succeeded, return the following json object:
+    #  TODO: user = {username: username, managed_stores: [int], purchase_history: [purchase should be json-style too],
+    #   notifications: [strings], cart: [basket should be json-style too] }
+
     def login(self, username: str, login_username: str):
         check = self.find_reg_user(login_username)
         if not (isinstance(check, NullUser)):
@@ -84,7 +88,8 @@ class UsersManager:
         user = self.find_user(username)
         return user.add_product(store_id, jsonpickle.decode(product), quantity)
 
-    def remove_product(self, username, store_id, product, quantity):
+    # TODO: remove product receive actual product. change to product_name
+    def remove_product(self, username, store_id, product, quantity) -> bool:
         user = self.find_user(username)
         return user.remove_product(store_id, jsonpickle.decode(product), quantity)
 
@@ -100,7 +105,7 @@ class UsersManager:
     def is_admin(self, username):
         return username in self.admins
 
-    def add_managed_store(self, username, store_id):
+    def add_managed_store(self, username, store_id) -> bool:
         user = self.find_reg_user(username)
         return user.add_managed_store(store_id)
 
@@ -123,7 +128,7 @@ class UsersManager:
         user = self.find_user(username)
         user.remove_cart()
 
-    def remove_managed_store(self, username, store_id):
+    def remove_managed_store(self, username, store_id) -> bool:
         user = self.find_reg_user(username)
         return user.remove_managed_store(store_id)
 
@@ -136,6 +141,6 @@ class UsersManager:
     def get_user_notifications(self, username):
         return self.find_reg_user(username).get_notifications()
 
-    def is_store_manager(self, username):
+    def is_store_manager(self, username) -> bool:
         reg_user = self.find_reg_user(username)
         return reg_user.is_store_manager()
