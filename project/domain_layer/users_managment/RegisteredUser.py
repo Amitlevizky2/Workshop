@@ -23,18 +23,30 @@ class RegisteredUser(User):
     def get_managed_store(self):
         return self.managed_stores
 
-    def add_managed_store(self, store_id):
+    def add_managed_store(self, store_id) -> bool:
+        """
+        :param store_id:
+        :return: if store_id is in managed_stores return False. Otherwise, add store_id and return True
+        """
         if store_id not in self.managed_stores:
             self.managed_stores.append(store_id)
+            return True
+        return False
 
-    def remove_managed_store(self, store_id):
+    def remove_managed_store(self, store_id) -> bool:
+        """
+        :param store_id:
+        :return: if store_id is in managed_stores, remove and return True. Otherwise, return False
+        """
         if store_id in self.managed_stores:
             self.managed_stores.remove(store_id)
+            return True
+        return False
 
     def add_notification(self, message):
         self.notifications.append(message)
 
-    def have_notifications(self):
+    def have_notifications(self) -> bool:
         return self.notifications.__len__() > 0
 
     def clear_notifications(self):
