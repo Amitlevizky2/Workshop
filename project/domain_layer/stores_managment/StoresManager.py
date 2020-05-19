@@ -31,6 +31,7 @@ class StoresManager:
         """
         return self.get_store(store_id).update_product(user, product_name, attribute, updated)
 
+# TODO: ask Amit if search result include store id?
     def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> {int: [Product]}:
         """
 
@@ -104,6 +105,7 @@ class StoresManager:
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         return self.get_store(store_id).remove_permission_from_manager(owner, manager, permission)
 
+# TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         purchase = jsonpickle.decode(purchase)
         return self.get_store(store_id).add_new_sale(purchase)
@@ -151,3 +153,8 @@ class StoresManager:
 
     def bound_publisher(self, publisher: Publisher):
         self.publisher = publisher
+
+# TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
+    #  TODO: and returns the product.
+    def get_product_from_store(self, store_id, product_name):
+        pass

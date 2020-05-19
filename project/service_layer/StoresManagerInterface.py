@@ -1,10 +1,10 @@
-from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.StoresManager import StoresManager
-from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Store import Store
 from spellchecker import SpellChecker
 
 from project import logger
+from project.domain_layer.communication_managment import Publisher
+from project.domain_layer.external_managment.Purchase import Purchase
+from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.StoresManager import StoresManager
 
 
 class StoresManagerInterface:
@@ -119,9 +119,10 @@ class StoresManagerInterface:
     def remove_owner(self, store_id, owner, to_remove):
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
 
-# implement
+# TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
+    #  TODO: and returns the product.
     def get_product_from_store(self, store_id, product_name) -> Product:
-        pass
+        return self.stores_manager.get_product_from_store(store_id, product_name)
 
     def bound_publisher(self, publisher: Publisher):
         self.stores_manager.bound_publisher(publisher)
