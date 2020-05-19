@@ -10,8 +10,9 @@ class User:
     def view_cart(self):
         self.cart.view()
 
-    def remove_product(self, store_id, product, quantity):
-        self.cart.remove_product(store_id, product, quantity)
+    # TODO: remove product receive actual product. change to product_name
+    def remove_product(self, store_id, product, quantity) -> bool:
+        return self.cart.remove_product(store_id, product, quantity)
 
     def add_product(self, store_id, product, quantity):
         self.cart.add_product(store_id, product, quantity)
