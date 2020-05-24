@@ -1,10 +1,10 @@
 from project import logger
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment import Discount
 from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import CompositeDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import \
     ConditionalProductDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalStoreDiscount import ConditionalStoreDiscount
+from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.NullStore import NullStore
@@ -13,6 +13,7 @@ from project.domain_layer.stores_managment.PurchasesPolicies import PurchasePoli
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import Basket
 from project.domain_layer.users_managment.Cart import Cart
+import json
 
 
 def get_logic_operator(logic_operator_str: str):
@@ -347,3 +348,8 @@ class StoresManager:
         store = self.get_store(store_id)
         description = store.get_description()
         return description
+
+    def get_jsn_description(self, store_id):
+        store = self.get_store(store_id)
+        jsn_desc = store.get_jsn_description()
+        return json.dumps(jsn_desc)

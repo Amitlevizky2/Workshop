@@ -1,5 +1,5 @@
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment import Discount
+from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store

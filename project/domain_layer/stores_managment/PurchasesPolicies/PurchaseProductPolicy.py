@@ -76,6 +76,21 @@ class PurchaseProductPolicy(PurchasePolicy):
 
         return [self.id, self.purchase_type, min_string, max_string, self.products_in_policy]
 
+    def get_jsn_description(self):
+        min_string = ""
+        max_string = ""
+        if self.min_amount_products == self.MIN_SIZE:
+            min_string = "no min limit"
+        else:
+            min_string = str(self.min_amount_products)
 
+        if self.min_amount_products == self.MAX_SIZE:
+            max_string = "no max limit"
+        else:
+            max_string = str(self.max_amount_products)
 
-
+        return {"Purchase ID": self.id,
+                "Min amount of products": self.min_amount_products,
+                "Max amount of products": self.max_amount_products,
+                "Products In Policy": self.products_in_policy.keys(),
+                "Purchase Type": self.purchase_type}

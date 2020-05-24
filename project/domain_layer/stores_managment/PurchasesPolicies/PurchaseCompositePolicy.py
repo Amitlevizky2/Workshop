@@ -95,3 +95,18 @@ class PurchaseCompositePolicy(PurchasePolicy):
         for policy in self.purchase_policies:
             policies_description.append(policy.get_description())
         return [self.id, self.purchase_type, policies_description]
+
+    def get_jsn_description(self):
+        policies_description = []
+        for policy in self.purchase_policies:
+            policies_description.append(policy.get_jsn_description())
+
+        return {"Purchase ID": self.id,
+                "Purchase Policies": policies_description,
+                "Logic Operator": self.logic_operator.__str__(),
+                "Purchase Type": self.purchase_type}
+    #
+    # self.logic_operator = logic_operator
+    # self.purchase_policies = purchase_policies
+    # self.id = id
+    # self.purchase_type = "Purchase Composite Policy"
