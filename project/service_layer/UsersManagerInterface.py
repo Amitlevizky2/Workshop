@@ -8,6 +8,7 @@ class UsersManagerInterface:
     def __init__(self):
         self.user_manager = UsersManager()
 
+
     def register(self, username, new_username, password):
         logger.log("user %s called register with new_username:%s, password:%s", username, new_username, password)
         return self.user_manager.register(username, new_username,password)
