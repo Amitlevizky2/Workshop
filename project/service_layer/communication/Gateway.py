@@ -17,6 +17,10 @@ initializer = Initializer()
 users_manager = initializer.get_users_manager_interface()
 stores_manager = initializer.get_stores_manager_interface()
 
+"""---------------------------------------------------------------------"""
+"""-------------------------------USER EVENTS-------------------------------- """
+"""---------------------------------------------------------------------"""
+
 
 @app.route('/guest_user_name', methods=['POST', 'GET'])
 def guest_user_name():
@@ -72,6 +76,10 @@ def is_manager():
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
+    """
+    adds a product to the user's ('username') shopping cart
+    :return:
+    """
     message = request.get_json()
     answer = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
                                        message['quantity'])
@@ -82,6 +90,10 @@ def add_product():
 
 @app.route('/remove_product', methods=['POST'])
 def remove_product():
+    """
+    removes a product from the user's ('username') shopping cart
+    :return:
+    """
     message = request.get_json()
     answer = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
                                           message['quantity'])
@@ -111,15 +123,6 @@ def view_cart():
     pass
 
 
-@app.route('/add_managed_store', methods=['POST'])
-def add_managed_store():
-    message = request.get_json()
-    answer = users_manager.add_managed_store(message['username'], message['store_id'])
-    if answer is True:
-        return 'done', 201
-    return 'error', 400
-
-
 # TODO: implement
 @app.route('/remove_managed_store', methods=['POST'])
 def remove_managed_store():
@@ -132,24 +135,6 @@ def get_managed_stores():
     answer = users_manager.get_managed_stores(message['username'])
     return jsonify({
         'managed_stores': answer
-    })
-
-
-@app.route('/open_store', methods=['POST'])
-def open_store():
-    message = request.get_json()
-    answer = stores_manager.open_store(message['username'], message['store_name'])
-    return jsonify({
-        'store_id': answer
-    })
-
-
-@app.route('/search', methods=['POST'])
-def search():
-    message = request.get_json()
-    answer = jsonpickle.decode(stores_manager.search_product(message['product_name']))
-    return jsonify({
-        "search_results": answer
     })
 
 
@@ -168,6 +153,80 @@ def add_purchase():
     pass
 
 
+"""---------------------------------------------------------------------"""
+"""-------------------------------STORE EVENTS------------------------------"""
+"""---------------------------------------------------------------------"""
+
+
+@app.route('/appoint_store_manager', methods=['POST'])
+def appoint_store_manager():
+    message = request.get_json()
+    answer = stores_manager.appoint_manager_to_store(message['store_id'], message['owner'], message['to_appoint'])
+    if answer is True:
+        return 'done', 201
+    return 'error', 400
+
+
+@app.route('/get_store_managers', methods=['POST'])
+def get_store_managers():
+    message = request.get_json()
+    answer = stores_manager.get_store_managers(message['store_id'])
+    return jsonify({
+        'managers': answer
+    })
+
+
+@app.route('/get_store_owners', methods=['POST'])
+def get_store_owners():
+    message = request.get_json()
+    answer = stores_manager.get_store_owners(message['store_id'])
+    return jsonify({
+        'owners': answer
+    })
+
+
+@app.route('/open_store', methods=['POST'])
+def open_store():
+    message = request.get_json()
+    answer = stores_manager.open_store(message['username'], message['store_name'])
+    return jsonify({
+        'store_id': answer
+    })
+
+
+@app.route('/appoint_store_owner', methods=['POST'])
+def appoint_store_owner():
+    message = request.get_json()
+    answer = stores_manager.appoint_owner_to_store(message['store_id'], message['owner'], message['to_appoint'])
+    if answer is False:
+        return 'error', 400
+    return 'done', 201
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    message = request.get_json()
+    answer = jsonpickle.decode(stores_manager.search_product(message['product_name']))
+    return jsonify({
+        "search_results": answer
+    })
+
+
+@app.route('/update_store_product', methods=['POST'])
+def update_store_product():
+    message = request.get_json()
+    answer = stores_manager.update_product(message['store_id'], message['username'], message['product_name'],
+                                           message['attribute'], message['updated'])
+    if answer is True:
+        return 'done', 200
+    return 'error', 400
+
+
+"""---------------------------------------------------------------------"""
+"""-------------------------------ADMIN EVENTS------------------------------"""
+"""---------------------------------------------------------------------"""
+
+
 # TODO: implement
 @app.route('/is_admin', methods=['POST'])
 def is_admin():
@@ -180,46 +239,32 @@ def view_purchases_admin():
     pass
 
 
-@sio.on('create_room')
-def create_room(sid, username):
-    join_room(room=username, sid=sid)
+"""---------------------------------------------------------------------"""
+"""-------------------------------SOCKET EVENTS------------------------------"""
+"""---------------------------------------------------------------------"""
 
 
-@sio.on('exit_room')
-def exit_room(sid, username):
-    leave_room(room=username, sid=sid)
+@sio.on('join')
+def join(sid, data):
+    join_room(room=data['room'], sid=sid)
+
+
+@sio.on('leave')
+def leave(sid, data):
+    leave_room(room=data['room'], sid=sid)
 
 
 def send_notification(username, message):
     str_msg = jsonpickle.decode(message)
     sio.send(jsonify({
-        'message': str_msg
+        'messages': str_msg
     }), json=True, room=username)
 
+
+"""---------------------------------------------------------------------"""
+"""-------------------------------RUN APPLICATION------------------------------"""
+"""---------------------------------------------------------------------"""
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-    """
-if __name__ == '__main__':
-    
-
-      wsgi.server(eventlet.wrap_ssl(eventlet.listen(('', 5000)),
-                                      certfile='cert.crt',
-                                      keyfile='private.key',
-                                      server_side=True),
-                    app)
-
-      
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)    
-    """
-
-"""
-def exchange_username(old_username, new_username, sid):
-    clients.pop(old_username)
-    sio.close_room(old_username)
-    clients[new_username] = sid
-    create_room(sid, new_username)
-    session = sio.get_session(sid)
-    session['username'] = new_username
-"""

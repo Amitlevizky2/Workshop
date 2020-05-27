@@ -108,6 +108,14 @@ class StoresManagerInterface:
                                                            percent)
 
     def update_product(self, store_id, username, product_name, attribute, updated):
+        """
+        :param store_id: the store we want to update
+        :param username: the user who wants to update
+        :param product_name: product to update
+        :param attribute: the parameter we wants to update
+        :param updated: new value
+        :return: True if succeed
+        """
         return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)
 
     def remove_manager(self, store_id, owner, to_remove):
@@ -119,7 +127,23 @@ class StoresManagerInterface:
     def remove_owner(self, store_id, owner, to_remove):
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
 
-# TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
+    # TODO: implement
+    def get_store_owners(self, store_id):
+        """
+        :param store_id:
+        :return: array of store owners user names
+        """
+        pass
+
+    # TODO: implement
+    def get_store_managers(self, store_id):
+        """
+        :param store_id:
+        :return: array of store managers user names
+        """
+        pass
+
+    # TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
     #  TODO: and returns the product.
     def get_product_from_store(self, store_id, product_name) -> Product:
         return self.stores_manager.get_product_from_store(store_id, product_name)
