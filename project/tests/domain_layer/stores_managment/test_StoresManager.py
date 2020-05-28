@@ -2,13 +2,12 @@ import datetime
 import unittest
 
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
-from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.Basket import Basket
+from project.domain_layer.users_managment.Cart import Cart
 
 
 class StubStore(Store):
@@ -274,6 +273,10 @@ class test_StoresManager(unittest.TestCase):
     def test_buy(self):
         cart = self.init_cart()
         is_apply = self.store_manager.buy(cart)
+        x=5
+
+    def test_get_store_jsn_description(self):
+        store_json = self.store_manager.get_jsn_description(1)
         x=5
 
 

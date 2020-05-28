@@ -6,8 +6,6 @@ class Product:
         self.key_words = key_words
         self.rate = 0
         self.amount = amount
-        self.visible_discount = []
-        self.conditional_product_discount = []
 
     def __eq__(self, other):
         return self.name == other.name and \
@@ -73,3 +71,11 @@ class Product:
             return False
         self.amount -= to_reduce
         x=5
+
+    def get_jsn_description(self):
+        return {"Name": self.name,
+                "Original Price": self.original_price,
+                "Categories": self.categories,
+                "Keywords": self.key_words,
+                "Rate": self.rate,
+                "Amount": self.amount}

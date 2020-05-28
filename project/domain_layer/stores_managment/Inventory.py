@@ -71,3 +71,9 @@ class Inventory:
         for product in self.products.values():
             products[product.name] = [product.amount, product.original_price]
         return products
+
+    def get_jsn_description(self):
+        products_dict_list = []
+        for tup in self.products.values():
+            products_dict_list.append(tup.get_jsn_description())
+        return products_dict_list

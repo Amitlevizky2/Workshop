@@ -38,6 +38,10 @@ class Discount(ABC):
     def get_description(self):
         pass
 
+    @abstractmethod
+    def get_jsn_description(self):
+        pass
+
     def add_product(self, product_name: str):
         self.products_in_discount[product_name] = True
 

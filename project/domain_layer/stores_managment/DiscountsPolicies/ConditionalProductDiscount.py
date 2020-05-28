@@ -106,3 +106,12 @@ class ConditionalProductDiscount(Discount):
 
     def get_description(self):
         return [self.id, self.discount_type, self.start, self.end, self.discount, self.products_in_discount]
+
+    def get_jsn_description(self):
+        return {"Start Date": self.start.strftime('%m/%d/%Y'),
+                "End Date": self.end.strftime('%m/%d/%Y'),
+                "Percent": self.discount,
+                "Min amount": self.min_amount,
+                "Number of products to apply": self.num_prods_to_apply,
+                "Products In Discount": self.products_in_discount.keys(),
+                "Discount Type": self.discount_type}
