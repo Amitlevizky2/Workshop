@@ -1,11 +1,15 @@
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
-from sqlalchemy.orm import relationship
-from project.DAL.RegisteredUserORM import RegisteredUserORM
+from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean, update
+
+from project.DAL import Base, session
 
 
-class ProductsInBasketORM(RegisteredUserORM):
+class ProductsInBasketORM(Base):
     __tablename__ = 'productsinbaskets'
     basket_id = Column(Integer, ForeignKey('baskets.id'), primary_key=True)
     product_name = Column(String, ForeignKey('products.username'), primary_key=True)
     quantity = Column(Integer)
+
+    def update_quantity(self, id, product_name, amount):
+        update('productsinbaskets').where(basket_id=id, product_name=product_name).values(quantity=amount)
+

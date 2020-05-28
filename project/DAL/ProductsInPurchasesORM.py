@@ -1,6 +1,7 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
-from sqlalchemy.orm import relationship
+
+from project.DAL import session
 from project.DAL.RegisteredUserORM import RegisteredUserORM
 
 
@@ -10,3 +11,7 @@ class ProductsInPurchasesORM(RegisteredUserORM):
     product_name = Column(String, ForeignKey('products.username'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     quantity = Column(Integer)
+
+    # create products in purchaseORM and send to this function
+    def add(self, productinpurchase):
+        session.add(productinpurchase)

@@ -20,6 +20,7 @@ class Basket:
             amount = self.products[product.name][1]
             amount += quantity
             self.products[product.name] = (product, amount)
+
         else:
             self.products[product.name] = (product, quantity)
         return True

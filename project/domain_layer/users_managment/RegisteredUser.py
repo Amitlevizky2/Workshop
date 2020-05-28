@@ -10,6 +10,7 @@ class RegisteredUser(User):
         self.loggedin = False
         self.managed_stores = []
 
+
     def logout(self):
         self.loggedin = False
 
