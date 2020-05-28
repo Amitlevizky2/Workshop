@@ -360,7 +360,7 @@ class StoresManager:
         jsn_desc = store.get_jsn_description()
         return json.dumps(jsn_desc)
 
-   def bound_publisher(self, publisher: Publisher):
+    def bound_publisher(self, publisher: Publisher):
         self.publisher = publisher
 
 # TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
