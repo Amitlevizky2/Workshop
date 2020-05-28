@@ -1,8 +1,3 @@
-from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
-from project.domain_layer.stores_managment.StoresManager import StoresManager
-from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Store import Store
 from spellchecker import SpellChecker
 
 from project import logger
@@ -255,3 +250,6 @@ class StoresManagerInterface:
 
     def bound_publisher(self, publisher: Publisher):
         self.stores_manager.bound_publisher(publisher)
+
+    def get_stores_manager(self) -> StoresManager:
+        return self.stores_manager

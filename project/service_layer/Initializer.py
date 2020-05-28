@@ -16,3 +16,9 @@ class Initializer:
 
     def get_stores_manager_interface(self) -> StoresManagerInterface:
         return self.stores_manager
+
+    def bound_managers(self):
+        users = self.users_manager.get_users_manager()
+        stores = self.stores_manager.get_stores_manager()
+        users.set_stores_manager(stores)
+        stores.set_users_manager(users)

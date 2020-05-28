@@ -19,6 +19,8 @@ from project.domain_layer.communication_managment.Publisher import Publisher
 
 import json
 
+from project.domain_layer.users_managment.UsersManager import UsersManager
+
 
 def get_logic_operator(logic_operator_str: str):
     if logic_operator_str is None:
@@ -36,6 +38,7 @@ def get_logic_operator(logic_operator_str: str):
 class StoresManager:
     def __init__(self):
         self.publisher = None
+        self.users_manager = None
         self.stores = {}
         self.stores_idx = 0
 
@@ -362,6 +365,9 @@ class StoresManager:
 
     def bound_publisher(self, publisher: Publisher):
         self.publisher = publisher
+
+    def set_users_manager(self, users_manager: UsersManager):
+        self.users_manager = users_manager
 
 # TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
     #  TODO: and returns the product.

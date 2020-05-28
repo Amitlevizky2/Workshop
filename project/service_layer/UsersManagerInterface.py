@@ -111,3 +111,8 @@ class UsersManagerInterface:
 
     def is_store_manager(self, username):
         return self.user_manager.is_store_manager(username)
+
+    def get_users_manager(self) -> UsersManager:
+        return self.user_manager
+
+

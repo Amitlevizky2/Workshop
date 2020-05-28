@@ -1,5 +1,5 @@
 from project.domain_layer.users_managment.Cart import Cart
-from project.domain_layer.stores_managment.StoresManager import StoresManager
+# from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
@@ -8,11 +8,12 @@ import jsonpickle
 
 
 class UsersManager:
-    store_manager = StoresManager()
+    # store_manager = StoresManager()
     incremental_id = 0
 
     def __init__(self):
-        self.publisher = None
+        # self.publisher = None
+      #  self.stores_manager = None
         self.reg_user_list = {}
         self.guest_user_list = {}
         # maybe dictionary {id, username}
@@ -99,15 +100,15 @@ class UsersManager:
         user = self.find_user(username)
         return jsonpickle.encode(user.get_cart())
 
-    def view_cart_after_discount(self, username: str):
-        updated_baskets_list = []
-        baskets = self.get_cart(username).baskets
-
-        for basket in baskets.values():
-            basket_prices = self.store_manager.calculate_basket_price(basket)
-            updated_baskets_list.append(basket_prices)
-
-        return updated_baskets_list
+   # def view_cart_after_discount(self, username: str):
+   #      updated_baskets_list = []
+   #      baskets = self.get_cart(username).baskets
+   #
+   #      for basket in baskets.values():
+   #          basket_prices = self.stores_manager.calculate_basket_price(basket)
+   #          updated_baskets_list.append(basket_prices)
+   #
+   #      return updated_baskets_list
 
     def view_purchases_admin(self, username, admin):
         if admin in self.admins:
@@ -156,3 +157,6 @@ class UsersManager:
     def is_store_manager(self, username) -> bool:
         reg_user = self.find_reg_user(username)
         return reg_user.is_store_manager()
+
+    # def set_stores_manager(self, stores_manager: StoresManager):
+    #     self.stores_manager = stores_manager
