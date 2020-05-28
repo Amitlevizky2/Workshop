@@ -117,16 +117,16 @@ class TestUsersManagerIntegration(TestCase):
     def test_register(self):
         guest_user_name = self.users_manager.add_guest_user()
         guest_cart = self.users_manager.get_cart(guest_user_name)
-        self.assertTrue(self.users_manager.register(guest_user_name, "lielle", "12345"))
+        self.assertTrue(self.users_manager.register(guest_user_name, "lielle"))
         self.assertEqual(guest_cart, self.users_manager.get_cart("lielle"))
         guest_user_name = self.users_manager.add_guest_user()
-        self.assertFalse(self.users_manager.register(guest_user_name, "lielle", "12345"))
+        self.assertFalse(self.users_manager.register(guest_user_name, "lielle"))
 
     def test_login(self):
         guest_user_name = self.users_manager.add_guest_user()
-        self.users_manager.register(guest_user_name, "registered1", "7777777")
+        self.users_manager.register(guest_user_name, "registered1")
         registered1 = self.users_manager.find_reg_user("registered1")
-        login_un = self.users_manager.login(guest_user_name, registered1.username, "7777777")
+        login_un = self.users_manager.login(guest_user_name, registered1.username)
         self.assertEqual(self.users_manager.find_reg_user(login_un).loggedin, registered1.loggedin)
 
     def test_view_cart(self):

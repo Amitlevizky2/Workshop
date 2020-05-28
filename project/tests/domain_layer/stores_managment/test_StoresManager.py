@@ -279,8 +279,6 @@ class test_StoresManager(unittest.TestCase):
         store_json = self.store_manager.get_jsn_description(1)
         x=5
 
-
-
     # def test_get_basket_description(self):
     #     self.fail()
 
@@ -315,7 +313,6 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Keyboard")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 5, "Apple")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 6, "Tomato")
-
 
             # self.tup_disc_prod_name_list = []
             # self.tup_disc_prod_name_list.append((self.discount3, ["Apple", "Carrot", "Keyboard"]))

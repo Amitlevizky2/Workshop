@@ -8,7 +8,7 @@ from project.domain_layer.stores_managment.Product import Product
 
 class test_Product(unittest.TestCase):
     def test_get_price(self):
-        date_str = '04-10-2020'
+        date_str = '04-20-2020'
         dt = timedelta(days=10)
         date_object = datetime.strptime(date_str, '%m-%d-%Y')
         self.product = Product("apple", 2, "food", None, 1)

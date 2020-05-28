@@ -1,16 +1,22 @@
 from unittest import TestCase
 
+import jsonpickle
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
 from project.domain_layer.users_managment.UsersManager import UsersManager
+from project.service_layer.Security import Security
+from project.service_layer.UsersManagerInterface import UsersManagerInterface
 
 
 class TestUserManager(TestCase):
     def setUp(self) -> None:
-        self.users_mng = UsersManager()
+        self.admin = UsersManagerInterface()
+        self.users_mng = self.admin.user_manager
+        self.security = Security()
 
     def test_find_reg_user(self):
         reg_user1 = RegisteredUser("reg_user1")
@@ -34,29 +40,29 @@ class TestUserManager(TestCase):
         user = User("guestUser700")
         self.users_mng.guest_user_list[user.username] = user
 
-        self.users_mng.register("guestUser700", "user200", "1234")
+        self.users_mng.register("guestUser700", "user200")
         self.assertTrue("user200" in self.users_mng.reg_user_list.keys())
         self.users_mng.reg_user_list.pop("user200")
 
         reg_lielle = RegisteredUser("lielle")
         self.users_mng.reg_user_list["lielle"] = reg_lielle
-        self.assertFalse(self.users_mng.register("guestUser700", "lielle", "1234"))
+        self.assertFalse(self.users_mng.register("guestUser700", "lielle"))
         self.users_mng.reg_user_list.pop("lielle")
 
     def test_login(self):
-        self.users_mng.security.add_user("lielle", "noa")
+        self.security.add_user("lielle", "noa")
         user = User("guestUser800")
         self.users_mng.guest_user_list[user.username] = user
         reg_lielle = RegisteredUser("lielle")
         self.users_mng.reg_user_list["lielle"] = reg_lielle
 
-        login_un = self.users_mng.login("guestUser800", "lielle", "noa")
+        login_un = self.users_mng.login("guestUser800", "lielle")
         self.assertEqual(login_un, "lielle")
 
-        login_un = self.users_mng.login("guestUser800", "lielle", "not_noa")
+        login_un = self.users_mng.login("guestUser800", "lielle")
         self.assertFalse(login_un)
 
-        login_un = self.users_mng.login("guestUser800", "bla", "not_noa")
+        login_un = self.users_mng.login("guestUser800", "bla")
         self.assertFalse(login_un)
 
         self.users_mng.reg_user_list.pop("lielle")
@@ -91,13 +97,13 @@ class TestUserManager(TestCase):
         reg_lielle.purchase_history.append(purchase)
         purch = [purchase]
 
-        x = self.users_mng.view_purchases("lielle")
-        self.assertListEqual(x, purch)
+        x = jsonpickle.decode(self.users_mng.view_purchases("lielle"))
+        self.assertEqual(x[0].purchase_id, purch[0].purchase_id)
 
         user = User("guestUser1212")
         self.users_mng.guest_user_list[user.username] = user
         user.purchase_history.append(purchase)
-        self.assertListEqual(self.users_mng.view_purchases("guestUser1212"), purch)
+        self.assertEqual(jsonpickle.decode(self.users_mng.view_purchases("guestUser1212"))[0].purchase_id, purch[0].purchase_id)
 
         self.users_mng.reg_user_list.pop("lielle")
 
@@ -120,13 +126,11 @@ class TestUserManager(TestCase):
         reg_lielle.purchase_history.append(purchase)
         purch = [purchase]
 
-        x = self.users_mng.view_purchases_admin("lielle", "admin")
-        self.assertListEqual(x, purch)
+        x = jsonpickle.decode(self.users_mng.view_purchases_admin("lielle", "admin"))
+        self.assertEqual(x[0].purchase_id, purch[0].purchase_id)
 
         y = self.users_mng.view_purchases_admin("lielle", "not_admin")
         self.assertFalse(y)
-
-        self.assertIsNone(self.users_mng.view_purchases_admin("stam", "admin"))
 
         self.users_mng.reg_user_list.pop("lielle")
 

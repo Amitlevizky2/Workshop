@@ -1,4 +1,6 @@
+import logging
 from project import logger
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import CompositeDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import \
@@ -13,6 +15,8 @@ from project.domain_layer.stores_managment.PurchasesPolicies import PurchasePoli
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.users_managment import Basket
 from project.domain_layer.users_managment.Cart import Cart
+from project.domain_layer.communication_managment.Publisher import Publisher
+
 import json
 
 
@@ -31,6 +35,7 @@ def get_logic_operator(logic_operator_str: str):
 
 class StoresManager:
     def __init__(self):
+        self.publisher = None
         self.stores = {}
         self.stores_idx = 0
 
@@ -49,6 +54,7 @@ class StoresManager:
         """
         return self.get_store(store_id).update_product(user, product_name, attribute, updated)
 
+# TODO: ask Amit if search result include store id?
     def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> {int: [Product]}:
         """
 
@@ -124,6 +130,7 @@ class StoresManager:
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         return self.get_store(store_id).remove_permission_from_manager(owner, manager, permission)
 
+# TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         return self.get_store(store_id).add_new_sale(purchase)
 
@@ -151,8 +158,7 @@ class StoresManager:
         return True
 
     def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
-        result = self.get_store(store_id).get_sales_history(user, is_admin)
-        return result
+        return self.get_store(store_id).get_sales_history(user, is_admin)
 
     def get_store_products(self, store_id):
         return self.get_store(store_id).get_store_products()
@@ -353,3 +359,11 @@ class StoresManager:
         store = self.get_store(store_id)
         jsn_desc = store.get_jsn_description()
         return json.dumps(jsn_desc)
+
+   def bound_publisher(self, publisher: Publisher):
+        self.publisher = publisher
+
+# TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
+    #  TODO: and returns the product.
+    def get_product_from_store(self, store_id, product_name):
+        pass

@@ -1,25 +1,22 @@
-from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Cart import Cart
+from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 from project.domain_layer.users_managment.User import User
 from project import logger
-from project.service_layer.Security import Security
+import jsonpickle
 
 
 class UsersManager:
-    security = Security()
     store_manager = StoresManager()
     incremental_id = 0
 
     def __init__(self):
+        self.publisher = None
         self.reg_user_list = {}
         self.guest_user_list = {}
         # maybe dictionary {id, username}
         self.admins = []
-        username = self.add_guest_user()
-        self.register(username, "admin", "1234")
-        self.admins.append("admin")
 
     def find_reg_user(self, username) -> RegisteredUser:
         if username in self.reg_user_list.keys():
@@ -39,11 +36,10 @@ class UsersManager:
                 user = NullUser()
         return user
 
-    def register(self, username, new_username, password):
+    def register(self, username, new_username):
         check = self.find_reg_user(new_username)
         if isinstance(check, NullUser):
             registered = RegisteredUser(new_username)
-            self.security.add_user(new_username, password)
             user = self.find_user(username)
             registered.cart = user.cart
             self.reg_user_list[new_username] = registered
@@ -51,15 +47,18 @@ class UsersManager:
         else:
             return False
 
-    def login(self, username: str, login_username: str, password):
+# TODO: if login succeeded, return the following json object:
+    #  TODO: user = {username: username, managed_stores: [int], purchase_history: [purchase should be json-style too],
+    #   notifications: [strings], cart: [basket should be json-style too] }
+
+    def login(self, username: str, login_username: str):
         check = self.find_reg_user(login_username)
         if not (isinstance(check, NullUser)):
-            if self.security.verify_password(login_username, password):
-                check.loggedin = True
-                self.guest_user_list.pop(username)
-                return login_username
-            else:
+            if check.loggedin is True:
                 return False
+            check.loggedin = True
+            self.guest_user_list.pop(username)
+            return login_username
         else:
             return False
 
@@ -72,9 +71,9 @@ class UsersManager:
         return user.username
 
     # look up via usr id change user list to map of ids and user
-    def view_cart(self, username) -> Cart:
+    def view_cart(self, username):
         user = self.find_user(username)
-        return user.cart
+        return jsonpickle.encode(user.cart)
 
     def logout(self, username):
         user = self.find_reg_user(username)
@@ -84,20 +83,21 @@ class UsersManager:
         return username
 
     def view_purchases(self, username):
-        return self.find_user(username).view_purchase_history()
+        return jsonpickle.encode(self.find_user(username).view_purchase_history())
         # if view purchases of username
 
     def add_product(self, username, store_id, product, quantity):
         user = self.find_user(username)
-        return user.add_product(store_id, product, quantity)
+        return user.add_product(store_id, jsonpickle.decode(product), quantity)
 
-    def remove_product(self, username, store_id, product, quantity):
+    # TODO: remove product receive actual product. change to product_name
+    def remove_product(self, username, store_id, product, quantity) -> bool:
         user = self.find_user(username)
-        return user.remove_product(store_id, product, quantity)
+        return user.remove_product(store_id, jsonpickle.decode(product), quantity)
 
     def get_cart(self, username):
         user = self.find_user(username)
-        return user.get_cart()
+        return jsonpickle.encode(user.get_cart())
 
     def view_cart_after_discount(self, username: str):
         updated_baskets_list = []
@@ -111,19 +111,19 @@ class UsersManager:
 
     def view_purchases_admin(self, username, admin):
         if admin in self.admins:
-            return self.find_reg_user(username).view_purchase_history()
+            return jsonpickle.encode(self.find_reg_user(username).view_purchase_history())
         return False
 
     def is_admin(self, username):
         return username in self.admins
 
-    def add_managed_store(self, username, store_id):
+    def add_managed_store(self, username, store_id) -> bool:
         user = self.find_reg_user(username)
         return user.add_managed_store(store_id)
 
     def get_managed_stores(self, username):
         user = self.find_reg_user(username)
-        return user.get_managed_store()
+        return jsonpickle.encode(user.get_managed_store())
 
     def check_if_registered(self, username):
         return username in self.reg_user_list.keys()
@@ -134,12 +134,25 @@ class UsersManager:
 
     def add_purchase(self, username, purchase):
         user = self.find_user(username)
-        user.add_purchase(purchase)
+        user.add_purchase(jsonpickle.decode(purchase))
 
     def remove_cart(self, username):
         user = self.find_user(username)
         user.remove_cart()
 
-    def remove_managed_store(self, username, store_id):
+    def remove_managed_store(self, username, store_id) -> bool:
         user = self.find_reg_user(username)
         return user.remove_managed_store(store_id)
+
+    def add_notification(self, loggedout_username, message):
+        self.find_reg_user(loggedout_username).add_notification(message)
+
+    def have_notifications(self, username):
+        return self.find_reg_user(username).have_notifications()
+
+    def get_user_notifications(self, username):
+        return self.find_reg_user(username).get_notifications()
+
+    def is_store_manager(self, username) -> bool:
+        reg_user = self.find_reg_user(username)
+        return reg_user.is_store_manager()

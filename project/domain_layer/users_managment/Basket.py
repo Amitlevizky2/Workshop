@@ -15,7 +15,7 @@ class Basket:
         return self.total
 
     # check += ???????
-    def add_product(self, product, quantity):
+    def add_product(self, product, quantity) -> bool:
         if product.name in self.products.keys():
             amount = self.products[product.name][1]
             amount += quantity
@@ -24,7 +24,8 @@ class Basket:
             self.products[product.name] = (product, quantity)
         return True
 
-    def remove_product(self, product, quantity):
+    # TODO: remove product receive actual product. change to product_name
+    def remove_product(self, product, quantity) -> bool:
         if product.name in self.products.keys():
             amount = self.products[product.name][1]
             amount = amount - quantity
@@ -34,3 +35,5 @@ class Basket:
                     self.products = {}
             else:
                 self.products[product.name] = (product, amount)
+            return True
+        return False

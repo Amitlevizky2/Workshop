@@ -39,7 +39,7 @@ class NullStore(Store):
         return False
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
-        return False
+        return []
 
     def update_product(self, user, product_name, attribute, updated):
         return False
