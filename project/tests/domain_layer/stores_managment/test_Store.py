@@ -9,6 +9,8 @@ from project.domain_layer.stores_managment.Product import Product
 
 from project.domain_layer.stores_managment.Store import Store
 import datetime
+from locust import HttpLocust, TaskSet, task, between
+
 
 from project.domain_layer.users_managment.Basket import Basket
 

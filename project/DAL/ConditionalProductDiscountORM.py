@@ -9,7 +9,7 @@ from project.DAL.RegisteredUserORM import association_owners, association_manage
 class ConditionalDiscountsORM(DiscountORM):
     __tablename__ = 'conditionalproductdiscounts'
     discount_id = Column(Integer, primary_key=True)
-    product_id = Column(String,ForeignKey('products.name'), primary_key=True)
+    product_id = Column(String, ForeignKey('products.name'), primary_key=True)
     start_date = Column(datetime)
     end_dae = Column(datetime)
     precent = Column(Integer)

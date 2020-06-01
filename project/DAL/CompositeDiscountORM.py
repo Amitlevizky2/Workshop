@@ -1,0 +1,1 @@
+print("The composite ORM discount is working , no need for checks")

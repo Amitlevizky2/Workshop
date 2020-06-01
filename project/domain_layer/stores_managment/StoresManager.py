@@ -35,7 +35,6 @@ class StoresManager:
 
     def update_product(self, store_id, user, product_name, attribute, updated):
         """
-
         Args:
             store_id: the store we want to update
             user: the user who wants to update
@@ -44,7 +43,6 @@ class StoresManager:
             updated: new value
 
         Returns:True if succeed
-
         """
         return self.get_store(store_id).update_product(user, product_name, attribute, updated)
 
