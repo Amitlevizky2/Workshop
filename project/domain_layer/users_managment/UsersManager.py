@@ -124,7 +124,7 @@ class UsersManager:
 
     def get_managed_stores(self, username):
         user = self.find_reg_user(username)
-        return jsonpickle.encode(user.get_managed_store())
+        return user.get_managed_store()
 
     def check_if_registered(self, username):
         return username in self.reg_user_list.keys()
