@@ -1,5 +1,5 @@
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String
+from sqlalchemy import Table, Column, Integer, ForeignKey, String,update
 from sqlalchemy.orm import relationship
 from datetime import  datetime
 from project.DAL.RegisteredUserORM import RegisteredUserORM
@@ -22,6 +22,10 @@ assosiation_stores = Table('store_discounts', Base.metadata,
                            Column('store_id', Integer, ForeignKey('stores.id'))
                            )
 
+def find_by_id(discount_id):
+    session.query(DiscountORM).filter_by(discount_id=discount_id).first()
+
+
 class DiscountORM(RegisteredUserORM):
     __tablename__ = 'discounts'
     discount_id = Column(Integer,primary_key=True)
@@ -30,3 +34,6 @@ class DiscountORM(RegisteredUserORM):
     precent = Column(Integer)
     discounted =  relationship("ProductORM", secondary=assosiation_products,back_populates="name")
     discountin = relationship("StoreORM", secondary=assosiation_stores, back_populates="discount_id")
+
+    def update_discount_precent(self,precent,id):
+        update('discounts').where(discount_id=id).values(precent=precent)

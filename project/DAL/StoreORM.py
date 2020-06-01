@@ -17,8 +17,8 @@ class StoreORM(Base):
     name = Column(String)
     discount_index = Column(Integer)
     policy_index = Column(Integer)
-    owned_by = relationship("StoreORM", secondary=association_owners, back_populates="owns")
-    managed_by = relationship("StoreORM", secondary=association_managers, back_populates="manages")
+    owned_by = relationship("RegisteredUserORM", secondary=association_owners, back_populates="owns")
+    managed_by = relationship("RegisteredUserORM", secondary=association_managers, back_populates="manages")
     ## OR THIS OR THIS
     owned_by = relationship("OwnerORM", back_populates="owns")
     managed_by = relationship("ManagerORM", back_populates="manages")
