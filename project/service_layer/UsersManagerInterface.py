@@ -1,3 +1,5 @@
+import jsons
+
 from project.domain_layer.users_managment.Cart import Cart
 from project.domain_layer.users_managment.UsersManager import UsersManager
 from project import logger
@@ -12,6 +14,7 @@ class UsersManagerInterface:
         self.user_manager = UsersManager()
         self.stores_manager = None
         username = self.user_manager.add_guest_user()
+        print(username)
         self.user_manager.register(username, "admin")
         self.user_manager.admins.append("admin")
 
@@ -20,20 +23,29 @@ class UsersManagerInterface:
 
     def register(self, username, new_username, password):
         logger.log("user %s called register with new_username:%s", username, new_username)
-        if self.user_manager.register(username, new_username):
+        ans, data = self.user_manager.register(username, new_username)
+        if ans is True:
             self.security.add_user(new_username, password)
-            return True
-        else:
-            return False
+        print(data)
+        return ans, data
 
 # TODO: remove the return type hint. does not necessarily returns bool
     # EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
-    def login(self, username: str, login_username: str, password) -> bool:
+    def login(self, username: str, login_username: str, password):
         logger.log("user %s called login with login_username:%s", username, login_username)
         if self.security.verify_password(login_username, password):
-            return self.user_manager.login(username, login_username)
+            logged_in, data = self.user_manager.login(username, login_username)
+            if logged_in is True:
+                user = jsons.loads(data['data'])
+                managed_stores = []
+                print(user)
+                for store in user['managed_stores']:
+                    store_description = self.stores_manager.get_store_description(store.store_id)
+                    managed_stores.append(store_description)
+                user['managed_stores'] = managed_stores
+                return logged_in, {'data': user}
         else:
-            return False
+            return False, {'error_msg': 'incorrect password. Try again.'}
 
     def add_guest_user(self):
         return self.user_manager.add_guest_user()
@@ -54,8 +66,7 @@ class UsersManagerInterface:
 # TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
     def add_product(self, username, store_id, product_name, quantity):
         logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product_name, quantity)
-        product = self.get_product_from_store(store_id, product_name)
-        return self.user_manager.add_product(username, store_id, product, quantity)
+        return self.user_manager.add_product(username, store_id, product_name, quantity)
 
     # TODO: remove_product receive actual product. change to product_name
     def remove_product(self, username, store_id, product, quantity):

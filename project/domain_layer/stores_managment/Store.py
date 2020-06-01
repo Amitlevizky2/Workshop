@@ -1,3 +1,4 @@
+from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies import ConditionalStoreDiscount, DiscountPolicy
 from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
@@ -51,15 +52,19 @@ class Store:
         self.appointed_by[owner].append(to_appoint)
         return True
 
-    def remove_owner(self, owner, to_remove):
+    def remove_owner(self, owner, to_remove, publisher: Publisher):
 
         """
 
         Args:
             owner:
             to_remove:
+            :param owner:
+            :param to_remove:
+            :param publisher:
 
         Returns:
+
 
         """
         if owner in self.store_owners:
@@ -67,6 +72,7 @@ class Store:
                 if owner in self.appointed_by.keys() and to_remove in self.appointed_by.get(owner):
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
+
                         self.__remove_owner_all_appointed(to_remove)
                     return True
                 else:

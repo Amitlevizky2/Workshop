@@ -70,7 +70,7 @@ class Product:
         if to_reduce > self.amount:
             return False
         self.amount -= to_reduce
-        x=5
+        x = 5
 
     def get_jsn_description(self):
         return {"Name": self.name,

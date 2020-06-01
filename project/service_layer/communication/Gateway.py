@@ -9,6 +9,7 @@ from flask_cors import CORS
 from project.service_layer.Initializer import Initializer
 
 import eventlet
+
 eventlet.monkey_patch()
 
 app = Flask(__name__)
@@ -30,53 +31,52 @@ stores_manager = initializer.get_stores_manager_interface()
 @app.route('/guest_user_name', methods=['POST', 'GET'])
 def guest_user_name():
     guest_username = users_manager.add_guest_user()
-    return jsonify({
-        'username': guest_username
-    })
+    return jsonify(
+        {'guest_username': guest_username}
+    )
 
 
 # username: str, login_username: str, password
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     message = request.get_json()
-    answer = users_manager.login(message['username'], message['new_username'], message['password'])
-    if answer is False:
-        return 'error', 400
-    return jsonify({
-        'user': answer
-    }), 201
+    print(message)
+    logged_in, data = users_manager.login(message['username'], message['new_username'], message['password'])
+    print(data)
+    response = {}
+    data['error'] = not logged_in
+    print(data)
+    return jsonify(data)
+    # if logged_in is True:
+    #
+    #
+    #     return jsonify(data), 201
+    # else:
+    #     return jsonify(data), 500
 
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     message = request.get_json()
-    answer = users_manager.logout(message['username'])
-    logged_out = True
-    # if user is not logged out --> still logged in
-    if not answer == message['username']:
-        logged_out = False
-    return json.dumps({
-        'logged_out': logged_out,
-        'username': answer
-    })
+    answer, data = users_manager.logout(message['username'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     message = request.get_json()
-    answer = users_manager.register(message['username'], message['new_username'], message['password'])
-    return jsonify({
-        'registered': answer
-    })
+    answer, data = users_manager.register(message['username'], message['new_username'], message['password'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 @app.route('/is_manager', methods=['POST', 'GET'])
 def is_manager():
     message = request.get_json()
-    answer = users_manager.is_store_manager(message['username'])
-    return jsonify({
-        'manager': answer
-    })
+    answer, data = users_manager.is_store_manager(message['username'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 @app.route('/add_product', methods=['POST', 'GET'])
@@ -86,11 +86,10 @@ def add_product():
     :return:
     """
     message = request.get_json()
-    answer = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
-                                       message['quantity'])
-    if answer is True:
-        return 'done', 201
-    return 'error', 400
+    answer, data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
+                                             message['quantity'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 @app.route('/remove_product', methods=['POST', 'GET'])
@@ -100,20 +99,18 @@ def remove_product():
     :return:
     """
     message = request.get_json()
-    answer = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
-                                          message['quantity'])
-    if answer is True:
-        return 'removed', 201
-    return 'error', 400
+    answer, data = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
+                                                message['quantity'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 @app.route('/get_cart', methods=['POST', 'GET'])
 def get_cart():
     message = request.get_json()
-    answer = jsonpickle.decode(users_manager.get_cart(message['username']))
-    return jsonify({
-        'cart': answer
-    })
+    answer, data = jsonpickle.decode(users_manager.get_cart(message['username']))
+    data['error'] = not answer
+    return jsonify(data)
 
 
 # TODO: implement
@@ -137,19 +134,17 @@ def remove_managed_store():
 @app.route('/get_managed_stores', methods=['POST', 'GET'])
 def get_managed_stores():
     message = request.get_json()
-    answer = users_manager.get_managed_stores(message['username'])
-    return jsonify({
-        'managed_stores': answer
-    })
+    answer, data = users_manager.get_managed_stores(message['username'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 @app.route('/view_user_purchases', methods=['POST', 'GET'])
 def view_user_purchases():
     message = request.get_json()
-    answer = jsonpickle.decode(users_manager.view_purchases(message['username']))
-    return jsonify({
-        "purchase_history": answer
-    })
+    answer, data = users_manager.view_purchases(message['username'])
+    data['error'] = not answer
+    return jsonify(data)
 
 
 # TODO: implement
@@ -273,4 +268,3 @@ def send_notification(username, message):
 if __name__ == "__main__":
     wsgi.server(eventlet.listen(('', 5000)), app)
     # app.run(debug=True)
-

@@ -21,12 +21,6 @@ class Cart:
             return self.baskets[store_id]
         return None
 
-    def get_total(self):
-        total = 0
-        for basket in self.baskets.values():
-            total += basket.get_total()
-        return total
-
     def view(self):
         return self.baskets
 
@@ -50,3 +44,29 @@ class Cart:
 
     def clear_cart(self):
         self.baskets = {}
+
+    def merge_carts(self, other):
+        pass
+
+    def get_jsn_description(self):
+        """
+        :return: cart =
+        {
+            baskets:
+            [
+                basket1 (json),
+                basket2 (json)
+                ...
+                basketN (json)
+            ]
+
+        }
+        """
+        baskets_description = []
+        for value in self.baskets.values():
+            baskets_description.append({
+                value.get_jsn_description()
+            })
+        return {
+            'baskets': baskets_description
+        }
