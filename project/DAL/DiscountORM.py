@@ -30,10 +30,16 @@ class DiscountORM(RegisteredUserORM):
     __tablename__ = 'discounts'
     discount_id = Column(Integer,primary_key=True)
     start_date = Column(datetime)
-    end_dae = Column(datetime)
+    end_date = Column(datetime)
     precent = Column(Integer)
     discounted =  relationship("ProductORM", secondary=assosiation_products,back_populates="name")
     discountin = relationship("StoreORM", secondary=assosiation_stores, back_populates="discount_id")
 
     def update_discount_precent(self,precent,id):
         update('discounts').where(discount_id=id).values(precent=precent)
+
+    def update_start_date(self,id,start):
+        update('discounts').where(discount_id=id).values(stat_date=start)
+
+    def update_start_date(self,id,end):
+        update('discounts').where(discount_id=id).values(end_date=end)
