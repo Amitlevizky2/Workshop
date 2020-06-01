@@ -2,8 +2,8 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.DAL import Base, session
-from project.DAL.ProductsInBasketORM import ProductsInBasketORM
+from project.data_access_layer import Base, session
+from project.data_access_layer.ProductsInBasketORM import ProductsInBasketORM
 
 
 

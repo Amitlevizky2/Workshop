@@ -2,8 +2,8 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
-from project.DAL import session
-from project.DAL.RegisteredUserORM import RegisteredUserORM
+from project.data_access_layer import session
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 
 class ManagerPermissionORM(RegisteredUserORM):

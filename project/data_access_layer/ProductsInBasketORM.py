@@ -1,7 +1,7 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean, update
 
-from project.DAL import Base, session
+from project.data_access_layer import Base, session
 
 
 class ProductsInBasketORM(Base):

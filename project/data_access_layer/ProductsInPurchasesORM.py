@@ -1,8 +1,8 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 
-from project.DAL import session
-from project.DAL.RegisteredUserORM import RegisteredUserORM
+from project.data_access_layer import session
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 
 class ProductsInPurchasesORM(RegisteredUserORM):
@@ -15,3 +15,4 @@ class ProductsInPurchasesORM(RegisteredUserORM):
     # create products in purchaseORM and send to this function
     def add(self, productinpurchase):
         session.add(productinpurchase)
+

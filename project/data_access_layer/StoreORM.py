@@ -2,8 +2,8 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.DAL import Base, session
-from project.DAL.RegisteredUserORM import association_owners, association_managers
+from project.data_access_layer import Base, session
+from project.data_access_layer.RegisteredUserORM import association_owners, association_managers
 
 
 def find_store(store_id):
@@ -20,7 +20,8 @@ class StoreORM(Base):
     owned_by = relationship("RegisteredUserORM", secondary=association_owners, back_populates="owns")
     managed_by = relationship("RegisteredUserORM", secondary=association_managers, back_populates="manages")
     ## OR THIS OR THIS
-    owned_by = relationship("OwnerORM", back_populates="owns")
-    managed_by = relationship("ManagerORM", back_populates="manages")
+    ##owned_by = relationship("OwnerORM", back_populates="owns")
+    ##managed_by = relationship("ManagerORM", back_populates="manages")
+    discounts = relationship("DiscountORM", back_populates="store")
 
 
