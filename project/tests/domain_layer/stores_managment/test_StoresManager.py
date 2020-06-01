@@ -49,12 +49,15 @@ class test_StoresManager(unittest.TestCase):
 
     def test_update_product(self):
         for store_id in self.store_manager.stores.keys():
-            self.assertFalse(
-                self.store_manager.update_product(store_id, "test_owner" + str(store_id), "not real product", "price",
-                                                  20))
-            self.assertTrue(
-                self.store_manager.update_product(store_id, "test_owner" + str(store_id), "Apple", "price",
-                                                  20))
+            res = self.store_manager.update_product(store_id, "test_owner" + str(store_id), "not real product", "price",
+                                                  20)
+            res = jsons.loads(res)
+            self.assertFalse(res['ans'])
+
+            res = self.store_manager.update_product(store_id, "test_owner" + str(store_id), "Apple", "price",
+                                                  20)
+            res = jsons.loads(res)
+            self.assertTrue(res)
 
     def test_search(self):
         res = self.store_manager.search("Banana")

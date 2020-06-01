@@ -292,7 +292,7 @@ class Store:
         return {'ans': False,
                 'desc': user + " don't have this permission"}
 
-    def add_new_sale(self, purchase: Purchase) -> bool:
+    def add_new_sale(self, purchase: Purchase):
         """
 
          Args:
@@ -303,8 +303,10 @@ class Store:
          """
         if purchase is not None:
             self.sales.append(purchase)
-            return True
-        return False
+            return {'ans': True,
+                    'desc': 'sale has been added'}
+        return {'ans': False,
+                'desc': 'sale has not been added'}
 
     def check_permission(self, user, function):
         return user in self.store_owners or \
@@ -414,8 +416,9 @@ class Store:
         if is_permitted and is_in_inventory:
             discount.add_product(product_name)
             return {'ans': True,
-                    'desc': 'product has been added to'}
-        return False
+                    'desc': 'product has been added to discount'}
+        return {'ans': False,
+                'desc': permitted_user + ' do not has this permission'}
 
     def remove_product_from_discount(self, permitted_user, discount_id, product_name):
         is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user,
@@ -424,8 +427,11 @@ class Store:
         discount: Discount = self.discounts[discount_id]
         if is_permitted and is_in_inventory:
             discount.remove_product(product_name)
-            return True
-        return False
+            return {'ans': True,
+                    'desc': 'product has been removed'}
+
+        return {'ans': False,
+                'desc': permitted_user + ' do not has this permission'}
 
     def add_purchase_store_policy(self, permitted_user, min_amount_products, max_amount_products):
         MAX_SIZE = 100000
@@ -461,11 +467,11 @@ class Store:
         policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx)
         self.purchase_policies[self.purchases_idx] = policy
 
-        return {'res': True, 'desc': "Policy as been added"}
+        return {'ans': True, 'desc': "Policy as been added"}
 
     def add_purchase_composite_policy(self, permitted_user: str, policies: list, logic_operator: LogicOperator):
         if not self.check_permission(permitted_user, getattr(Store, "add_purchase_composite_policy")):
-            return {'res': False, 'desc': "User dont have permission\n"}
+            return {'ans': False, 'desc': "User dont have permission\n"}
 
         self.purchases_idx += 1
 
@@ -475,37 +481,37 @@ class Store:
         policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx)
         self.purchase_policies[self.purchases_idx] = policy
 
-        return {'res': True, 'desc': "Policy as been added"}
+        return {'ans': True, 'desc': "Policy as been added"}
 
     def add_policy_to_purchase_composite_policy(self, permitted_user: str, composite_id, policy_id: int):
         if composite_id not in self.purchase_policies.keys() or policy_id not in self.purchase_policies.keys():
-            return {'res': False, 'desc': "One of the policies is not exist for this store"}
+            return {'ans': False, 'desc': "One of the policies is not exist for this store"}
 
         if not self.check_permission(permitted_user, getattr(Store, "add_policy_to_purchase_composite_policy")):
-            return {'res': False, 'desc': "policy is not exist for this store\n"}
+            return {'ans': False, 'desc': "policy is not exist for this store\n"}
 
         self.purchase_policies[composite_id].add_policy(self.purchase_policies[policy_id])
-        return {'res': True, 'desc': "Policy as been added"}
+        return {'ans': True, 'desc': "Policy as been added"}
 
     def add_product_to_purchase_product_policy(self, policy_id, permitted_user: str, product_name: str):
         if policy_id not in self.purchase_policies.keys():
-            return {'res': False, 'desc': "policy is not exist for this store\n"}
+            return {'ans': False, 'desc': "policy is not exist for this store\n"}
 
         if not self.check_permission(permitted_user, getattr(Store, "add_product_to_purchase_product_policy")):
-            return {'res': False, 'desc': "policy is not exist for this store\n"}
+            return {'ans': False, 'desc': "policy is not exist for this store\n"}
 
         self.purchase_policies[policy_id].add_product(product_name)
-        return {'res': True, 'desc': "Product has been added to policy"}
+        return {'ans': True, 'desc': "Product has been added to policy"}
 
     def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
         if policy_id is None:
-            return False, "No such policy \n"
+            return {'ans': False, 'desc': "No such policy"}
         if policy_id not in self.purchase_policies.keys():
-            return {'res': False, 'desc': "policy is not exist for this store\n"}
+            return {'ans': False, 'desc': "policy is not exist for this store\n"}
         if not self.check_permission(permitted_user,getattr(Store, "remove_product_from_purchase_product_policy")):
-            return {'res': False, 'desc': "User dont have permission\n"}
+            return {'ans': False, 'desc': "User dont have permission\n"}
         self.purchase_policies[policy_id].remove_product(product_name)
-        return {'res': True, 'desc': product_name + " has been removed from policy \n"}
+        return {'ans': True, 'desc': product_name + " has been removed from policy \n"}
 
     def get_discounts(self):
         return self.discounts
@@ -515,14 +521,15 @@ class Store:
             return {'ans': False, 'discount': self.discounts[discount_id]}
 
     def get_purchase_policies(self):
-        return self.purchase_policies
+        return {'ans': True,
+                'desc': self.purchase_policies}
 
     def get_purchase_policy_by_id(self, purchase_policy_id: int):
         if purchase_policy_id is None:
-            return {'ans': False, 'desc': "No such policy \n"}
+            return {'ans': False, 'desc': "No such policy"}
 
         if purchase_policy_id not in self.purchase_policies.keys():
-            return {'ans': False, 'desc': "No such policy \n"}
+            return {'ans': False, 'desc': "No such policy"}
 
         if purchase_policy_id in self.purchase_policies.keys():
             return {'ans': True, 'desc': self.purchase_policies[purchase_policy_id]}
