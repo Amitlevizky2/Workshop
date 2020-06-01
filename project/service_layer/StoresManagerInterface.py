@@ -168,7 +168,7 @@ class StoresManagerInterface:
         return self.stores_manager.get_purchases_policies(store_id)
 
     def get_purchase_policy_details(self, store_id: int = None, purchase_policy_id: int = None):
-        return self.stores_manager.get_purchase_by_id(store_id, purchase_policy_id)
+        return self.stores_manager.get_purchase_policy_by_id(store_id, purchase_policy_id)
 
     def get_cart_description(self, cart = None):  #NEED_TO_CHECK
         return self.stores_manager.get_cart_description(cart)
