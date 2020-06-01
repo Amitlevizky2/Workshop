@@ -413,7 +413,8 @@ class Store:
         discount: Discount = self.discounts[discount_id]
         if is_permitted and is_in_inventory:
             discount.add_product(product_name)
-            return True
+            return {'ans': True,
+                    'desc': 'product has been added to'}
         return False
 
     def remove_product_from_discount(self, permitted_user, discount_id, product_name):
