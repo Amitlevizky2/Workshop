@@ -32,19 +32,24 @@ class UsersManagerInterface:
 # TODO: remove the return type hint. does not necessarily returns bool
     # EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password):
+        print("here!")
         logger.log("user %s called login with login_username:%s", username, login_username)
         if self.security.verify_password(login_username, password):
             logged_in, data = self.user_manager.login(username, login_username)
+            print(data)
             if logged_in is True:
                 user = jsons.loads(data['data'])
                 managed_stores = []
                 print(user)
                 for store in user['managed_stores']:
-                    store_description = self.stores_manager.get_store_description(store.store_id)
+                    store_description = self.stores_manager.get_store_description(store['store_id'])
                     managed_stores.append(store_description)
                 user['managed_stores'] = managed_stores
+                print("******************")
+                print(user)
                 return logged_in, {'data': user}
         else:
+            print("!!!!!!!!!!!")
             return False, {'error_msg': 'incorrect password. Try again.'}
 
     def add_guest_user(self):

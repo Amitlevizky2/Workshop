@@ -56,24 +56,32 @@ class Initializer:
     def open_store(self, username, store_name):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
-        return self.stores_manager.open_store(username, store_name)
+        sid= self.stores_manager.open_store(username, store_name)
+        self.users_manager.logout(username)
+        return sid
 
     def add_product(self, username, storeid, pname, price, quatity):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_product_to_store((storeid), username, pname, price, [], [], quatity)
+        self.users_manager.logout(username)
+
+
 
     def appoint_manager(self, username, storeid, appointed):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.appoint_manager_to_store((storeid), username, appointed)
+        self.users_manager.logout(username)
 
     def appoint_owner(self, username, storeid, appointed):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.appoint_owner_to_store((storeid), username, appointed)
+        self.users_manager.logout(username)
 
     def add_permission(self, username, store_id, manager, permission):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_permission_to_manager_in_store((store_id), username, manager, permission)
+        self.users_manager.logout(username)

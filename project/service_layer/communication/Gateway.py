@@ -40,7 +40,7 @@ def guest_user_name():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     message = request.get_json()
-    print(message)
+    print(message['username'])
     logged_in, data = users_manager.login(message['username'], message['new_username'], message['password'])
     print(data)
     response = {}

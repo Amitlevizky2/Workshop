@@ -78,6 +78,7 @@ class StoresManager:
         return jsons.dumps(search_result)
 
     def get_store(self, store_id: int) -> Store:
+        print(store_id)
         if store_id in self.stores.keys():
 
             return self.stores.get(store_id)
@@ -411,3 +412,6 @@ class StoresManager:
         store = self.get_store(store_id)
         return jsons.dumps({'ans': True,
                 'store_owners': store.store_owners})
+
+    def get_store_description_by_id(self, store_id):
+        return self.get_store(store_id).get_jsn_description()
