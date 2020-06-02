@@ -7,7 +7,7 @@
 
 # Mac/OSX
 .DS_Store
-
+init.txt
 #logs
 .log
 
