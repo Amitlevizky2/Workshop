@@ -5,6 +5,7 @@ from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
+from project.domain_layer.stores_managment.StoresGetters import StoresGetters
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
@@ -33,10 +34,10 @@ class StubStore(Store):
     def __init__(self, idx, name, owner):
         Store.__init__(self, idx, name, owner)
 
-
 class test_StoresManager(unittest.TestCase):
     def setUp(self) -> None:
         self.store_manager = StoresManager()
+        # self.stores_getters = StoresGetters(self.store_manager)
         for i in range(5):
             self.store_manager.stores[i] = Store(i, "test_store" + str(i), "test_owner" + str(i))
             self.store_manager.stores[i].store_managers["test_owner"] = [Store.add_product, Store.add_visible_product_discount, Store.add_conditional_discount_to_product,

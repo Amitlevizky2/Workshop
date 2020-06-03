@@ -4,12 +4,14 @@ from project import logger
 from project.domain_layer.communication_managment import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.StoresGetters import StoresGetters
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 
 
 class StoresManagerInterface:
     def __init__(self, users_manager):
         self.stores_manager = StoresManager()
+        self.stores_getters = StoresGetters(self.stores_manager)
         self.spell_checker = SpellChecker()
         self.users_manager = users_manager
 
@@ -34,8 +36,8 @@ class StoresManagerInterface:
 
         return self.stores_manager.add_purchase_to_store(store_id, purchase)
 
-    # def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {Store: [Product]}:
-    #     return self.stores_manager.search(search_term, categories, key_words)
+    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None):
+        return self.stores_manager.search(search_term, categories, key_words)
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
@@ -159,16 +161,16 @@ class StoresManagerInterface:
         return self.stores_manager.remove_product_from_purchase_product_policy(store_id, policy_id, permitted_user, product_name)
 
     def get_discounts(self, store_id: int = None):
-        return self.stores_manager.get_discounts(store_id)
+        return self.stores_getters.get_store_discounts("", store_id)
 
     def get_discount_details(self, store_id: int = None, discount_id: int = None):
-        return self.stores_manager.get_discount_details(store_id, discount_id)
+        return self.stores_getters.get_store_discount('', store_id, discount_id)
 
     def get_purchases_policies(self, store_id: int = None):
-        return self.stores_manager.get_purchases_policies(store_id)
+        return self.stores_getters.get_purchases_policies('', store_id)
 
     def get_purchase_policy_details(self, store_id: int = None, purchase_policy_id: int = None):
-        return self.stores_manager.get_purchase_policy_by_id(store_id, purchase_policy_id)
+        return self.stores_getters.get_purchase_policy('', store_id, purchase_policy_id)
 
     def get_cart_description(self, cart = None):  #NEED_TO_CHECK
         return self.stores_manager.get_cart_description(cart)
@@ -222,18 +224,17 @@ class StoresManagerInterface:
         return self.edit_conditional_discount_to_store(store_id, discount_id, username, start_date, end_date, percent, min_price)
 
     def get_store_description(self, store_id):
-        return self.stores_manager.get_store_description_by_id(store_id)
+        return self.stores_getters.get_store_description(store_id)
 
     def get_inventory_description(self, store_id):
-        return self.stores_manager.get_inventory_description(store_id)
+        return self.stores_getters.get_inventory_description('', store_id)
 
-    # TODO: implement
     def get_store_owners(self, store_id):
         """
         :param store_id:
         :return: array of store owners user names
         """
-        pass
+        return self.stores_getters.get_store_owners('', store_id)
 
     # TODO: implement
     def get_store_managers(self, store_id):
@@ -241,12 +242,12 @@ class StoresManagerInterface:
         :param store_id:
         :return: array of store managers user names
         """
-        pass
+        return self.stores_getters.get_store_managers('', store_id)
 
     # TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
     #  TODO: and returns the product.
     def get_product_from_store(self, store_id, product_name) -> Product:
-        return self.stores_manager.get_product_from_store(store_id, product_name)
+        return self.stores_getters.get_product_from_store('', store_id, product_name)
 
     def bound_publisher(self, publisher: Publisher):
         self.stores_manager.bound_publisher(publisher)
