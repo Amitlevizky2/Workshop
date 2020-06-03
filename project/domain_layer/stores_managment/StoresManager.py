@@ -148,7 +148,7 @@ class StoresManager:
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
         # send notification to user owner.
-        self.publisher.store_status_update(self.stores_idx, store_name, [owner], status='open')
+        # self.publisher.store_status_update(self.stores_idx, store_name, [owner], status='open')
         self.stores_idx += 1
         return self.stores_idx - 1
 

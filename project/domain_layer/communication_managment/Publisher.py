@@ -22,9 +22,9 @@ class Publisher:
             self.users_manager.add_notification(user, message)
 
     def send_notification(self, username, message):
-        self.sio.send(jsonify({
+        self.sio.send({
             'messages': message
-        }), json=True, room=username)
+        }, json=True, room=username)
 
     def store_status_update(self, store_id, store_name, users: [str], status=''):
         """

@@ -191,9 +191,11 @@ def get_store_owners():
 @app.route('/open_store', methods=['POST', 'GET'])
 def open_store():
     message = request.get_json()
+    print(message)
     answer = stores_manager.open_store(message['username'], message['store_name'])
+    print('store_id: ' + str(answer))
     return jsonify({
-        'store_id': answer
+        'data': answer
     })
 
 
