@@ -1,5 +1,8 @@
+from project.data_access_layer.ProductORM import ProductORM
+
+
 class Product:
-    def __init__(self, name, price, categories, key_words, amount):
+    def __init__(self, name, price, categories, key_words, amount,store_id):
         self.name = name
         self.original_price = price
         self.categories = categories
@@ -8,6 +11,9 @@ class Product:
         self.amount = amount
         self.visible_discount = []
         self.conditional_product_discount = []
+        self.orm =  ProductORM()
+        self.orm.name = name
+        self.orm.store_id = store_id
 
     def __eq__(self, other):
         return self.name == other.name and \

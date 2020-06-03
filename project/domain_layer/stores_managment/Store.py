@@ -1,3 +1,4 @@
+from project.data_access_layer.StoreORM import StoreORM
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment import Discount
 from project.domain_layer.stores_managment.DiscountsPolicies import ConditionalStoreDiscount
@@ -25,6 +26,11 @@ class Store:
         self.sales = []
         self.rate = 0
         self.appointed_by = {store_owner: []}
+        self.orm = StoreORM()
+        self.orm.name = name
+        self.orm.discount_index = self.discount_idx
+        self.orm.owned_by = store_owner
+        self.orm.add()
 
     def appoint_owner(self, owner, to_appoint):
         """
