@@ -16,8 +16,7 @@ class StoresManagerInterface:
         self.users_manager = users_manager
         self.publisher = None
 
-    def search_product(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) \
-            -> {int: [Product]}:
+    def search_product(self, search_term: str = "", categories: [str] = [], key_words: [str] = []):
         """
 
         Args:
