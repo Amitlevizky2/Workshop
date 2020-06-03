@@ -20,9 +20,7 @@ class User:
         self.cart.add_product(store_id, product, quantity)
         return True
 
-    def get_cart(self, view_format=''):
-        if view_format == 'json':
-            return self.cart.get_jsn_description()
+    def get_cart(self) -> Cart:
         return self.cart
 
     def remove_cart(self):

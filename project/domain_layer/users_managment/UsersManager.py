@@ -130,8 +130,8 @@ class UsersManager:
     def get_cart(self, username):
         ans, user = self.find_user(username)
         if ans is True:
-            cart = user.get_cart(view_format='json')
-            return ans, {'data': cart}
+            cart = user.get_cart()
+            return ans, cart
         else:
             return ans, user
 
@@ -169,7 +169,7 @@ class UsersManager:
     def get_managed_stores(self, username, view_format=''):
         ans, user = self.find_reg_user(username)
         if ans is True:
-            return True, jsonpickle.encode(user.get_managed_store())
+            return True, (user.get_managed_store())
         return ans, user
 
     def check_if_registered(self, username):

@@ -36,7 +36,7 @@ class StoresManagerInterface:
 
         return self.stores_manager.add_purchase_to_store(store_id, purchase)
 
-    def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None):
+    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []):
         return self.stores_manager.search(search_term, categories, key_words)
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
@@ -46,8 +46,9 @@ class StoresManagerInterface:
             "user %s called add product to store no.%d. product name:%s"
             " product price:%d product categories:%s,key words:%s, amount:%d",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
+        print(self.users_manager.get_managed_stores(user_name))
+        if store_id in self.users_manager.get_managed_stores(user_name)[1]:
 
-        if store_id in self.users_manager.get_managed_stores(user_name):
             return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
                                                             product_categories, key_words, amount)
         return False
@@ -225,6 +226,9 @@ class StoresManagerInterface:
 
     def get_store_description(self, store_id):
         return self.stores_getters.get_store_description(store_id)
+
+    def get_stores(self):
+        return self.stores_getters.get_stores_description()
 
     def get_inventory_description(self, store_id):
         return self.stores_getters.get_inventory_description('', store_id)

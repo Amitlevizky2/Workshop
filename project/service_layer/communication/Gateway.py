@@ -1,6 +1,7 @@
 import os
 import json
 import jsonpickle
+import jsons
 from eventlet import wsgi
 from flask import Flask, jsonify, request, current_app
 from flask_socketio import SocketIO, join_room, leave_room
@@ -21,7 +22,7 @@ sio = SocketIO(app, logger=True, engineio_logger=True,
 # current_app(app)
 with app.app_context():
     # within this block, current_app points to app.
-    print("current: "+current_app.name)
+    print("current: " + current_app.name)
     initializer = Initializer(sio)
 users_manager = initializer.get_users_manager_interface()
 stores_manager = initializer.get_stores_manager_interface()
@@ -89,10 +90,19 @@ def add_product():
     :return:
     """
     message = request.get_json()
-    answer, data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
-                                             message['quantity'])
-    data['error'] = not answer
-    return jsonify(data)
+    print(message)
+    data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
+                                     message['quantity'])
+
+    if data is True:
+        print('data is True')
+    else:
+        print('data is False')
+    return jsonify({
+        'error': not data,
+        'error_msg': 'error',
+        'data': 'added!'
+    })
 
 
 @app.route('/remove_product', methods=['POST', 'GET'])
@@ -125,7 +135,9 @@ def remove_cart():
 # TODO: implement
 @app.route('/view_cart', methods=['POST', 'GET'])
 def view_cart():
-    pass
+    message = request.get_json()
+    answer = users_manager.view_cart(message['username'])
+    return jsonify(answer)
 
 
 # TODO: implement
@@ -195,6 +207,7 @@ def open_store():
     answer = stores_manager.open_store(message['username'], message['store_name'])
     print('store_id: ' + str(answer))
     return jsonify({
+        'error': False,
         'data': answer
     })
 
@@ -211,9 +224,13 @@ def appoint_store_owner():
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     message = request.get_json()
-    answer = jsonpickle.decode(stores_manager.search_product(message['product_name']))
+    print(message)
+    search_res = stores_manager.search(search_term=message['product_name'])
+    print(search_res)
+    answer = jsons.loads(search_res)
     return jsonify({
-        "search_results": answer
+        'error': False,
+        "data": answer
     })
 
 
@@ -225,6 +242,18 @@ def update_store_product():
     if answer is True:
         return 'done', 200
     return 'error', 400
+
+
+@app.route('/get_stores', methods=['POST', 'GET'])
+def get_stores():
+    message = request.get_json()
+    stores_res = stores_manager.get_stores()
+    print(stores_res)
+    answer = jsons.loads(stores_res)
+    return jsonify({
+        'error': False,
+        'data': answer
+    })
 
 
 """---------------------------------------------------------------------"""

@@ -57,7 +57,7 @@ class StoresManager:
         """
         return jsons.dumps(self.get_store(store_id).update_product(user, product_name, attribute, updated))
 
-    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> {int: [Product]}:
+    def search(self, search_term: str = "", categories = [], key_words= []) -> {int: [Product]}:
         """
 
         Args:

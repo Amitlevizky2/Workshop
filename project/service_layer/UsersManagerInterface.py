@@ -57,9 +57,21 @@ class UsersManagerInterface:
 
 # TODO: view_cart returns json object, not Cart.
     # look up via usr id change user list to map of ids and user
-    def view_cart(self, username) -> Cart:
+    def view_cart(self, username):
         logger.log("user %s called view_cart", username)
-        return self.user_manager.view_cart(username)
+        res, user_cart = self.get_cart(username)
+        if res is True:
+            print(user_cart.baskets)
+            cart_view = jsons.loads(self.stores_manager.get_cart_description(user_cart))
+            print(cart_view)
+            return ({
+                'error': False,
+                'data': cart_view
+            })
+        return ({
+            'error': True,
+            'error_msg': user_cart
+        })
 
     def logout(self, username):
         return self.user_manager.logout(username)
@@ -69,7 +81,7 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
 # TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
-    def add_product(self, username, store_id, product_name, quantity):
+    def add_product(self, username, store_id, product_name, quantity) -> bool:
         logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product_name, quantity)
         return self.user_manager.add_product(username, store_id, product_name, quantity)
 

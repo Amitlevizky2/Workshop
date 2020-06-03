@@ -256,7 +256,7 @@ class Store:
             return {'ans': False,
                     'desc': "User don't have permission"}
 
-    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> [Product]:
+    def search(self, search_term: str = "", categories = [], key_words = []) -> [Product]:
         """
 
         Args:
@@ -410,6 +410,7 @@ class Store:
     def get_updated_basket(self, basket: Basket):
         product_price_dict = {}
         for product in basket.products.values():
+            print(product)
             product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price * product[1])  #{product_name, (amount, updated_price)}
 
         for discount in self.discounts.values():

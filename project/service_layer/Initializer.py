@@ -64,7 +64,7 @@ class Initializer:
     def add_product(self, username, storeid, pname, price, quatity):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
-        self.stores_manager.add_product_to_store((storeid), username, pname, price, [], [], quatity)
+        print(self.stores_manager.add_product_to_store((storeid), username, pname, price, [], [], quatity))
         self.users_manager.logout(username)
 
     def appoint_manager(self, username, storeid, appointed):
