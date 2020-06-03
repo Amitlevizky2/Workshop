@@ -17,3 +17,6 @@ class PurchasePolicy(ABC):
     def get_description(self):
         pass
 
+    @abstractmethod
+    def get_jsn_description(self):
+        pass

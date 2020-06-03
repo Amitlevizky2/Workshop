@@ -1,6 +1,8 @@
 import datetime
 import unittest
 
+import jsonpickle
+
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
@@ -104,20 +106,23 @@ class test_StoresManager(unittest.TestCase):
     def test_search(self):
         self.test_add_product_to_store()
         # regular search
-        self.assertIn(self.idx - 1, self.store_manager.search("iphone").keys())
+        iphone_search = jsonpickle.decode(self.store_manager.search("iphone")).keys()
+        self.assertIn(str(self.idx - 1), iphone_search)
 
         # by category
-        self.assertIn(self.idx - 2, self.store_manager.search("", categories=["food"]).keys())
-        self.assertIn(self.idx - 3, self.store_manager.search("", categories=["food"]).keys())
+        food_search = jsonpickle.decode(self.store_manager.search("", categories=["food"])).keys()
+        self.assertIn(str(self.idx - 2), food_search)
+        self.assertIn(str(self.idx - 3), food_search)
 
         # by key words
-
-        self.assertIn(self.idx - 1, self.store_manager.search("", key_words=["fruits"]).keys())
-        self.assertIn(self.idx - 2, self.store_manager.search("", key_words=["fruits"]).keys())
-        self.assertNotIn(self.idx - 3, self.store_manager.search("", key_words=["fruits"]).keys())
+        fruits_search = jsonpickle.decode(self.store_manager.search("", key_words=["fruits"])).keys()
+        self.assertIn(str(self.idx - 1), fruits_search)
+        self.assertIn(str(self.idx - 2), fruits_search)
+        self.assertNotIn(str(self.idx - 3), fruits_search)
 
         # search for non - existing product
-        self.assertTrue(len(self.store_manager.search("not real product")) == 0)
+        not_real = jsonpickle.decode(self.store_manager.search("not real product"))
+        self.assertTrue(len(not_real) == 0)
 
     def test_add_product_to_store(self):
         # check when store does not exit
@@ -195,8 +200,8 @@ class test_StoresManager(unittest.TestCase):
     def test_add_purchase_to_store(self):
         self.test_add_product_to_store()
         purchase = Purchase({self.products[-1][0]: (Product(*self.products[-1]), 2)}, "moshe", self.idx - 1, 0)
-        self.assertTrue(self.store_manager.add_purchase_to_store(self.idx - 1, purchase))
-        self.assertFalse(self.store_manager.add_purchase_to_store(self.idx + 1, purchase))
+        self.assertTrue(self.store_manager.add_purchase_to_store(self.idx - 1, jsonpickle.encode(purchase)))
+        self.assertFalse(self.store_manager.add_purchase_to_store(self.idx + 1, jsonpickle.encode(purchase)))
 
     def test_open_store(self):
         self.assertEqual(self.idx,
@@ -210,20 +215,20 @@ class test_StoresManager(unittest.TestCase):
         cart = Cart()
         cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
         cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 2)
-        self.assertTrue(self.store_manager.buy(cart))
+        self.assertTrue(self.store_manager.buy(jsonpickle.encode(cart)))
         cart = Cart()
         cart.baskets = {self.idx + 1: Basket(self.idx + 1)}
         cart.get_basket(self.idx + 1).add_product(Product(*self.products[-1]), 2)
-        self.assertFalse(self.store_manager.buy(cart))
+        self.assertFalse(self.store_manager.buy(jsonpickle.encode(cart)))
         cart = Cart()
         cart.baskets = {self.idx - 1: Basket(self.idx - 1)}
         cart.get_basket(self.idx - 1).add_product(Product(*self.products[-1]), 30)
-        self.assertFalse(self.store_manager.buy(cart))
+        self.assertFalse(self.store_manager.buy(jsonpickle.encode(cart)))
 
     def test_get_sales_history(self):
         self.test_add_purchase_to_store()
-        self.assertEqual(len(self.store_manager.get_sales_history(self.idx - 1, "moshe" + str(self.idx - 1), False)), 1)
-        self.assertEqual(len(self.store_manager.get_sales_history(self.idx - 1, "not moshe" + str(self.idx - 1), True)),
+        self.assertEqual(len(jsonpickle.decode(self.store_manager.get_sales_history(self.idx - 1, "moshe" + str(self.idx - 1), False))), 1)
+        self.assertEqual(len(jsonpickle.decode(self.store_manager.get_sales_history(self.idx - 1, "not moshe" + str(self.idx - 1), True))),
                          1)
 
     def test_add_discount_to_product(self):

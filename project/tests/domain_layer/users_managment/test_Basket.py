@@ -11,7 +11,7 @@ class TestBasket(TestCase):
         # 1234 for store id
         self.basket = Basket(1234)
         date_str = '04-10-2020'
-        dt = timedelta(days=10)
+        dt = timedelta(days=100000)
         date_object = datetime.strptime(date_str, '%m-%d-%Y')
         self.product_orange = Product("orange", 2, "food", None, 100)
         self.product_orange.visible_discount.append(VisibleProductDiscount(date_object, date_object + dt, 50))
