@@ -249,12 +249,12 @@ class Store:
         if self.check_permission(user_name, getattr(Store, "add_product")):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
-            return {'ans': True,
-                    'desc': "Product has benn added"}
+            return {'error': False,
+                    'data': "Product has been added"}
         else:
             logger.error("%s Don't have this permission", user_name)
-            return {'ans': False,
-                    'desc': "User don't have permission"}
+            return {'error': True,
+                    'error_msg': "User don't have permission"}
 
     def search(self, search_term: str = "", categories = [], key_words = []) -> [Product]:
         """

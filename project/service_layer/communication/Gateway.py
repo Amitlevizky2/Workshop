@@ -149,8 +149,7 @@ def remove_managed_store():
 @app.route('/get_managed_stores', methods=['POST', 'GET'])
 def get_managed_stores():
     message = request.get_json()
-    answer, data = users_manager.get_managed_stores(message['username'])
-    data['error'] = not answer
+    data = users_manager.get_managed_stores_description(message['username'])
     return jsonify(data)
 
 
@@ -180,6 +179,13 @@ def appoint_store_manager():
     if answer is True:
         return 'done', 201
     return 'error', 400
+
+
+@app.route('/add_product_to_store', methods=['POST', 'GET'])
+def add_product_to_store():
+    message = request.get_json()
+    data = stores_manager.add_product_to_store(message['store_id'], message['username'], message['product_name'], message['price'], message['categories'], message['key_words'], message['amount'])
+    return jsonify(data)
 
 
 @app.route('/get_store_managers', methods=['POST', 'GET'])

@@ -122,6 +122,24 @@ class UsersManagerInterface:
     def remove_managed_store(self, username, store_id):
         return self.user_manager.remove_managed_store(username, store_id)
 
+    def get_managed_stores_description(self, username):
+        ans, stores = self.user_manager.get_managed_stores(username)
+        if ans is True:
+            stores_des = []
+            for store in stores:
+                res_store = self.stores_manager.get_store_description(store)
+                print(res_store)
+                stores_des.append(res_store)
+            return ({
+                'error': False,
+                'data': stores_des
+            })
+        else:
+            return({
+                'error': True,
+                'error_msg': stores['error_msg']
+            })
+
     def get_managed_stores(self, username):
         return self.user_manager.get_managed_stores(username)
 

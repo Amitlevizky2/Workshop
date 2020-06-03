@@ -1,3 +1,4 @@
+import jsons
 from spellchecker import SpellChecker
 
 from project import logger
@@ -41,17 +42,20 @@ class StoresManagerInterface:
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
-                             key_words: [str], amount) -> bool:
+                             key_words: [str], amount):
         logger.log(
-            "user %s called add product to store no.%d. product name:%s"
-            " product price:%d product categories:%s,key words:%s, amount:%d",
+            "user %s called add product to store no.%s. product name:%s"
+            " product price:%s product categories:%s,key words:%s, amount:%s",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
         print(self.users_manager.get_managed_stores(user_name))
         if store_id in self.users_manager.get_managed_stores(user_name)[1]:
 
-            return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
-                                                            product_categories, key_words, amount)
-        return False
+            return jsons.loads(self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
+                                                            product_categories, key_words, amount))
+        return {
+            'error': True,
+            'error_msg': 'User ' + user_name + ' is not associated with the store.'
+        }
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint manager %s to store no.%d", owner, to_appoint, store_id)
