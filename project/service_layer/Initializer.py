@@ -5,12 +5,13 @@ from os import path
 
 
 class Initializer:
-    def __init__(self):
+    def __init__(self, sio):
         self.users_manager = UsersManagerInterface()
         self.stores_manager = StoresManagerInterface(self.users_manager)
-        self.publisher = Publisher()
+        self.publisher = Publisher(sio)
         self.users_manager.set_stores_manager(self.stores_manager)
         self.stores_manager.bound_publisher(self.publisher)
+        self.bound_managers()
         if path.exists("init.txt"):
             file1 = open('init.txt', 'r')
             Lines = file1.readlines()
@@ -46,8 +47,8 @@ class Initializer:
     def bound_managers(self):
         users = self.users_manager.get_users_manager()
         stores = self.stores_manager.get_stores_manager()
-        users.set_stores_manager(stores)
         stores.set_users_manager(users)
+        self.publisher.set_users_manager(users)
 
     def register(self, username):
         guest = self.users_manager.add_guest_user()
@@ -56,7 +57,7 @@ class Initializer:
     def open_store(self, username, store_name):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
-        sid= self.stores_manager.open_store(username, store_name)
+        sid = self.stores_manager.open_store(username, store_name)
         self.users_manager.logout(username)
         return sid
 
@@ -65,8 +66,6 @@ class Initializer:
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_product_to_store((storeid), username, pname, price, [], [], quatity)
         self.users_manager.logout(username)
-
-
 
     def appoint_manager(self, username, storeid, appointed):
         guest = self.users_manager.add_guest_user()

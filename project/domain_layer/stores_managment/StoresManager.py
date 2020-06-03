@@ -141,11 +141,14 @@ class StoresManager:
 
 # TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
-        return jsons.dumps(self.get_store(store_id).add_new_sale(purchase))
+        # send notification to user to_remove.
+        return jsons.dumps(self.get_store(store_id).add_new_sale(purchase, self.publisher))
 
 # TODO: add publisher
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
+        # send notification to user owner.
+        self.publisher.store_status_update(self.stores_idx, store_name, [owner], status='open')
         self.stores_idx += 1
         return self.stores_idx - 1
 
@@ -255,7 +258,7 @@ class StoresManager:
 
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
-        return jsons.dumps(store.remove_owner(owner, to_remove))
+        return jsons.dumps(store.remove_owner(owner, to_remove, self.publisher))
 
     def add_purchase_store_policy(self, store_id: int, permitted_user: str, min_amount_products: int, max_amount_products: int):
         store = self.get_store(store_id)

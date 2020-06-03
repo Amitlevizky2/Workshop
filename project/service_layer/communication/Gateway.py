@@ -2,7 +2,7 @@ import os
 import json
 import jsonpickle
 from eventlet import wsgi
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, current_app
 from flask_socketio import SocketIO, join_room, leave_room
 from flask_cors import CORS
 
@@ -18,8 +18,11 @@ app.secret_key = os.environ.get('SECRET')
 app.config['WTF_CSRF_SECRET_KEY'] = "b'f\xfa\x8b{X\x8b\x9eM\x83l\x19\xad\x84\x08\xaa"
 sio = SocketIO(app, logger=True, engineio_logger=True,
                cors_allowed_origins='*', async_mode='eventlet')
-
-initializer = Initializer()
+# current_app(app)
+with app.app_context():
+    # within this block, current_app points to app.
+    print("current: "+current_app.name)
+    initializer = Initializer(sio)
 users_manager = initializer.get_users_manager_interface()
 stores_manager = initializer.get_stores_manager_interface()
 

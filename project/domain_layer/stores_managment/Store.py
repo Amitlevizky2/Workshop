@@ -74,8 +74,7 @@ class Store:
                 if owner in self.appointed_by.keys() and to_remove in self.appointed_by.get(owner):
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
-
-                        self.__remove_owner_all_appointed(to_remove)
+                        self.__remove_owner_all_appointed(to_remove, publisher)
                     return {'ans': True,
                             'desc': 'product has been removed'}
                 else:
@@ -122,15 +121,17 @@ class Store:
             return {'ans': False,
                     'desc': owner + ' is not an owner of this store'}
 
-    def __remove_owner_all_appointed(self, to_remove):
+    def __remove_owner_all_appointed(self, to_remove, publisher):
 
         if to_remove in self.store_owners:
             self.store_owners.remove(to_remove)
+            # send notification to user to_remove.
+            publisher.store_ownership_update(self.store_id, self.name, [to_remove])
         if to_remove in self.store_managers.keys():
             self.store_managers.pop(to_remove)
         if to_remove in self.appointed_by.keys():
             for own_or_man in self.appointed_by[to_remove]:
-                self.__remove_owner_all_appointed(own_or_man)
+                self.__remove_owner_all_appointed(own_or_man, publisher)
                 self.appointed_by.pop(to_remove)
 
     def add_permission_to_manager(self, owner, manager, permission):
@@ -298,7 +299,7 @@ class Store:
         return {'ans': False,
                 'desc': user + " don't have this permission"}
 
-    def add_new_sale(self, purchase: Purchase):
+    def add_new_sale(self, purchase: Purchase, publisher: Publisher):
         """
 
          Args:
@@ -306,9 +307,13 @@ class Store:
              purchase: Holds the store products bought by the user
          Returns:
                  True if @new_sale was added to @self.sales list, else false
+                 :param purchase:
+                 :param publisher:
          """
         if purchase is not None:
             self.sales.append(purchase)
+            # send notification to owners.
+            publisher.purchase_update(self.store_id, self.name, self.store_owners)
             return {'ans': True,
                     'desc': 'sale has been added'}
         return {'ans': False,
@@ -338,8 +343,6 @@ class Store:
                     'desc': 'visible discount has been added'}
         return {'ans': False,
                 'desc': permitted_username + ' do not have this permission'}
-
-
 
     def add_conditional_discount_to_product(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_product")):
