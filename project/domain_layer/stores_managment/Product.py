@@ -1,22 +1,13 @@
-from functools import reduce
-import datetime
-
-
-class Discount(object):
-    def __init__(self, start_date, end_date, percent):
-        self.start = start_date
-        self.end = end_date
-        self.discount = 1 - percent / 100
-
-
 class Product:
-    def __init__(self, name, price, categories, key_words, amount):
+    def __init__(self, name, price, categories, key_words, amount,store_id):
         self.name = name
         self.original_price = price
         self.categories = categories
         self.key_words = key_words
         self.rate = 0
         self.amount = amount
+        self.visible_discount = []
+        self.conditional_product_discount = []
 
     def __eq__(self, other):
         return self.name == other.name and \
@@ -63,6 +54,17 @@ class Product:
             return True
         return False
 
+    def edit_conditional_product_discount(self, discount_id, start_date, end_date, percent, conditions):
+        cur_disc = None
+        for disc in self.conditional_product_discount:
+            if disc.id == discount_id:
+                cur_disc = disc
+
+        if cur_disc:
+            cur_disc.edit_product_discount(start_date, end_date, percent, conditions)
+            return True
+        return False
+
     def get_price_by_amount(self, amount):
         return amount * self.original_price
 
@@ -70,12 +72,4 @@ class Product:
         if to_reduce > self.amount:
             return False
         self.amount -= to_reduce
-        x = 5
-
-    def get_jsn_description(self):
-        return {"Name": self.name,
-                "Original Price": self.original_price,
-                "Categories": self.categories,
-                "Keywords": self.key_words,
-                "Rate": self.rate,
-                "Amount": self.amount}
+        x=5

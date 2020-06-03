@@ -6,7 +6,7 @@ from project.data_access_layer.DiscountORM import DiscountORM
 from project.data_access_layer.RegisteredUserORM import association_owners, association_managers
 
 
-class ConditionalDiscountsORM(DiscountORM):
+class ConditionalProductDiscountsORM(DiscountORM):
     __tablename__ = 'conditionalproductdiscounts'
     discount_id = Column(Integer, ForeignKey('discounts.id'), primary_key=True)
     product_id = Column(String, ForeignKey('products.name'), primary_key=True)

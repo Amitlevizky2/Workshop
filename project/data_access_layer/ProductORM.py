@@ -1,5 +1,5 @@
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy import Table, Column, Integer, String, update
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session
@@ -26,3 +26,7 @@ class ProductORM(Base):
 
 def find_product(name, store_id):
     return session.query(ProductORM).filter_by(name= name, store_id=store_id).first()
+
+def update_product_amount(name,store_id,amount):
+    return update('products').where(name=name, store_id=store_id).value(quantity = amount)
+

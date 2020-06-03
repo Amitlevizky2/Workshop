@@ -34,3 +34,7 @@ class CompositeDiscountORM(DiscountORM):
     __mapper_args__ = {
         'polymorphic_identity': 'CompositeDiscount',
     }
+
+    def change_logic_operaor(self,id,lo):
+        update('CompositeDiscounts').where(discount_id = id).value(logic_operator = lo)
+
