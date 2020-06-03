@@ -78,7 +78,6 @@ class StoresManager:
         return jsons.dumps(search_result)
 
     def get_store(self, store_id: int) -> Store:
-        print(store_id)
         if store_id in self.stores.keys():
 
             return self.stores.get(store_id)
@@ -175,7 +174,7 @@ class StoresManager:
         return jsons.dumps({'ans': True,
                             'result': 'Purchase confirmed, total price: ' + str(price)})
 
-    def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
+    def get_sales_history(self, store_id, user, is_admin):
         return jsons.dump(self.get_store(store_id).get_sales_history(user, is_admin))
 
     def get_store_products(self, store_id):
@@ -389,10 +388,10 @@ class StoresManager:
         return jsons.dumps({'ans': True,
                             'inventory': store.inventory})
 
-    def get_jsn_description(self, store_id):
-        store = self.get_store(store_id)
-        jsn_desc = jsons.dumps(store)
-        return jsn_desc
+    # def get_jsn_description(self, store_id):
+    #     store = self.get_store(store_id)
+    #     jsn_desc = jsons.dumps(store)
+    #     return jsn_desc
 
     def bound_publisher(self, publisher: Publisher):
         self.publisher = publisher
@@ -414,7 +413,7 @@ class StoresManager:
     def get_store_owners(self, store_id: int):
         store = self.get_store(store_id)
         return jsons.dumps({'ans': True,
-                'store_owners': store.store_owners})
+                            'store_owners': store.store_owners})
 
     def get_store_description_by_id(self, store_id):
         return self.get_store(store_id).get_jsn_description()

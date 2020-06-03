@@ -523,7 +523,8 @@ class Store:
         return {'ans': True, 'desc': product_name + " has been removed from policy \n"}
 
     def get_discounts(self):
-        return self.discounts
+        return {'ans': True,
+                'desc': self.discounts}
 
     def get_discount_by_id(self, discount_id):
         if discount_id in self.discounts.keys():
@@ -581,28 +582,28 @@ class Store:
     def get_inventory_description(self):
         return self.inventory
 
-    def get_jsn_description(self):
-        return {"Store ID": self.store_id,
-                "Name": self.name,
-                "Inventory": self.inventory.get_jsn_description(),
-                "Discounts": self.get_jsn_description_discounts(),
-                "Purchase Policies": self.get_jsn_description_purchases(),
-                "Store Owners": self.store_owners,
-                "Store Managers": self.store_managers,
-                "Sales": self.sales,
-                "Rate": self.rate}
+    # def get_jsn_description(self):
+    #     return {"Store ID": self.store_id,
+    #             "Name": self.name,
+    #             "Inventory": self.inventory.get_jsn_description(),
+    #             "Discounts": self.get_jsn_description_discounts(),
+    #             "Purchase Policies": self.get_jsn_description_purchases(),
+    #             "Store Owners": self.store_owners,
+    #             "Store Managers": self.store_managers,
+    #             "Sales": self.sales,
+    #             "Rate": self.rate}
 
-    def get_jsn_description_discounts(self):
-        discounts_description = []
-        for discount in self.discounts.values():
-            discounts_description.append(discount.get_jsn_description())
-        return discounts_description
+    # def get_jsn_description_discounts(self):
+    #     discounts_description = []
+    #     for discount in self.discounts.values():
+    #         discounts_description.append(discount.get_jsn_description())
+    #     return discounts_description
 
-    def get_jsn_description_purchases(self):
-        policies_description = []
-        for policy in self.purchase_policies.values():
-            policies_description.append(policy.get_jsn_description())
-        return policies_description
+    # def get_jsn_description_purchases(self):
+    #     policies_description = []
+    #     for policy in self.purchase_policies.values():
+    #         policies_description.append(policy.get_jsn_description())
+    #     return policies_description
 
     def get_product(self, product_name):
         return self.inventory.get_product(product_name)
