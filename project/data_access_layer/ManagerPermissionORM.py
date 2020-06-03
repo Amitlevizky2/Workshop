@@ -13,8 +13,8 @@ class ManagerPermissionORM(RegisteredUserORM):
     permission = Column(String, primary_key=True)
 
 
-    def add(self, permission):
-        session.add(permission)
+    def add(self):
+        session.add(self)
 
     def remove(self, username, store_id, permission):
         session.query(ManagerPermissionORM).delete.where(username=username, store_id=store_id, permission=permission)

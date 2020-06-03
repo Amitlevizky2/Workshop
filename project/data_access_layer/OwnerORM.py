@@ -16,3 +16,8 @@ class OwnerORM(Base):
 
     def add(self, owner):
         session.add(owner)
+        session.commit()
+
+    def remove(self):
+        session.delete(self)
+        session.commit()

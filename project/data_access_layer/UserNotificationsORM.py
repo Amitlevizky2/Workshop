@@ -15,3 +15,6 @@ class UserNotificationORM(Base):
     __tablename__ = 'notifications'
     username = Column(String, ForeignKey('regusers'), primary_key=True)
     notification = Column(String)
+
+    def add(self):
+        session.add(self)

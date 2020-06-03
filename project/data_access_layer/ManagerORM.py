@@ -16,3 +16,7 @@ class ManagerORM(RegisteredUserORM):
 
     def add(self, manager):
         session.add(manager)
+
+    def remove(self):
+        session.delete(self)
+        session.commit()

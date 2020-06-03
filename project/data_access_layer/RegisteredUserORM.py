@@ -3,7 +3,7 @@ from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session
-
+from project.data_access_layer.UserNotificationsORM import UserNotificationORM
 
 association_managers = Table('managers', Base.metadata,
     Column('username', Integer, ForeignKey('regusers.username')),
@@ -19,7 +19,7 @@ association_owners = Table('owners', Base.metadata,
 
 
 def find_by_username(username):
-    session.query(RegisteredUserORM).filter_by(username=username).first()
+    return session.query(RegisteredUserORM).filter_by(username=username).first()
 
 
 
@@ -39,7 +39,7 @@ class RegisteredUserORM(Base):
     def add(self):
         session.add(self)
 
-    #what am i updating
-    def update(self, username):
-        session.query(RegisteredUserORM).filter_by(username=username).first().update()
-
+    def add_notification(self, username, message):
+        notif = UserNotificationORM(username=username, notification=message)
+        session.add(notif)
+        session.commit()

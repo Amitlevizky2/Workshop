@@ -27,6 +27,14 @@ class Store:
         self.sales = []
         self.rate = 0
         self.appointed_by = {store_owner: []}
+        self.orm = StoreORM()
+        self.orm.id = store_id
+        self.orm.name = name
+        self.orm.discount_index = 0
+        self.orm.appoint_owner(store_owner, "")
+        self.orm.purchase_index = 0
+
+
 
     def appoint_owner(self, owner, to_appoint):
         """
@@ -47,6 +55,7 @@ class Store:
 
     def appoint_owner_helper(self, owner, to_appoint):
         self.store_owners.append(to_appoint)
+        self.orm.appoint_owner(owner, to_appoint)
         self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
             self.store_managers.pop(to_appoint)
@@ -70,6 +79,7 @@ class Store:
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
                         self.__remove_owner_all_appointed(to_remove)
+                        self.orm.remove_owner(to_remove)
                     return True
                 else:
                     logger.error("%s is not a store owner", owner)
@@ -98,7 +108,7 @@ class Store:
 
                     self.appointed_by[owner].remove(to_remove)
                     self.store_managers.pop(to_remove)
-
+                    self.orm.remove_manager(to_remove)
                     return True
                 else:
                     return False
@@ -137,6 +147,7 @@ class Store:
                     permission_function = getattr(Store, permission)
                     if permission_function not in self.store_managers.get(manager):
                         self.store_managers[manager].append(permission_function)
+                        self.orm.add_permission(manager, permission)
                         return True
                     else:
                         return False
@@ -166,6 +177,7 @@ class Store:
                         permission_function = getattr(Store, permission)
                         if permission_function in self.store_managers.get(manager):
                             self.store_managers[manager].remove(permission_function)
+                            self.orm.remove_permission(manager, permission)
                             return True
                         else:
                             return False
@@ -191,6 +203,7 @@ class Store:
             if to_appoint not in self.store_managers.keys():
                 self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
                 self.appointed_by[owner].append(to_appoint)
+                self.orm.appoint_manager(owner, to_appoint)
                 return True
             else:
                 return False
@@ -216,6 +229,7 @@ class Store:
         if self.check_permission(user_name, getattr(Store, "add_product")):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
+            self.orm.add_product(product_name, product_price, product_categories, key_words, amount)
             return True
         else:
             logger.error("%s Don't have this permission", user_name)
