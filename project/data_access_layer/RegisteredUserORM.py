@@ -26,9 +26,9 @@ def find_by_username(username):
 class RegisteredUserORM(Base):
     __tablename__ = 'regusers'
     username = Column(String, primary_key=True)
-    hashed_pass = Column(String)
     #not sure if need back populate here
     baskets = relationship('BasketORM', back_populates="user")
+    notifications = relationship('UserNotification', backpopulates='user')
     owns = relationship( "StoreORM", secondary=association_owners, back_populates="owned_by")
     manages = relationship("StoreORM", secondary=association_managers, back_populates="managed_by")
     ##OR THIS OR THIS
@@ -36,8 +36,8 @@ class RegisteredUserORM(Base):
     manages = relationship("ManagerORM", back_populates="managed_by")
 
 
-    def add(self, user):
-        session.add(user)
+    def add(self):
+        session.add(self)
 
     #what am i updating
     def update(self, username):

@@ -1,5 +1,6 @@
 import jsons
 
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 from project.domain_layer.users_managment.User import User
 
 
@@ -12,7 +13,12 @@ class RegisteredUser(User):
         self.loggedin = False
         self.managed_stores = []
         self.notifications = []
+        self.orm = RegisteredUserORM()
+        self.orm.add()
 
+    def add_purchase(self, purchase):
+        self.purchase_history.append(purchase)
+        purchase.orm.add_products_to_purchase(purchase.products)
 
     def logout(self):
         self.loggedin = False

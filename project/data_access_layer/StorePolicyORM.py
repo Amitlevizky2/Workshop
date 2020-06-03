@@ -16,7 +16,6 @@ class StorePolicyORM(PolicyORM):
     policy_in = relationship("StoreORM", back_populates="policy")
 
 
-
     def update_min_amount(self, id, min):
         update('storepolicys').where(policy_id=id).values(min_amount=min)
 

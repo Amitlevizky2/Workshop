@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from project.data_access_layer.PurchaseORM import PurchaseORM
 from project.domain_layer.stores_managment.Product import Product
 
 
@@ -10,3 +11,9 @@ class Purchase:
         self.products = products
         self.purchase_id = purchase_id
         self.date = datetime.now()
+        self.orm = PurchaseORM()
+        self.orm.username = buyer_name
+        self.orm.store_id = store_id
+        self.orm.date = self.date
+        self.orm.add()
+

@@ -21,8 +21,9 @@ class BasketORM(Base):
 
 
     #add commit
-    def add(self, basket):
-        session.add(basket)
+    def add(self):
+        session.add(self)
+        session.commit()
 
 
     #add commit
@@ -30,16 +31,16 @@ class BasketORM(Base):
     def update_basket_product_quantity(self, product_name, amount):
         ProductsInBasketORM.update_quantity(self.id, product_name, amount)
 
-#add commit
     def update_basket_add_product(self, product_name, amount):
         productinbasket = ProductsInBasketORM(basket_id = self.id, product_name = product_name, quantity = amount)
         session.add(productinbasket)
+        session.commit()
 
-#add commit?
     def remove_product_from_basket(self, product_name):
         session.query(ProductsInBasketORM).delete.where(basket_id=self.id, product_name=product_name)
+        session.commit()
 
     def remove_basket(self):
         session.query(ProductsInBasketORM).delete.where(basket_id = self.id)
         session.query(BasketORM).delete.where(id=self.id)
-        #session.commit()
+        session.commit()
