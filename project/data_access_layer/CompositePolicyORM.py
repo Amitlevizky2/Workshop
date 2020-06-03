@@ -25,3 +25,5 @@ class CompositePolicyORM(PolicyORM):
     logic_operator = Column(Integer)
     policies_in_here = relationship("PoliciesORM", secondary=policies_in_composite_association)
 
+    def change_logic_operaor(self, id,store_id, lo):
+        update('CompositeDiscounts').where(id=id, store_id=store_id).value(logic_operator=lo)

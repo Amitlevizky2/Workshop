@@ -11,10 +11,11 @@ class ConditionalStoreDiscountORM(DiscountORM):
     __tablename__ = 'conditionalstorediscount'
     discount_id = id = Column(Integer, ForeignKey('discounts.id'), primary_key=True)
     store_id = Column(Integer,ForeignKey('stores.id'),primary_key=True)
+    min_price = Column(Integer)
 
     __mapper_args__ = {
         'polymorphic_identity': 'ConditionalStore',
     }
 
-    def min_price(self, id,min):
+    def Update_min_price(self, id, min):
         update('conditionalstorediscount').where(discount_id=id).values(min_price=min)
