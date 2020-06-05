@@ -311,13 +311,14 @@ class Store:
                  :param publisher:
          """
         if purchase is not None:
+            print(purchase)
             self.sales.append(purchase)
             # send notification to owners.
             publisher.purchase_update(self.store_id, self.name, self.store_owners)
-            return {'ans': True,
-                    'desc': 'sale has been added'}
-        return {'ans': False,
-                'desc': 'sale has not been added'}
+            return {'error': False,
+                    'data': 'sale has been added'}
+        return {'error': True,
+                'error_msg': 'sale has not been added'}
 
     def check_permission(self, user, function):
         return user in self.store_owners or \
@@ -554,11 +555,12 @@ class Store:
             return {'ans': True, 'desc': self.purchase_policies[purchase_policy_id]}
             # return self.purchase_policies[purchase_policy_id]
 
-    def check_basket_validity(self, basket: Basket):
+    def check_basket_validity(self, basket):
         is_approved = True
         description = ""
         for policy in self.purchase_policies.values():
-            p_approved, outcome = policy.is_approved(basket.products)
+
+            p_approved, outcome = policy.is_approved(basket)
             if not p_approved:
                 description += outcome
                 is_approved = False

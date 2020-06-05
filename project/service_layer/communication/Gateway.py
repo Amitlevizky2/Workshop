@@ -26,6 +26,7 @@ with app.app_context():
     initializer = Initializer(sio)
 users_manager = initializer.get_users_manager_interface()
 stores_manager = initializer.get_stores_manager_interface()
+purchase_manager = initializer.get_purchase_manager_interface()
 
 """---------------------------------------------------------------------"""
 """-------------------------------USER EVENTS-------------------------------- """
@@ -165,6 +166,13 @@ def view_user_purchases():
 @app.route('/add_purchase', methods=['POST', 'GET'])
 def add_purchase():
     pass
+
+
+@app.route('/buy', methods=['POST', 'GET'])
+def buy():
+    message = request.get_json()
+    data = purchase_manager.buy(message['username'])
+    return jsonify(data)
 
 
 """---------------------------------------------------------------------"""

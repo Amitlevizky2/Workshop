@@ -15,7 +15,7 @@ class Publisher:
         self.users_manager = users_manager
 
     def notify(self, message, user):
-        print('open message: ' + message)
+        print('publisher message: ' + message)
         if self.users_manager.check_if_loggedin(user):
             self.send_notification(user, message)
         else:

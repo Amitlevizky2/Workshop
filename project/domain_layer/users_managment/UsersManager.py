@@ -88,9 +88,9 @@ class UsersManager:
     def view_cart(self, username):
         ans, user = self.find_user(username)
         if ans is True:
-            return ans, jsons.dumps(user.view_cart())
+            return jsonpickle.encode(user.view_cart())
         else:
-            return ans, user
+            return None
 
     def logout(self, username):
         ans, user = self.find_reg_user(username)
@@ -131,7 +131,7 @@ class UsersManager:
         ans, user = self.find_user(username)
         if ans is True:
             cart = user.get_cart()
-            return ans, cart
+            return ans, jsonpickle.encode(cart)
         else:
             return ans, user
 
@@ -181,10 +181,10 @@ class UsersManager:
             return user.loggedin
         return False
 
-    def add_purchase(self, username, purchase):
+    def add_purchase(self, username, purchases):
         ans, user = self.find_user(username)
         if ans is True:
-            user.add_purchase(jsonpickle.decode(purchase))
+            user.add_purchase(jsonpickle.decode(purchases))
             return True
         else:
             return ans, user

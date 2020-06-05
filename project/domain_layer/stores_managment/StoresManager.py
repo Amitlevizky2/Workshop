@@ -141,7 +141,9 @@ class StoresManager:
 # TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         # send notification to user to_remove.
-        return jsons.dumps(self.get_store(store_id).add_new_sale(purchase, self.publisher))
+        print('add purchase to store: ' + str(purchase.store_id) + ' username: ' + purchase.buyer + '.')
+        store = self.get_store(store_id)
+        return jsons.dumps(store.add_new_sale(purchase, self.publisher))
 
 # TODO: add publisher
     def open_store(self, owner: str, store_name):
@@ -152,27 +154,29 @@ class StoresManager:
         return self.stores_idx - 1
 
     def buy(self, cart: Cart):
-        if not self.check_cart_validity(cart):
-            return jsons.dumps({'ans': False})
+        answer = jsons.loads(self.check_cart_validity(cart))
+        if not answer['error']:
+            return jsons.dumps({'error': True,
+                                'error_msg': answer['description']})
 
-        # price, description =\
-        buy_res = jsons.loads(self.get_cart_description(cart))
-        price = buy_res['cart_price']
-        description = buy_res['cart_description']
+        # # price, description =\
+        # buy_res = jsons.loads(self.get_cart_description(cart))
+        # price = buy_res['cart_price']
+        # description = buy_res['cart_description']
+
         #  if user dont have enough money according to 'price' will return false
 
         #  user will also get a description for his purchase
 
-        for store in cart.baskets.keys():
-            basket = cart.get_basket(store)
-            store_obj = self.get_store(basket.store_id)
+        for store_id in cart.baskets.keys():
+            basket = cart.get_basket(store_id)
             for product in basket.products.keys():
-                if not self.get_store(store).buy_product(product, basket.products.get(product)[1]):
+                if not self.get_store(store_id).buy_product(product, basket.products[product]):
                     return False
 
-            store_obj.sales.append(description[store_obj.name])
-        return jsons.dumps({'ans': True,
-                            'result': 'Purchase confirmed, total price: ' + str(price)})
+            # store_obj.sales.append(description[store_obj.name])
+        return jsons.dumps({'error': False,
+                            'data': 'confirmed'})
 
     def get_sales_history(self, store_id, user, is_admin):
         return jsons.dump(self.get_store(store_id).get_sales_history(user, is_admin))
@@ -334,13 +338,14 @@ class StoresManager:
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
             description[store.name] = []
-            p_approved, outcome = store.check_basket_validity(basket)
+            basket_dict = self.get_basket_dict(store.inventory, basket)
+            p_approved, outcome = store.check_basket_validity(basket_dict)
 
             if not p_approved:
                 description[store.name].append(outcome)
                 is_approved = False
 
-        return jsons.dump({'ans': is_approved,
+        return jsons.dumps({'error': not is_approved,
                            'description': description})
 
     def get_cart_description(self, cart: Cart):
@@ -354,8 +359,12 @@ class StoresManager:
             print("***********************")
             # print(jsons.dump(basket))
             updated_dict_basket = self.get_updated_basket(basket)
-            cart_price += self.get_total_basket_price(updated_dict_basket)
-            cart_discription_dict[store.name] = (self.get_basket_description(updated_dict_basket.values()))
+            basket_price = self.get_total_basket_price(updated_dict_basket)
+            cart_price += basket_price
+            cart_discription_dict[store.name] = {'store_name': store.name,
+                                                 'store_id': basket.store_id,
+                                                 'store_purchase_price': basket_price,
+                                                 'desc': (self.get_basket_description(updated_dict_basket.values()))}
 
         return jsons.dumps({'ans': True,
                            'cart_price': cart_price,

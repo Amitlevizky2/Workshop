@@ -1,3 +1,4 @@
+import jsonpickle
 import jsons
 
 from project.domain_layer.users_managment.Cart import Cart
@@ -59,18 +60,17 @@ class UsersManagerInterface:
     # look up via usr id change user list to map of ids and user
     def view_cart(self, username):
         logger.log("user %s called view_cart", username)
-        res, user_cart = self.get_cart(username)
+        res, cart = self.user_manager.get_cart(username)
         if res is True:
-            print(user_cart.baskets)
+            user_cart = jsonpickle.decode(cart)
             cart_view = jsons.loads(self.stores_manager.get_cart_description(user_cart))
-            print(cart_view)
             return ({
                 'error': False,
                 'data': cart_view
             })
         return ({
             'error': True,
-            'error_msg': user_cart
+            'error_msg': cart
         })
 
     def logout(self, username):
@@ -102,7 +102,10 @@ class UsersManagerInterface:
         return self.stores_manager.get_product_from_store(store_id, product_name)
 
     def get_cart(self, username):
-        return self.user_manager.get_cart(username)
+        answer, data = self.user_manager.get_cart(username)
+        if answer is False:
+            return answer, data
+        return answer, jsonpickle.decode(data)
 
     def view_purchases_admin(self, username, admin):
         logger.log("admin %s called view_purchases_admin for user %s", admin, username)
@@ -149,8 +152,8 @@ class UsersManagerInterface:
     def check_if_loggedin(self, username):
         return self.user_manager.check_if_loggedin(username)
 
-    def add_purchase(self, username, purchase):
-        return self.user_manager.add_purchase(username, purchase)
+    def add_purchase(self, username, purchases):
+        return self.user_manager.add_purchase(username, jsonpickle.encode(purchases))
 
     def remove_cart(self, username):
         return self.user_manager.remove_cart(username)

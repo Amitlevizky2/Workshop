@@ -1,13 +1,15 @@
 from project.domain_layer.communication_managment.Publisher import Publisher
+from project.service_layer.PurchaseManager import PurchaseManager
 from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
 from os import path
 
 
 class Initializer:
-    def __init__(self,sio):
+    def __init__(self, sio):
         self.users_manager = UsersManagerInterface()
         self.stores_manager = StoresManagerInterface(self.users_manager)
+        self.purchase_manager = PurchaseManager(self.users_manager, self.stores_manager)
         self.publisher = Publisher(sio)
         self.users_manager.set_stores_manager(self.stores_manager)
         self.stores_manager.bound_publisher(self.publisher)
@@ -43,6 +45,9 @@ class Initializer:
 
     def get_stores_manager_interface(self) -> StoresManagerInterface:
         return self.stores_manager
+
+    def get_purchase_manager_interface(self):
+        return self.purchase_manager
 
     def bound_managers(self):
         users = self.users_manager.get_users_manager()

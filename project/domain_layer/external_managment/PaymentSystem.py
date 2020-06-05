@@ -20,16 +20,20 @@ class PaymentSystem:
             logger.error("Failed to connect to payment system")
         return False
 
-    def pay(self, user, cart: Cart) -> [Purchase]:
-        res = []
-        cart = jsonpickle.decode(cart)
-        if True: #self.external_payment_system.pay(user, cart):
-            for store in cart.baskets.keys():
-                res.append(Purchase(cart.baskets.get(store).products, user, store, self.p_id))
-                self.p_id += 1
-        else:
-            logger.error("Failed to complete payment")
-        return jsonpickle.encode(res)
+    def pay(self, user, store_id, price):
+        return True;
+        # res = []
+        # cart = jsonpickle.decode(cart)
+        # if True:  # self.external_payment_system.pay(user, cart):
+        #     for store in cart.baskets.keys():
+        #         res.append(Purchase(cart.baskets.get(store).products, user, store, self.p_id))
+        #         self.p_id += 1
+        # else:
+        #     logger.error("Failed to complete payment")
+        # return jsonpickle.encode(res)
 
     def cancel(self, purchases):
         self.external_payment_system.cancel(purchases)
+
+    def check_user(self, user, cart_price):
+        return True

@@ -99,7 +99,7 @@ class StoresManagerInterface:
         return -1
 
     def buy(self, cart):
-        self.stores_manager.buy(cart)
+        return self.stores_manager.buy(cart)
 
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
@@ -262,3 +262,6 @@ class StoresManagerInterface:
 
     def get_stores_manager(self) -> StoresManager:
         return self.stores_manager
+
+    def check_cart_validity(self, cart):
+        return self.stores_manager.check_cart_validity(cart)
