@@ -3,7 +3,7 @@ from sqlalchemy import Table, Column, Integer, String, update
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session
-from project.data_access_layer.DiscountORM import assosiation_products
+
 
 
 def find_product(name, store_id):
@@ -21,7 +21,7 @@ class ProductORM(Base):
     key_words = Column(String)
     price = Column(Integer)
     quantity = Column(Integer)
-    discounts = relationship("DiscountORM", secondary=assosiation_products, back_populates="products")
+
 
 
 def find_product(name, store_id):

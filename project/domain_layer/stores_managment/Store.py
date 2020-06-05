@@ -33,6 +33,7 @@ class Store:
         self.orm.discount_index = 0
         self.orm.appoint_owner(store_owner, "")
         self.orm.purchase_index = 0
+        self.orm.add()
 
 
 

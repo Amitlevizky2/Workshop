@@ -2,20 +2,10 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session
-from project.data_access_layer.UserNotificationsORM import UserNotificationORM
+from project.data_access_layer import Base, session,engine
 
-association_managers = Table('managers', Base.metadata,
-    Column('username', Integer, ForeignKey('regusers.username')),
-    Column('store_id', Integer, ForeignKey('stores.id')),
-    Column('appointed_by', String, ForeignKey('regusers.username'))
-)
+#from project.data_access_layer.OwnerORM import OwnerORM
 
-association_owners = Table('owners', Base.metadata,
-    Column('username', Integer, ForeignKey('regusers.username')),
-    Column('store_id', Integer, ForeignKey('stores.id')),
-    Column('appointed_by', String, ForeignKey('regusers.username'))
-)
 
 
 def find_by_username(username):
@@ -24,22 +14,24 @@ def find_by_username(username):
 
 
 class RegisteredUserORM(Base):
+    from project.data_access_layer.UserNotificationsORM import UserNotificationORM
+
+    from project.data_access_layer.StoreORM import StoreORM
     __tablename__ = 'regusers'
     username = Column(String, primary_key=True)
-    #not sure if need back populate here
     baskets = relationship('BasketORM', back_populates="user")
-    notifications = relationship('UserNotificationORM', back_populates='user')
-    #owns = relationship("StoreORM", secondary=association_owners, back_populates="owned_by")
-    #manages = relationship("StoreORM", secondary=association_managers, back_populates="managed_by")
-    ##OR THIS OR THIS
-    owns = relationship("OwnerORM", back_populates="owned_by")
-    manages = relationship("ManagerORM", back_populates="managed_by")
+    notifications = relationship('UserNotificationORM')
 
+    owns = relationship('OwnerORM', back_populates="user",foreign_keys="OwnerORM.username")
+    manages = relationship("ManagerORM", back_populates="managed_by",foreign_keys="ManagerORM.username")
 
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
         session.add(self)
+        session.commit()
 
     def add_notification(self, username, message):
+        from project.data_access_layer.UserNotificationsORM import UserNotificationORM
         notif = UserNotificationORM(username=username, notification=message)
         session.add(notif)
         session.commit()

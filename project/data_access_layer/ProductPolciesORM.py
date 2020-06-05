@@ -2,7 +2,7 @@ import datetime
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, update
 from sqlalchemy.orm import relationship
-from project.data_access_layer import Base, session
+from project.data_access_layer import Base, session, engine
 
 
 class ProductPoliciesORM(Base):
@@ -20,3 +20,8 @@ class ProductPoliciesORM(Base):
 
     def update_max_amount(self, id, max):
         update('storepolicys').where(policy_id=id).values(max_amount=max)
+
+    def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['productspolices']], checkfirst=True)
+        session.add(self)
+        session.commit()

@@ -2,7 +2,8 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session
+from project.data_access_layer import Base, session,engine
+
 
 
 class OwnerORM(Base):
@@ -10,11 +11,11 @@ class OwnerORM(Base):
     username = Column(String, ForeignKey('regusers.username'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     appointed_by = Column(String, ForeignKey('regusers.username'))
-    owns = relationship("StoreORM", back_populates="owned_by")
-    owned_by = relationship("RegUserORM", back_populates="owns")
-
+    store = relationship("StoreORM", back_populates="owned_by",foreign_keys=[store_id])
+    user = relationship("RegisteredUserORM", back_populates="owns", foreign_keys=[username])
 
     def add(self, owner):
+        Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
         session.add(owner)
         session.commit()
 

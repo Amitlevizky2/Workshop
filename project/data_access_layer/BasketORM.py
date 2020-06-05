@@ -2,7 +2,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session
+from project.data_access_layer import Base, session, engine
 from project.data_access_layer.ProductsInBasketORM import ProductsInBasketORM
 
 
@@ -20,8 +20,9 @@ class BasketORM(Base):
         return session.query(BasketORM).filter_by(username=username).first()
 
 
-    #add commit
+
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['baskets']], checkfirst=True)
         session.add(self)
         session.commit()
 

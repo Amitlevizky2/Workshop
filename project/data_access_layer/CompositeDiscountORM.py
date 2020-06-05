@@ -6,7 +6,7 @@ from datetime import datetime
 from project.data_access_layer.DiscountORM import DiscountORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
-from project.data_access_layer import Base, session
+from project.data_access_layer import Base, session, engine
 
 predicates_association = Table('Predicates', Base.metadata,
                                Column('composite_discount_id', Integer, ForeignKey('CompositeDiscounts.discount_id')),
@@ -38,3 +38,8 @@ class CompositeDiscountORM(DiscountORM):
     def change_logic_operaor(self,id,lo):
         update('CompositeDiscounts').where(discount_id = id).value(logic_operator = lo)
 
+
+    def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['CompositeDiscounts']], checkfirst=True)
+        session.add(self)
+        session.commit()

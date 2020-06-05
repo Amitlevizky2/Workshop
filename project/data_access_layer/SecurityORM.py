@@ -2,7 +2,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session
+from project.data_access_layer import Base, session, engine
 
 
 def find_pass(username):
@@ -15,5 +15,6 @@ class SecurityORM(Base):
     hashed_pass = Column(String)
 
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['passwords']], checkfirst=True)
         session.add(self)
         session.commit()

@@ -3,7 +3,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, update
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session
+from project.data_access_layer import Base, session, engine
 from project.data_access_layer.PolicyORM import PolicyORM
 
 
@@ -15,6 +15,10 @@ class StorePolicyORM(PolicyORM):
     max_amount = Column(Integer)
     policy_in = relationship("StoreORM", back_populates="policy")
 
+    def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['storepolicies']], checkfirst=True)
+        session.add(self)
+        session.commit()
 
     def update_min_amount(self, id, min):
         update('storepolicys').where(policy_id=id).values(min_amount=min)

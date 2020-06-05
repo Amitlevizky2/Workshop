@@ -7,9 +7,7 @@ from project.data_access_layer.DiscountORM import DiscountORM
 from project.data_access_layer.PolicyORM import PolicyORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
-from project.data_access_layer import Base, session
-
-
+from project.data_access_layer import Base, session, engine
 
 policies_in_composite_association = Table('Policies_in_Composite', Base.metadata,
                              Column('composite_policy_id', Integer, ForeignKey('CompositePolicies.discount_id')),
@@ -27,3 +25,8 @@ class CompositePolicyORM(PolicyORM):
 
     def change_logic_operaor(self, id,store_id, lo):
         update('CompositeDiscounts').where(id=id, store_id=store_id).value(logic_operator=lo)
+
+    def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['CompositePolicies']], checkfirst=True)
+        session.add(self)
+        session.commit()

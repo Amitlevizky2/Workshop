@@ -2,11 +2,9 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String,update
 from sqlalchemy.orm import relationship
 from datetime import  datetime
-from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
-from project.data_access_layer import Base,session
-
-
+from project.data_access_layer import Base, session
+from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
 
 
 def find_by_id(discount_id):
@@ -16,15 +14,17 @@ def find_by_id(discount_id):
 class DiscountORM(Base):
     __tablename__ = 'discounts'
     discount_id = Column(Integer, primary_key=True)
-    store_id = Column(Integer, ForeignKey('stores'))
-    start_date = Column(datetime)
-    end_date = Column(datetime)
+    store_id = Column(Integer, ForeignKey('stores.id'))
+    #MODIFY TO STRING
+    start_date = Column(String)
+    end_date = Column(String)
     precent = Column(Integer)
-    products = relationship("ProductInDiscountsORM", back_populates="discounts")
-    store = relationship("StoreORM", back_populates="discounts")
+    products = relationship("ProductsInDiscountsORM")
+    discriminator = Column('type', String(50))
+    #store = relationship("StoreORM", back_populates="discounts")
     __mapper_args__ = {
         'polymorphic_identity': 'discount',
-        'polymorphic_on': type
+        'polymorphic_on': discriminator
     }
 
     def update_discount_precent(self, precent, id):

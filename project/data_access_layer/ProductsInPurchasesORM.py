@@ -1,11 +1,11 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 
-from project.data_access_layer import session
-from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
+from project.data_access_layer import session, Base, engine
 
 
-class ProductsInPurchasesORM(RegisteredUserORM):
+
+class ProductsInPurchasesORM(Base):
     __tablename__ = 'productsinpurcases'
     purchase_id = Column(Integer, ForeignKey('purchases.id'), primary_key=True)
     product_name = Column(String, ForeignKey('products.username'), primary_key=True)
@@ -13,6 +13,8 @@ class ProductsInPurchasesORM(RegisteredUserORM):
     quantity = Column(Integer)
 
     # create products in purchaseORM and send to this function
-    def add(self, productinpurchase):
-        session.add(productinpurchase)
+    def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['productsinpurcases']], checkfirst=True)
+        session.add(self)
+        session.commit()
 

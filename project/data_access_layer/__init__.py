@@ -1,10 +1,18 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-
-path = 'sqlite:///C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1'
+path = 'sqlite:///C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db'
 Base = declarative_base()
-session = sessionmaker()
-engine = create_engine(path)
-session.configure(bind=engine)
+# session = sessionmaker()
+engine = create_engine(path, echo = True)
+# session.configure(bind=engine)
+Session = sessionmaker(bind=engine)
+# Session is a class
+session = Session()
+
+# Base.metadata.bind = engine
+# Base.metadata.create_all(engine)
+meta = MetaData()
+meta.create_all(engine)
+session.commit()

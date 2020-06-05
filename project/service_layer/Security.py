@@ -39,5 +39,5 @@ class Security:
 
     def add_user(self, username, password):
         self.passwords[username] = self.hash_password(password)
-        orm = SecurityORM(username=username, hash_pass=self.passwords[username])
+        orm = SecurityORM(username=username, hashed_pass=self.passwords[username])
         orm.add()

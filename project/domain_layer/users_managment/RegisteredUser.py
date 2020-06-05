@@ -14,6 +14,7 @@ class RegisteredUser(User):
         self.managed_stores = []
         self.notifications = []
         self.orm = RegisteredUserORM()
+        self.orm.username = username
         self.orm.add()
 
     def add_purchase(self, purchase):
