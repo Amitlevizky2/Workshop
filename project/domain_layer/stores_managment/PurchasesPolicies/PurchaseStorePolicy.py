@@ -32,7 +32,7 @@ class PurchaseStorePolicy(PurchasePolicy):
             max_string = "no max limit"
         else:
             max_string = str(self.max_amount_products)
-        desc = "You have {} products in your basket and you can only buy minimum {} and maximum {} products in this store\n".\
+        desc = "You have [{}] products in your basket and you can only buy minimum [{}] and maximum [{}] products in this store\n".\
             format(str_basket_size, min_string, max_string)
         return desc
 
@@ -59,21 +59,3 @@ class PurchaseStorePolicy(PurchasePolicy):
             max_string = str(self.max_amount_products)
 
         return [self.id, self.purchase_type, min_string, max_string]
-
-    def get_jsn_description(self):
-        min_string = ""
-        max_string = ""
-        if self.min_amount_products == self.MIN_SIZE:
-            min_string = "no min limit"
-        else:
-            min_string = str(self.min_amount_products)
-
-        if self.min_amount_products == self.MAX_SIZE:
-            max_string = "no max limit"
-        else:
-            max_string = str(self.max_amount_products)
-
-        return {"Purchase ID": self.id,
-                "Min amount of products": self.min_amount_products,
-                "Max amount of products": self.max_amount_products,
-                "Purchase Type": self.purchase_type}

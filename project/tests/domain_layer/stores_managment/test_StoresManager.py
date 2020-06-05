@@ -77,15 +77,15 @@ class test_StoresManager(unittest.TestCase):
         res = self.store_manager.add_product_to_store(7, "not real store", "what a product", 1222, ["imaginary products"],
                                                     ["no"], 20)
         res = jsons.loads(res)
-        self.assertFalse(res['ans'])
+        self.assertFalse(res['error'])
         res = self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
                                                 ["no"], 20)
         res = jsons.loads(res)
-        self.assertTrue(res['ans'])
+        self.assertTrue(res['error'])
         res = self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
                                                     ["no"], 20)
         res = jsons.loads(res)
-        self.assertTrue(res['ans'])
+        self.assertTrue(res['error'])
 
     def test_open_store(self):
         index = self.store_manager.stores_idx
@@ -153,7 +153,7 @@ class test_StoresManager(unittest.TestCase):
 
         res = self.store_manager.add_policy_to_purchase_composite_policy(
             1, "test_owner1", 5, 10)
-        # self.assertFalse(res)
+        # self.assertFalse(res['error'])
 
         res = self.store_manager.add_policy_to_purchase_composite_policy(
             1, "test_owner1", 10, 4)
@@ -271,11 +271,6 @@ class test_StoresManager(unittest.TestCase):
         apple_price = product['price_after_disc']
         self.assertEqual(apple_price, 136.0)
 
-
-
-    # def test_get_updated_basket(self):
-    #     self.fail()
-
     def test_get_total_basket_tup_price(self):
         cart = self.init_cart()
         updated = self.store_manager.get_updated_basket(cart.baskets[1])
@@ -292,10 +287,6 @@ class test_StoresManager(unittest.TestCase):
     def test_buy(self):
         cart = self.init_cart()
         is_apply = self.store_manager.buy(cart)
-        x=5
-
-    def test_get_store_jsn_description(self):
-        store_json = self.store_manager.get_jsn_description(1)
         x=5
 
     def test_get_product_from_store(self):
@@ -358,22 +349,6 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Keyboard")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 5, "Apple")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 6, "Tomato")
-
-            # self.tup_disc_prod_name_list = []
-            # self.tup_disc_prod_name_list.append((self.discount3, ["Apple", "Carrot", "Keyboard"]))
-            # self.tup_disc_prod_name_list.append((self.discount4, ["Apple", "Orange"]))
-            # self.tup_disc_prod_name_list.append((self.discount5, ["Tomato"]))
-
-            # self.discount6 = CompositeDiscount(store.store_id, "test store", datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-            #                                    LogicOperator.AND,
-            #                                    self.tup_disc_prod_name_list, [self.discount, self.discount1])
-            # self.discount7 = CompositeDiscount(store.store_id, "test store", datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-            #                                    LogicOperator.OR,
-            #                                    self.tup_disc_prod_name_list, [self.discount, self.discount2])
-            # self.discount8 = CompositeDiscount(store.store_id, "test store", datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-            #                                    LogicOperator.XOR,
-            #                                    self.tup_disc_prod_name_list, [self.discount, self.discount5])
-
             self.store_manager.add_composite_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17),
                                                       "and", {4: ["Apple", "Carrot", "Keyboard"],
                                                                           5: ["Apple", "Orange"],

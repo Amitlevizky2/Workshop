@@ -249,12 +249,12 @@ class Store:
         if self.check_permission(user_name, getattr(Store, "add_product")):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
-            return {'error': False,
-                    'data': "Product has been added"}
-        else:
-            logger.error("%s Don't have this permission", user_name)
             return {'error': True,
                     'error_msg': "User don't have permission"}
+        else:
+            logger.error("%s Don't have this permission", user_name)
+            return {'error': False,
+                    'data': "Product has been added"}
 
     def search(self, search_term: str = "", categories = [], key_words = []) -> [Product]:
         """
@@ -339,6 +339,7 @@ class Store:
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
+            discount.set_id(self.discount_idx)
             return {'ans': True,
                     'desc': 'visible discount has been added'}
         return {'ans': False,
@@ -349,6 +350,7 @@ class Store:
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
+            discount.set_id(self.discount_idx)
             return {'ans': True,
                     'desc': 'conditional discount has been added'}
         return {'ans': False,
@@ -359,6 +361,7 @@ class Store:
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
+            discount.set_id(self.discount_idx)
             return {'ans': True,
                     'desc': 'conditional discount has been added'}
         return {'ans': False,
@@ -369,6 +372,7 @@ class Store:
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
+            discount.set_id(self.discount_idx)
             return {'ans': True,
                     'desc': 'composite discount has been added'}
         return {'ans': False,
@@ -410,7 +414,7 @@ class Store:
     def get_updated_basket(self, basket: Basket):
         product_price_dict = {}
         for product in basket.products.values():
-            print(product)
+            # print(product)
             product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price * product[1])  #{product_name, (amount, updated_price)}
 
         for discount in self.discounts.values():
@@ -458,6 +462,7 @@ class Store:
 
         policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx)
         self.purchase_policies[self.purchases_idx] = policy
+        policy.set_id(self.purchases_idx)
 
         return {'ans': True, 'desc': "Policy as been added"}
 
@@ -476,6 +481,7 @@ class Store:
 
         policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx)
         self.purchase_policies[self.purchases_idx] = policy
+        policy.set_id(self.purchases_idx)
 
         return {'ans': True, 'desc': "Policy as been added"}
 
@@ -490,6 +496,7 @@ class Store:
 
         policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx)
         self.purchase_policies[self.purchases_idx] = policy
+        policy.set_id(self.purchases_idx)
 
         return {'ans': True, 'desc': "Policy as been added"}
 

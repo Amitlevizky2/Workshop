@@ -317,10 +317,10 @@ class TestStore(unittest.TestCase):
     def test_add_product_one(self):
         # Lielle you silly, you don't have the add product permission, moreover,
         res = self.store.add_product("Lielle", "Macbook", 25, "Food", "Fruits", 20)
-        self.assertFalse(res['ans'])
+        self.assertFalse(res['error'])
         # Sebastian is not one of the users in the system.
         res = self.store.add_product("Sebastian", "Macbook", 25, "Food", "Fruits", 20)
-        self.assertFalse(res['ans'])
+        self.assertFalse(res['error'])
 
     def test_add_product_two(self):
         p = Product("Macbook", 25, "Food", "Fruits", 20)
@@ -328,7 +328,7 @@ class TestStore(unittest.TestCase):
         self.assertNotIn("Macbook", self.store.inventory.products)
         # Amitush, you have the permission to add product, use it!
         res = self.store.add_product("Amit", p.name, p.original_price, p.categories, p.key_words, p.amount)
-        self.assertTrue(res['ans'])
+        self.assertTrue(res['error'])
         # Let's see if you did it well
         self.assertIn("Macbook", self.store.inventory.products)
 
