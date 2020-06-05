@@ -350,6 +350,9 @@ class StoresManager:
 
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
+            #store.get
+            print("***********************")
+            # print(jsons.dump(basket))
             updated_dict_basket = self.get_updated_basket(basket)
             cart_price += self.get_total_basket_price(updated_dict_basket)
             cart_discription_dict[store.name] = (self.get_basket_description(updated_dict_basket.values()))
@@ -358,9 +361,10 @@ class StoresManager:
                            'cart_price': cart_price,
                            'cart_description': cart_discription_dict})
 
-    def get_updated_basket(self, basket: Basket):
+    def get_updated_basket(self, basket):
         store = self.get_store(basket.store_id)
-        return store.get_updated_basket(basket)  # {product_name, (Product, amount, updated_price, policy)}
+        basket_dict = self.get_basket_dict(store.inventory, basket)
+        return store.get_updated_basket(basket_dict)  # {product_name, (Product, amount, updated_price, policy)}
 
     def get_total_basket_price(self, updated_basket_dict):
         price = 0.0
@@ -417,3 +421,14 @@ class StoresManager:
 
     def get_store_description_by_id(self, store_id):
         return self.get_store(store_id).get_jsn_description()
+
+    def get_basket_dict(self, inventory, basket):
+        # print("!!!!!!!!!!!!!")
+        # print(basket)
+        products = basket.products
+        products_dict = {}
+        for product in products.keys():
+            products_dict[product] = (inventory.products[product], products[product], inventory.products[product].original_price)
+        return products_dict
+
+# {product_name, (Product, amount, updated_price, policy)}

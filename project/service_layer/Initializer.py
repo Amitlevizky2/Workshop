@@ -5,7 +5,7 @@ from os import path
 
 
 class Initializer:
-    def __init__(self, sio):
+    def __init__(self,sio):
         self.users_manager = UsersManagerInterface()
         self.stores_manager = StoresManagerInterface(self.users_manager)
         self.publisher = Publisher(sio)

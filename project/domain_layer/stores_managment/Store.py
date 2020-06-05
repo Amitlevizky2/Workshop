@@ -249,12 +249,12 @@ class Store:
         if self.check_permission(user_name, getattr(Store, "add_product")):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
-            return {'error': True,
-                    'error_msg': "User don't have permission"}
-        else:
-            logger.error("%s Don't have this permission", user_name)
             return {'error': False,
                     'data': "Product has been added"}
+        else:
+            logger.error("%s Don't have this permission", user_name)
+            return {'error': True,
+                    'error_msg': "User don't have permission"}
 
     def search(self, search_term: str = "", categories = [], key_words = []) -> [Product]:
         """
@@ -411,10 +411,11 @@ class Store:
             return True
         return False
 
-    def get_updated_basket(self, basket: Basket):
+    def get_updated_basket(self, basket):
         product_price_dict = {}
-        for product in basket.products.values():
-            # print(product)
+        for product in basket.values():
+            print(product)
+
             product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price * product[1])  #{product_name, (amount, updated_price)}
 
         for discount in self.discounts.values():

@@ -185,6 +185,7 @@ def appoint_store_manager():
 def add_product_to_store():
     message = request.get_json()
     data = stores_manager.add_product_to_store(message['store_id'], message['username'], message['product_name'], message['price'], message['categories'], message['key_words'], message['amount'])
+    print(data)
     return jsonify(data)
 
 
