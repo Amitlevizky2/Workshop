@@ -28,9 +28,9 @@ class RegisteredUserORM(Base):
     username = Column(String, primary_key=True)
     #not sure if need back populate here
     baskets = relationship('BasketORM', back_populates="user")
-    notifications = relationship('UserNotification', backpopulates='user')
-    owns = relationship( "StoreORM", secondary=association_owners, back_populates="owned_by")
-    manages = relationship("StoreORM", secondary=association_managers, back_populates="managed_by")
+    notifications = relationship('UserNotificationORM', back_populates='user')
+    #owns = relationship("StoreORM", secondary=association_owners, back_populates="owned_by")
+    #manages = relationship("StoreORM", secondary=association_managers, back_populates="managed_by")
     ##OR THIS OR THIS
     owns = relationship("OwnerORM", back_populates="owned_by")
     manages = relationship("ManagerORM", back_populates="managed_by")

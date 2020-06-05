@@ -14,7 +14,7 @@ class BasketORM(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, ForeignKey('regusers.username'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
-    #not sure if needed
+    user = relationship("RegisteredUserORM", back_populates="baskets")
 
     def find_user_baskets(self, username):
         return session.query(BasketORM).filter_by(username=username).first()

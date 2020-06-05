@@ -13,8 +13,10 @@ def find_all_notifications(username):
 
 class UserNotificationORM(Base):
     __tablename__ = 'notifications'
-    username = Column(String, ForeignKey('regusers'), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    username = Column(String, ForeignKey('regusers.username'))
     notification = Column(String)
+    user = relationship("RegisteredUserORM", back_populates="notifications")
 
     def add(self):
         session.add(self)
