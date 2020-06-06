@@ -343,7 +343,8 @@ class Store:
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
             return {'error': False,
-                    'data': 'visible discount has been added'}
+                    'data': 'visible discount has been added',
+                    'discount_id': self.discount_idx}
         return {'error': True,
                 'error_msg': permitted_username + ' do not have this permission'}
 
@@ -354,7 +355,8 @@ class Store:
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
             return {'ans': True,
-                    'desc': 'conditional discount has been added'}
+                    'desc': 'conditional discount has been added',
+                    'discount_id': self.discount_idx}
         return {'ans': False,
                 'desc': permitted_username + ' do not have this permission'}
 
@@ -365,7 +367,8 @@ class Store:
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
             return {'ans': True,
-                    'desc': 'conditional discount has been added'}
+                    'desc': 'conditional discount has been added',
+                    'discount_id': self.discount_idx}
         return {'ans': False,
                 'desc': permitted_username + ' do not have this permission'}
 
@@ -376,7 +379,8 @@ class Store:
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
             return {'ans': True,
-                    'desc': 'composite discount has been added'}
+                    'desc': 'composite discount has been added',
+                    'discount_id': self.discount_idx}
         return {'ans': False,
                 'desc': permitted_username + ' do not have this permission'}
 
@@ -429,6 +433,7 @@ class Store:
                                                                       getattr(Store, "add_product_to_discount"))
         is_in_inventory = product_name in self.inventory.products.keys()
         discount: Discount = self.discounts[discount_id]
+        print("Add produxt to discount in store: " + product_name)
         if is_permitted and is_in_inventory:
             discount.add_product(product_name)
             return {'ans': True,

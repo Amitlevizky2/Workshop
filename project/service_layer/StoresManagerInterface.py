@@ -186,11 +186,11 @@ class StoresManagerInterface:
         return self.stores_manager.get_updated_basket(basket)
 
     def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
-                                        end_date = None, percent: int = None):
+                                        end_date = None, percent: int = None, products: [str] = None):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
         _percent = int(percent)
-        return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent)
+        return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent, products)
 
     def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
                                             end_date = None, percent: int = None,

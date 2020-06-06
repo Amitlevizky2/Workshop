@@ -58,18 +58,20 @@ class StoresGetters:
             store = self.stores_manager.get_store(basket.store_id)
             updated_dict_basket = self.stores_manager.get_updated_basket(basket)
             cart_price += self.stores_manager.get_total_basket_price(updated_dict_basket)
-            cart_discription_dict[store.name] = (self.stores_manager.get_basket_description(updated_dict_basket.values()))
+            cart_discription_dict[store.name] = (
+                self.stores_manager.get_basket_description(updated_dict_basket.values()))
 
         return jsons.dumps({'ans': True,
-                           'cart_price': cart_price,
-                           'cart_description': cart_discription_dict})
+                            'cart_price': cart_price,
+                            'cart_description': cart_discription_dict})
 
     def get_basket_description(self, permitted_user: str, product_tup_list):
         basket_dict = {}
         for product_tup in product_tup_list:
             basket_dict[product_tup[0].name] = {"amount": product_tup[1],
                                                 "price_after_disc": product_tup[2],
-                                                "original_price": product_tup[3]}  #[product_tup[1], product_tup[2], product_tup[3]]
+                                                "original_price": product_tup[
+                                                    3]}  # [product_tup[1], product_tup[2], product_tup[3]]
         return jsons.dumps(basket_dict)
 
     def get_inventory_description(self, permitted_user: str, store_id: int):

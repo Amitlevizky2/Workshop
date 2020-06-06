@@ -23,8 +23,8 @@ class Publisher:
 
     def send_notification(self, username, message):
         self.sio.send({
-            'messages': message
-        }, json=True, room=username)
+            'messages': [message]
+        }, room=username)
 
     def store_status_update(self, store_id, store_name, users: [str], status=''):
         """

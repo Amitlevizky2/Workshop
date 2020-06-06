@@ -191,10 +191,15 @@ class StoresManager:
             return jsons.dumps(store.remove_product(product_name, username))
         return jsons.dumps(False)
 
-    def add_visible_product_discount(self, store_id: int, username: str, start_date, end_date, percent: int):
+    def add_visible_product_discount(self, store_id: int, username: str, start_date, end_date, percent: int, products):
         store = self.get_store(store_id)
-        return jsons.dumps(store.add_visible_product_discount(username,
-                                                              VisibleProductDiscount(start_date, end_date, percent)))
+        answer = store.add_visible_product_discount(username,
+                                                    VisibleProductDiscount(start_date, end_date, percent))
+        print(answer)
+        if answer['error'] is False:
+            for product_name in products:
+                self.add_product_to_discount(store_id, username, answer['discount_id'], product_name)
+        return jsons.dumps(answer)
 
     def add_conditional_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int,
                                             min_amount: int, num_prods_to_apply: int):
@@ -213,8 +218,8 @@ class StoresManager:
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
-        return jsons.dumps(
-            store.add_product_to_discount(permitted_user, discount_id, product_name))
+        print("Add produxt to discount in storesmanager: " + product_name)
+        return store.add_product_to_discount(permitted_user, discount_id, product_name)
 
     def remove_product_from_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
@@ -389,7 +394,9 @@ class StoresManager:
 
     def get_updated_basket(self, basket):
         store = self.get_store(basket.store_id)
-        basket_dict = self.get_basket_dict(store.inventory, basket)
+        print('in get_updated_basket: ')
+        print(basket)
+        basket_dict = self.get_basket_dict_discount(store.inventory, basket)
         return store.get_updated_basket(basket_dict)  # {product_name, (Product, amount, updated_price, policy)}
 
     def get_total_basket_price(self, updated_basket_dict):
@@ -453,23 +460,25 @@ class StoresManager:
         products = basket.products
         products_dict = {}
         for product in products.keys():
-            products_dict[product] = (inventory.products[product], (products[product], inventory.products[product].original_price))
+            products_dict[product] = (
+            inventory.products[product], (products[product], inventory.products[product].original_price))
         return products_dict
 
     def get_basket_dict_purchase(self, inventory, basket):
         products = basket.products
         products_dict = {}
         for product in products.keys():
-            products_dict[product] = (products[product], products[product][1])
+            products_dict[product] = (inventory.products[product], products[product])
         return products_dict
 
     def get_basket_dict_discount(self, inventory, basket):
         products = basket.products
         products_dict = {}
         for product in products.keys():
-            products_dict[product] = (products[product][0], products[product][1],
-                                      products[product][1] * products[product][0].original_price,
-                                      products[product][1] * products[product][0].original_price)
+            print(products[product])
+            products_dict[product] = (inventory.products[product], products[product],
+                                      products[product] * inventory.products[product].original_price,
+                                      products[product] * inventory.products[product].original_price)
         return products_dict
 
 # {product_name, (Product, amount, updated_price, original_price)}

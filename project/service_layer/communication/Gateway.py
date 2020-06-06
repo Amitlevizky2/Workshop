@@ -281,7 +281,7 @@ def add_visible_discount():
     print(message)
     answer = stores_manager.add_visible_discount_to_product(message['store_id'], message['username'],
                                                             message['start_date'], message['end_date'],
-                                                            message['percent'])
+                                                            message['percent'], message['products'])
     data = jsons.loads(answer)
     return jsonify(data)
 
@@ -291,9 +291,10 @@ def get_discounts():
     message = request.get_json()
     answer = stores_manager.get_discounts(message['store_id'])
     data = jsons.loads(answer)
+    print(data)
     return jsonify({
         'error': False,
-        'data': data.desc
+        'data': data['desc']
     })
 
 
