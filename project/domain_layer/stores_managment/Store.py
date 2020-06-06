@@ -12,6 +12,7 @@ from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy
 from project.domain_layer.users_managment import Basket
 
 
+
 class Store:
     def __init__(self, store_id, name, store_owner):
         self.store_id = store_id
@@ -26,6 +27,7 @@ class Store:
         self.sales = []
         self.rate = 0
         self.appointed_by = {store_owner: []}
+        self.publisher = None
 
     def appoint_owner(self, owner, to_appoint):
         """

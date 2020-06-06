@@ -1,5 +1,5 @@
 import unittest
-
+from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import CompositeDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import ConditionalProductDiscount
@@ -12,7 +12,13 @@ import datetime
 import jsons
 
 from project.domain_layer.users_managment.Basket import Basket
+class PublisherStub(Publisher):
 
+
+    def store_ownership_update(self,sid,name,rem):
+        pass
+    def purchase_update(self,sid,name,owen):
+        pass
 
 class TestStore(unittest.TestCase):
     def setUp(self):
@@ -42,7 +48,6 @@ class TestStore(unittest.TestCase):
         self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5)
         self.discount2 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5, 2, 2)
         self.discount3 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5, 7, 1)
-
         self.discount4 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5, 6, 3)
 
         self.discount5 = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 100, 3, 1)
@@ -151,13 +156,13 @@ class TestStore(unittest.TestCase):
         self.appoint_managers_to_owners(users)
 
         #owner is not really a store owner
-        res = self.store.remove_owner("Sebastian", "Amit")
+        res = self.store.remove_owner("Sebastian", "Amit",PublisherStub(None))
         self.assertFalse(res['ans'])
         #to_remove is not a store owner
-        res = self.store.remove_owner("Amit", "Sebastian")
+        res = self.store.remove_owner("Amit", "Sebastian",PublisherStub(None))
         self.assertFalse(res['ans'])
         #to_remove was not appointed by owner
-        res = self.store.remove_owner("Amit", "Lielle")
+        res = self.store.remove_owner("Amit", "Lielle",PublisherStub(None))
         self.assertFalse(res['ans'])
 
     def test_remove_owner_two(self):
@@ -173,7 +178,7 @@ class TestStore(unittest.TestCase):
         for i in range(0, len(users) - 1):
             self.assertIn(users[i + 1], self.store.appointed_by[users[i]])
 
-        self.store.remove_owner("test owner", "Moshe")
+        self.store.remove_owner("test owner", "Moshe",PublisherStub(None))
         # Check that all of the owner that was appoint by Moshe will be deleted
         for i in range(0, len(users)):
             self.assertNotIn(users[i], self.store.store_owners)
@@ -317,10 +322,11 @@ class TestStore(unittest.TestCase):
     def test_add_product_one(self):
         # Lielle you silly, you don't have the add product permission, moreover,
         res = self.store.add_product("Lielle", "Macbook", 25, "Food", "Fruits", 20)
-        self.assertFalse(res['error'])
+        x=5
+        self.assertTrue(res['error'])
         # Sebastian is not one of the users in the system.
         res = self.store.add_product("Sebastian", "Macbook", 25, "Food", "Fruits", 20)
-        self.assertFalse(res['error'])
+        self.assertTrue(res['error'])
 
     def test_add_product_two(self):
         p = Product("Macbook", 25, "Food", "Fruits", 20)
@@ -328,7 +334,8 @@ class TestStore(unittest.TestCase):
         self.assertNotIn("Macbook", self.store.inventory.products)
         # Amitush, you have the permission to add product, use it!
         res = self.store.add_product("Amit", p.name, p.original_price, p.categories, p.key_words, p.amount)
-        self.assertTrue(res['error'])
+        x=5
+        self.assertFalse(res['error'])
         # Let's see if you did it well
         self.assertIn("Macbook", self.store.inventory.products)
 
@@ -368,11 +375,14 @@ class TestStore(unittest.TestCase):
 
     def test_add_new_sale(self):
         # Sale is None
-        res = self.store.add_new_sale(None)
-        self.assertFalse(res['ans'])
+
+        res = self.store.add_new_sale(Purchase(["Apple"], "Bon", self.store.store_id, 1),PublisherStub(None))
+        x=5
+        self.assertFalse(res['error'])
         # Valid new sale
-        res = self.store.add_new_sale(Purchase(["Apple"], "Ron", self.store.store_id, 1))
-        self.assertTrue(res['ans'])
+        res = self.store.add_new_sale(Purchase(["Apple"], "Ron", self.store.store_id, 1),PublisherStub(None))
+        x=5
+        self.assertFalse(res['error'])
 
     # def test_buy_product(self):
     #     # The amount of the product you are asking to but is to big
