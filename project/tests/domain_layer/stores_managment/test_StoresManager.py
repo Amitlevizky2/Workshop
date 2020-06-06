@@ -81,11 +81,11 @@ class test_StoresManager(unittest.TestCase):
         res = self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
                                                 ["no"], 20)
         res = jsons.loads(res)
-        self.assertTrue(res['error'])
+        self.assertFalse(res['error'])
         res = self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
                                                     ["no"], 20)
         res = jsons.loads(res)
-        self.assertTrue(res['error'])
+        self.assertFalse(res['error'])
 
     def test_open_store(self):
         index = self.store_manager.stores_idx
@@ -232,11 +232,12 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
 
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "and")
+        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1, 2], "and")
 
         cart = self.init_cart()
         res = self.store_manager.check_cart_validity(cart)
-        self.assertFalse(res['ans'])
+        res = jsons.loads(res)
+        self.assertTrue(res['error'])
 
     def test_check_cart_validity_or(self):
         self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
@@ -267,7 +268,8 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(cart['cart_price'], 1950.0)
         cart = cart['cart_description']
         store = cart['test_store1']
-        product = store['Apple']
+        desc = store['desc']
+        product = desc['Apple']
         apple_price = product['price_after_disc']
         self.assertEqual(apple_price, 136.0)
 

@@ -141,7 +141,6 @@ class StoresManager:
 # TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         # send notification to user to_remove.
-        print('add purchase to store: ' + str(purchase.store_id) + ' username: ' + purchase.buyer + '.')
         store = self.get_store(store_id)
         return jsons.dumps(store.add_new_sale(purchase, self.publisher))
 
@@ -338,7 +337,7 @@ class StoresManager:
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
             description[store.name] = []
-            basket_dict = self.get_basket_dict(store.inventory, basket)
+            basket_dict = self.get_basket_dict_purchase(store.inventory, basket)
             p_approved, outcome = store.check_basket_validity(basket_dict)
 
             if not p_approved:
@@ -355,9 +354,6 @@ class StoresManager:
 
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
-            #store.get
-            print("***********************")
-            # print(jsons.dump(basket))
             updated_dict_basket = self.get_updated_basket(basket)
             basket_price = self.get_total_basket_price(updated_dict_basket)
             cart_price += basket_price
@@ -372,7 +368,7 @@ class StoresManager:
 
     def get_updated_basket(self, basket):
         store = self.get_store(basket.store_id)
-        basket_dict = self.get_basket_dict(store.inventory, basket)
+        basket_dict = self.get_basket_dict_discount(store.inventory, basket)
         return store.get_updated_basket(basket_dict)  # {product_name, (Product, amount, updated_price, policy)}
 
     def get_total_basket_price(self, updated_basket_dict):
@@ -432,12 +428,26 @@ class StoresManager:
         return self.get_store(store_id).get_jsn_description()
 
     def get_basket_dict(self, inventory, basket):
-        # print("!!!!!!!!!!!!!")
-        # print(basket)
         products = basket.products
         products_dict = {}
         for product in products.keys():
-            products_dict[product] = (inventory.products[product], products[product], inventory.products[product].original_price)
+            products_dict[product] = (inventory.products[product], (products[product], inventory.products[product].original_price))
         return products_dict
 
-# {product_name, (Product, amount, updated_price, policy)}
+    def get_basket_dict_purchase(self, inventory, basket):
+        products = basket.products
+        products_dict = {}
+        for product in products.keys():
+            products_dict[product] = (products[product], products[product][1])
+        return products_dict
+
+    def get_basket_dict_discount(self, inventory, basket):
+        products = basket.products
+        products_dict = {}
+        for product in products.keys():
+            products_dict[product] = (products[product][0], products[product][1],
+                                      products[product][1] * products[product][0].original_price,
+                                      products[product][1] * products[product][0].original_price)
+        return products_dict
+
+# {product_name, (Product, amount, updated_price, original_price)}
