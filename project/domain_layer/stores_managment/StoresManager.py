@@ -116,7 +116,7 @@ class StoresManager:
             to_appoint:
         """
         return jsons.dumps(
-            self.get_store(0).appoint_manager(owner, to_appoint))
+            self.get_store(store_id).appoint_manager(owner, to_appoint))
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         """

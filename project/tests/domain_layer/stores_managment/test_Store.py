@@ -14,15 +14,17 @@ from locust import HttpLocust, TaskSet, task, between
 import jsons
 
 from project.domain_layer.users_managment.Basket import Basket
+from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 
 
 class TestStore(unittest.TestCase):
     def setUp(self):
-        self.store = Store(0, "test store", "test owner")
+        self.owner = RegisteredUser('Owner')
+        self.store = Store(0, "test store", 'Owner')
         self.store.store_managers = {"Moshe": [],
                                      "Amit": [Store.add_product],
                                      "Hadar": [],
-                                     "Lielle": [Store.remove_product],
+                                     "Lielle__": [Store.remove_product],
                                      "Noa": [Store.add_visible_product_discount],
                                      "Evgeny": [Store.update_product]}
 
@@ -30,15 +32,15 @@ class TestStore(unittest.TestCase):
                                "Alex",
                                "Ron"]
 
-        self.store.inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 30),
-                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
-                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
-                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
-                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10),
-                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10),
-                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
-                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
-                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+        self.store.inventory.products = {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 30,0),
+                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10,0),
+                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10,0),
+                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10,0),
+                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10,0),
+                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10,0),
+                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10,0),
+                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10,0),
+                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10,0)}
 
         self.discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5)
         self.discount1 = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17), 5)
@@ -95,17 +97,16 @@ class TestStore(unittest.TestCase):
         self.discount8.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
         self.discount9.products_in_discount["Hard Disk"] = self.store.inventory.products["Hard Disk"]
 
+        user = RegisteredUser("Lielle")
 
-
-
-        self.basket = Basket(self.store.store_id)
+        self.basket = Basket("Lielle", self.store.store_id)
         self.basket.products["Apple"] = (self.store.inventory.products["Apple"], 10)
         self.basket.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 5)
         self.basket.products["Carrot"] = (self.store.inventory.products["Carrot"], 1)
         self.basket.products["Orange"] = (self.store.inventory.products["Orange"],3)
         self.basket.products["Tomato"] = (self.store.inventory.products["Tomato"],4)
 
-        self.basket1 = Basket(self.store.store_id)
+        self.basket1 = Basket("Owner", self.store.store_id)
         self.basket1.products["Apple"] = (self.store.inventory.products["Apple"], 10)
         self.basket1.products["Keyboard"] = (self.store.inventory.products["Keyboard"], 10)
         self.basket1.products["Carrot"] = (self.store.inventory.products["Carrot"], 10)
@@ -367,6 +368,13 @@ class TestStore(unittest.TestCase):
         res = self.store.update_product("test owner", "Apple", "amount", 8)
         self.assertTrue(res['ans'])
         # You can also append discount to a product
+
+    def test_manager(self):
+
+        self.store.appoint_manager('Owner', "Lielle")
+        print("ere")
+        print(self.store.store_managers["Lielle"])
+
 
     def test_add_new_sale(self):
         # Sale is None

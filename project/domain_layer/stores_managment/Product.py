@@ -1,5 +1,5 @@
 class Product:
-    def __init__(self, name, price, categories, key_words, amount,store_id):
+    def __init__(self, name, price, categories, key_words, amount, store_id):
         self.name = name
         self.original_price = price
         self.categories = categories
@@ -8,6 +8,7 @@ class Product:
         self.amount = amount
         self.visible_discount = []
         self.conditional_product_discount = []
+
 
     def __eq__(self, other):
         return self.name == other.name and \

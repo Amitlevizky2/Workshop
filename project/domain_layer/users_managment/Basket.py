@@ -2,6 +2,8 @@ from project.data_access_layer.BasketORM import BasketORM
 
 
 class Basket:
+
+    incremental = 0
     # send the initial product to init????
     def __init__(self, username, store_id):
         # products = {"product name",amount}
@@ -10,6 +12,8 @@ class Basket:
         self.username = username
         if not username.startswith('guest'):
             self.orm = BasketORM()
+            self.orm.id = Basket.incremental
+            Basket.incremental += 1
             self.orm.username = username
             self.orm.store_id = store_id
             self.orm.add()

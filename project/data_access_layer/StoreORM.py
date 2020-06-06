@@ -57,6 +57,7 @@ class StoreORM(Base):
         managers = session.query(OwnerORM).filter_by(appointed_by=to_remove)
         for manager in managers:
             manager.remove()
+        session.commit()
 
     def remove_manager(self, to_remove):
         self.remove_appoint_by(to_remove)
@@ -72,7 +73,9 @@ class StoreORM(Base):
         session.commit()
 
     def appoint_manager(self, owner, to_appoint):
+        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
         manager = ManagerORM(username=to_appoint, store_id=id, appointed_by=owner)
-        self.owned_by.append(manager)
-        manager.add()
+        self.managed_by.append(manager)
+        session.add(manager)
         session.commit()
+

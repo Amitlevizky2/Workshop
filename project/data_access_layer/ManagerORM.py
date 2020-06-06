@@ -14,9 +14,9 @@ class ManagerORM(Base):
     manages = relationship("StoreORM", back_populates="managed_by")
     managed_by = relationship("RegisteredUserORM", back_populates="manages", foreign_keys=username)
 
-    def add(self):
+    def add(self, manager):
         Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
-        session.add()
+        session.add(manager)
         session.commit()
 
     def remove(self):
