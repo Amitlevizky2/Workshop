@@ -90,5 +90,5 @@ class StoresGetters:
 
     def get_store_owners(self, permitted_user: str, store_id: int):
         store = self.stores_manager.get_store(store_id)
-        return jsons.dumps({'ans': True,
-                            'store_owners': store.store_owners})
+        return jsons.dumps({'error': False,
+                            'data': store.store_owners})

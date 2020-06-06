@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import jsons
 from spellchecker import SpellChecker
 
@@ -110,8 +112,8 @@ class StoresManagerInterface:
     def remove_product(self, store_id, product_name, username):
         return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
 
-    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+    # def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+    #     return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
 
     def update_product(self, store_id, username, product_name, attribute, updated):
         """
@@ -185,7 +187,10 @@ class StoresManagerInterface:
 
     def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
                                         end_date = None, percent: int = None):
-        return self.stores_manager.add_visible_product_discount(store_id, username, start_date, end_date, percent)
+        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _percent = int(percent)
+        return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent)
 
     def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
                                             end_date = None, percent: int = None,

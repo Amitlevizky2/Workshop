@@ -342,10 +342,10 @@ class Store:
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
-            return {'ans': True,
-                    'desc': 'visible discount has been added'}
-        return {'ans': False,
-                'desc': permitted_username + ' do not have this permission'}
+            return {'error': False,
+                    'data': 'visible discount has been added'}
+        return {'error': True,
+                'error_msg': permitted_username + ' do not have this permission'}
 
     def add_conditional_discount_to_product(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_product")):

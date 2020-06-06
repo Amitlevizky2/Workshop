@@ -185,14 +185,18 @@ def appoint_store_manager():
     message = request.get_json()
     answer = stores_manager.appoint_manager_to_store(message['store_id'], message['owner'], message['to_appoint'])
     if answer is True:
-        return 'done', 201
-    return 'error', 400
+        return jsonify({'error': False,
+                        'data': 'appointed successfully'})
+    return jsonify({'error': True,
+                    'error_msg': 'appointment failed'})
 
 
 @app.route('/add_product_to_store', methods=['POST', 'GET'])
 def add_product_to_store():
     message = request.get_json()
-    data = stores_manager.add_product_to_store(message['store_id'], message['username'], message['product_name'], message['price'], message['categories'], message['key_words'], message['amount'])
+    data = stores_manager.add_product_to_store(message['store_id'], message['username'], message['product_name'],
+                                               message['price'], message['categories'], message['key_words'],
+                                               message['amount'])
     print(data)
     return jsonify(data)
 
@@ -268,6 +272,28 @@ def get_stores():
     return jsonify({
         'error': False,
         'data': answer
+    })
+
+
+@app.route('/add_visible_discount', methods=['POST', 'GET'])
+def add_visible_discount():
+    message = request.get_json()
+    print(message)
+    answer = stores_manager.add_visible_discount_to_product(message['store_id'], message['username'],
+                                                            message['start_date'], message['end_date'],
+                                                            message['percent'])
+    data = jsons.loads(answer)
+    return jsonify(data)
+
+
+@app.route('/get_discounts', methods=['POST', 'GET'])
+def get_discounts():
+    message = request.get_json()
+    answer = stores_manager.get_discounts(message['store_id'])
+    data = jsons.loads(answer)
+    return jsonify({
+        'error': False,
+        'data': data.desc
     })
 
 
