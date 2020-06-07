@@ -49,7 +49,6 @@ class StoresManagerInterface:
             "user %s called add product to store no.%s. product name:%s"
             " product price:%s product categories:%s,key words:%s, amount:%s",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
-        print(self.users_manager.get_managed_stores(user_name))
         if store_id in self.users_manager.get_managed_stores(user_name)[1]:
 
             return jsons.loads(self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,

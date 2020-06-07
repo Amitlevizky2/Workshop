@@ -45,7 +45,6 @@ class Discount(ABC):
         self.id = d_id
 
     def add_product(self, product_name: str):
-        print('ADDDDDDDDDDDDDDDDDD')
         self.products_in_discount[product_name] = True
 
     def remove_product(self, product_name: str):

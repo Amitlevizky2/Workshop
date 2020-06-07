@@ -141,7 +141,6 @@ class StoresManager:
     # TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         # send notification to user to_remove.
-        print('add purchase to store: ' + str(purchase.store_id) + ' username: ' + purchase.buyer + '.')
         store = self.get_store(store_id)
         return jsons.dumps(store.add_new_sale(purchase, self.publisher))
 
@@ -195,7 +194,6 @@ class StoresManager:
         store = self.get_store(store_id)
         answer = store.add_visible_product_discount(username,
                                                     VisibleProductDiscount(start_date, end_date, percent))
-        print(answer)
         if answer['error'] is False:
             for product_name in products:
                 self.add_product_to_discount(store_id, username, answer['discount_id'], product_name)
@@ -218,7 +216,6 @@ class StoresManager:
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
-        print("Add produxt to discount in storesmanager: " + product_name)
         return store.add_product_to_discount(permitted_user, discount_id, product_name)
 
     def remove_product_from_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
@@ -377,9 +374,6 @@ class StoresManager:
 
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
-            # store.get
-            print("***********************")
-            # print(jsons.dump(basket))
             updated_dict_basket = self.get_updated_basket(basket)
             basket_price = self.get_total_basket_price(updated_dict_basket)
             cart_price += basket_price
@@ -394,8 +388,6 @@ class StoresManager:
 
     def get_updated_basket(self, basket):
         store = self.get_store(basket.store_id)
-        print('in get_updated_basket: ')
-        print(basket)
         basket_dict = self.get_basket_dict_discount(store.inventory, basket)
         return store.get_updated_basket(basket_dict)  # {product_name, (Product, amount, updated_price, policy)}
 
@@ -475,7 +467,6 @@ class StoresManager:
         products = basket.products
         products_dict = {}
         for product in products.keys():
-            print(products[product])
             products_dict[product] = (inventory.products[product], products[product],
                                       products[product] * inventory.products[product].original_price,
                                       products[product] * inventory.products[product].original_price)

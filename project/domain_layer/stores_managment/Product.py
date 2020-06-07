@@ -2,13 +2,6 @@ from functools import reduce
 import datetime
 
 
-class Discount(object):
-    def __init__(self, start_date, end_date, percent):
-        self.start = start_date
-        self.end = end_date
-        self.discount = 1 - percent / 100
-
-
 class Product:
     def __init__(self, name, price, categories, key_words, amount):
         self.name = name
@@ -20,9 +13,9 @@ class Product:
 
     def __eq__(self, other):
         return self.name == other.name and \
-               self.original_price == other.price and \
+               self.original_price == other.original_price and \
                self.categories == other.categories and \
-               self.original_price == other.price and \
+               self.original_price == other.original_price and \
                self.key_words == other.key_words and \
                self.rate == other.rate
 

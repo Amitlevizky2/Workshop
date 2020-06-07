@@ -433,7 +433,6 @@ class Store:
                                                                       getattr(Store, "add_product_to_discount"))
         is_in_inventory = product_name in self.inventory.products.keys()
         discount: Discount = self.discounts[discount_id]
-        print("Add produxt to discount in store: " + product_name)
         if is_permitted and is_in_inventory:
             discount.add_product(product_name)
             return {'ans': True,

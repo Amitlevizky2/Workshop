@@ -334,8 +334,8 @@ class test_StoresManager(unittest.TestCase):
     def init_discounts(self):
         for store in self.store_manager.stores.values():
             str_id = str(store.store_id)
-            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 30)
-            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5)
+            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 30, [])
+            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, [])
             self.store_manager.add_conditional_discount_to_product(
                 store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 2, 2)
             self.store_manager.add_conditional_discount_to_product(
@@ -364,20 +364,20 @@ class test_StoresManager(unittest.TestCase):
 
     def init_cart(self):
         basket = Basket(1)
-        basket.products["Apple"] = (self.store_manager.get_store(1).inventory.products["Apple"], 10)
-        basket.products["Keyboard"] = (self.store_manager.get_store(1).inventory.products["Keyboard"], 5)
-        basket.products["Carrot"] = (self.store_manager.get_store(1).inventory.products["Carrot"], 1)
+        basket.products["Apple"] = 10
+        basket.products["Keyboard"] = 5
+        basket.products["Carrot"] = 1
 
         basket1 = Basket(2)
-        basket1.products["Apple"] = (self.store_manager.get_store(2).inventory.products["Apple"], 10)
-        basket1.products["Keyboard"] = (self.store_manager.get_store(2).inventory.products["Keyboard"], 10)
-        basket1.products["Carrot"] = (self.store_manager.get_store(2).inventory.products["Carrot"], 10)
-        basket1.products["Banana"] = (self.store_manager.get_store(2).inventory.products["Banana"], 10)
-        basket1.products["Orange"] = (self.store_manager.get_store(2).inventory.products["Orange"], 10)
-        basket1.products["Cucumber"] = (self.store_manager.get_store(2).inventory.products["Cucumber"], 10)
-        basket1.products["Iphone"] = (self.store_manager.get_store(2).inventory.products["Iphone"], 10)
-        basket1.products["Hard Disk"] = (self.store_manager.get_store(2).inventory.products["Hard Disk"], 10)
-        basket1.products["Tomato"] = (self.store_manager.get_store(2).inventory.products["Tomato"], 10)
+        basket1.products["Apple"] = 10
+        basket1.products["Keyboard"] = 10
+        basket1.products["Carrot"] = 10
+        basket1.products["Banana"] = 10
+        basket1.products["Orange"] = 10
+        basket1.products["Cucumber"] = 10
+        basket1.products["Iphone"] = 10
+        basket1.products["Hard Disk"] = 10
+        basket1.products["Tomato"] = 10
         cart = Cart()
         cart.baskets[1] = basket
         cart.baskets[2] = basket1
