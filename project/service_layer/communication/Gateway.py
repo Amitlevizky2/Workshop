@@ -1,8 +1,9 @@
 import os
 import json
 import jsonpickle
+import jsons
 from eventlet import wsgi
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, current_app
 from flask_socketio import SocketIO, join_room, leave_room
 from flask_cors import CORS
 
@@ -18,10 +19,14 @@ app.secret_key = os.environ.get('SECRET')
 app.config['WTF_CSRF_SECRET_KEY'] = "b'f\xfa\x8b{X\x8b\x9eM\x83l\x19\xad\x84\x08\xaa"
 sio = SocketIO(app, logger=True, engineio_logger=True,
                cors_allowed_origins='*', async_mode='eventlet')
-
-initializer = Initializer()
+# current_app(app)
+with app.app_context():
+    # within this block, current_app points to app.
+    print("current: " + current_app.name)
+    initializer = Initializer(sio)
 users_manager = initializer.get_users_manager_interface()
 stores_manager = initializer.get_stores_manager_interface()
+purchase_manager = initializer.get_purchase_manager_interface()
 
 """---------------------------------------------------------------------"""
 """-------------------------------USER EVENTS-------------------------------- """
@@ -86,10 +91,19 @@ def add_product():
     :return:
     """
     message = request.get_json()
-    answer, data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
-                                             message['quantity'])
-    data['error'] = not answer
-    return jsonify(data)
+    print(message)
+    data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
+                                     message['quantity'])
+
+    if data is True:
+        print('data is True')
+    else:
+        print('data is False')
+    return jsonify({
+        'error': not data,
+        'error_msg': 'error',
+        'data': 'added!'
+    })
 
 
 @app.route('/remove_product', methods=['POST', 'GET'])
@@ -122,7 +136,9 @@ def remove_cart():
 # TODO: implement
 @app.route('/view_cart', methods=['POST', 'GET'])
 def view_cart():
-    pass
+    message = request.get_json()
+    answer = users_manager.view_cart(message['username'])
+    return jsonify(answer)
 
 
 # TODO: implement
@@ -134,8 +150,7 @@ def remove_managed_store():
 @app.route('/get_managed_stores', methods=['POST', 'GET'])
 def get_managed_stores():
     message = request.get_json()
-    answer, data = users_manager.get_managed_stores(message['username'])
-    data['error'] = not answer
+    data = users_manager.get_managed_stores_description(message['username'])
     return jsonify(data)
 
 
@@ -153,6 +168,13 @@ def add_purchase():
     pass
 
 
+@app.route('/buy', methods=['POST', 'GET'])
+def buy():
+    message = request.get_json()
+    data = purchase_manager.buy(message['username'])
+    return jsonify(data)
+
+
 """---------------------------------------------------------------------"""
 """-------------------------------STORE EVENTS------------------------------"""
 """---------------------------------------------------------------------"""
@@ -163,8 +185,20 @@ def appoint_store_manager():
     message = request.get_json()
     answer = stores_manager.appoint_manager_to_store(message['store_id'], message['owner'], message['to_appoint'])
     if answer is True:
-        return 'done', 201
-    return 'error', 400
+        return jsonify({'error': False,
+                        'data': 'appointed successfully'})
+    return jsonify({'error': True,
+                    'error_msg': 'appointment failed'})
+
+
+@app.route('/add_product_to_store', methods=['POST', 'GET'])
+def add_product_to_store():
+    message = request.get_json()
+    data = stores_manager.add_product_to_store(message['store_id'], message['username'], message['product_name'],
+                                               message['price'], message['categories'], message['key_words'],
+                                               message['amount'])
+    print(data)
+    return jsonify(data)
 
 
 @app.route('/get_store_managers', methods=['POST', 'GET'])
@@ -188,9 +222,12 @@ def get_store_owners():
 @app.route('/open_store', methods=['POST', 'GET'])
 def open_store():
     message = request.get_json()
+    print(message)
     answer = stores_manager.open_store(message['username'], message['store_name'])
+    print('store_id: ' + str(answer))
     return jsonify({
-        'store_id': answer
+        'error': False,
+        'data': answer
     })
 
 
@@ -206,9 +243,13 @@ def appoint_store_owner():
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     message = request.get_json()
-    answer = jsonpickle.decode(stores_manager.search_product(message['product_name']))
+    print(message)
+    search_res = stores_manager.search(search_term=message['product_name'])
+    print(search_res)
+    answer = jsons.loads(search_res)
     return jsonify({
-        "search_results": answer
+        'error': False,
+        "data": answer
     })
 
 
@@ -220,6 +261,41 @@ def update_store_product():
     if answer is True:
         return 'done', 200
     return 'error', 400
+
+
+@app.route('/get_stores', methods=['POST', 'GET'])
+def get_stores():
+    message = request.get_json()
+    stores_res = stores_manager.get_stores()
+    print(stores_res)
+    answer = jsons.loads(stores_res)
+    return jsonify({
+        'error': False,
+        'data': answer
+    })
+
+
+@app.route('/add_visible_discount', methods=['POST', 'GET'])
+def add_visible_discount():
+    message = request.get_json()
+    print(message)
+    answer = stores_manager.add_visible_discount_to_product(message['store_id'], message['username'],
+                                                            message['start_date'], message['end_date'],
+                                                            message['percent'], message['products'])
+    data = jsons.loads(answer)
+    return jsonify(data)
+
+
+@app.route('/get_discounts', methods=['POST', 'GET'])
+def get_discounts():
+    message = request.get_json()
+    answer = stores_manager.get_discounts(message['store_id'])
+    data = jsons.loads(answer)
+    print(data)
+    return jsonify({
+        'error': False,
+        'data': data['desc']
+    })
 
 
 """---------------------------------------------------------------------"""

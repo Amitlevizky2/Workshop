@@ -61,6 +61,7 @@ class RegisteredUser(User):
         return False, 'Store id: ' + store_id + ' is not associated with the user:  ' + self.username + '.'
 
     def add_notification(self, message):
+        print('user: ' + self.username + 'got notification: ' + message)
         self.notifications.append(message)
         self.orm.add_notification(self.username, message)
 

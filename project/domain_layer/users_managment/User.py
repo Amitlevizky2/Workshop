@@ -20,16 +20,15 @@ class User:
         self.cart.add_product(self.username, store_id, product, quantity)
         return True
 
-    def get_cart(self, view_format=''):
-        if view_format == 'json':
-            return self.cart.get_jsn_description()
+    def get_cart(self) -> Cart:
         return self.cart
 
     def remove_cart(self):
         self.cart.clear_cart()
 
-    def add_purchase(self, purchase):
-        self.purchase_history.append(purchase)
+    def add_purchase(self, purchases):
+        for purchase in purchases:
+            self.purchase_history.append(purchase)
 
     def view_purchase_history(self):
         return self.purchase_history

@@ -55,7 +55,7 @@ class StoresManager:
         """
         return jsons.dumps(self.get_store(store_id).update_product(user, product_name, attribute, updated))
 
-    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) -> {int: [Product]}:
+    def search(self, search_term: str = "", categories=[], key_words=[]) -> {int: [Product]}:
         """
 
         Args:
@@ -76,7 +76,6 @@ class StoresManager:
         return jsons.dumps(search_result)
 
     def get_store(self, store_id: int) -> Store:
-        print(store_id)
         if store_id in self.stores.keys():
 
             return self.stores.get(store_id)
@@ -105,7 +104,7 @@ class StoresManager:
 
         """
         return jsons.dumps(self.get_store(store_id).add_product(user_name, product_name, product_price,
-                                                    product_categories, key_words, amount))
+                                                                product_categories, key_words, amount))
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         """
@@ -137,40 +136,46 @@ class StoresManager:
         return jsons.dumps(
             self.get_store(store_id).remove_permission_from_manager(owner, manager, permission))
 
-# TODO: add Publisher
+    # TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
-        return jsons.dumps(self.get_store(store_id).add_new_sale(purchase))
+        # send notification to user to_remove.
+        store = self.get_store(store_id)
+        return jsons.dumps(store.add_new_sale(purchase, self.publisher))
 
-# TODO: add publisher
+    # TODO: add publisher
     def open_store(self, owner: str, store_name):
         self.stores[self.stores_idx] = Store(self.stores_idx, store_name, owner)
+        # send notification to user owner.
+        # self.publisher.store_status_update(self.stores_idx, store_name, [owner], status='open')
         self.stores_idx += 1
         return self.stores_idx - 1
 
     def buy(self, cart: Cart):
-        if not self.check_cart_validity(cart):
-            return jsons.dumps({'ans': False})
+        answer = jsons.loads(self.check_cart_validity(cart))
+        if not answer['error']:
+            return jsons.dumps({'error': True,
+                                'error_msg': answer['description']})
 
-        # price, description =\
-        buy_res = jsons.loads(self.get_cart_description(cart))
-        price = buy_res['cart_price']
-        description = buy_res['cart_description']
+        # # price, description =\
+        # buy_res = jsons.loads(self.get_cart_description(cart))
+        # price = buy_res['cart_price']
+        # description = buy_res['cart_description']
+
         #  if user dont have enough money according to 'price' will return false
 
         #  user will also get a description for his purchase
 
-        for store in cart.baskets.keys():
-            basket = cart.get_basket(store)
-            store_obj = self.get_store(basket.store_id)
+        for store_id in cart.baskets.keys():
+            basket = cart.get_basket(store_id)
             for product in basket.products.keys():
-                if not self.get_store(store).buy_product(product, basket.products.get(product)[1]):
+                if not self.get_store(store_id).buy_product(product, basket.products[product]):
                     return False
 
-            store_obj.sales.append(description[store_obj.name])
-        return jsons.dumps({'ans': True,
-                            'result': 'Purchase confirmed, total price: ' + str(price)})
+            # store_obj.sales.append(description[store_obj.name])
+        return jsons.dumps({'error': False,
+                            'data': 'confirmed'})
 
-    def get_sales_history(self, store_id, user, is_admin) -> [Purchase]:
+    def get_sales_history(self, store_id, user, is_admin):
         return jsons.dump(self.get_store(store_id).get_sales_history(user, is_admin))
 
     def get_store_products(self, store_id):
@@ -183,33 +188,42 @@ class StoresManager:
             return jsons.dumps(store.remove_product(product_name, username))
         return jsons.dumps(False)
 
-    def add_visible_product_discount(self, store_id: int, username: str, start_date, end_date, percent: int):
+    def add_visible_product_discount(self, store_id: int, username: str, start_date, end_date, percent: int, products):
         store = self.get_store(store_id)
-        return jsons.dumps(store.add_visible_product_discount(username,
-                                                     VisibleProductDiscount(start_date, end_date, percent)))
+        answer = store.add_visible_product_discount(username,
+                                                    VisibleProductDiscount(start_date, end_date, percent))
+        if answer['error'] is False:
+            for product_name in products:
+                self.add_product_to_discount(store_id, username, answer['discount_id'], product_name)
+        return jsons.dumps(answer)
 
-    def add_conditional_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int, min_amount: int, num_prods_to_apply: int):
+    def add_conditional_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int,
+                                            min_amount: int, num_prods_to_apply: int):
         store = self.get_store(store_id)
         return jsons.dumps(store.add_conditional_discount_to_product(username,
-                                                     ConditionalProductDiscount(start_date, end_date, percent, min_amount, num_prods_to_apply)))
+                                                                     ConditionalProductDiscount(start_date, end_date,
+                                                                                                percent, min_amount,
+                                                                                                num_prods_to_apply)))
 
-    def add_conditional_discount_to_store(self, store_id: int, username: str, start_date, end_date, percent: int, min_price: int):
+    def add_conditional_discount_to_store(self, store_id: int, username: str, start_date, end_date, percent: int,
+                                          min_price: int):
         store = self.get_store(store_id)
         return jsons.dumps(store.add_conditional_discount_to_store(username,
-                                                       ConditionalStoreDiscount(start_date, end_date, percent, min_price)))
+                                                                   ConditionalStoreDiscount(start_date, end_date,
+                                                                                            percent, min_price)))
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
-        return jsons.dumps(
-            store.add_product_to_discount(permitted_user, discount_id, product_name))
+        return store.add_product_to_discount(permitted_user, discount_id, product_name)
 
     def remove_product_from_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
         return jsons.dumps(
-        store.remove_product_from_discount(permitted_user, discount_id, product_name))
+            store.remove_product_from_discount(permitted_user, discount_id, product_name))
 
-    def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator_str: str, discounts_products_dict: dict, discounts_to_apply_id: list):
-        store = self.get_store(store_id)  #                                                                                {dicount_id, [product_names]}
+    def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator_str: str,
+                               discounts_products_dict: dict, discounts_to_apply_id: list):
+        store = self.get_store(store_id)  # {dicount_id, [product_names]}
         tup_list = []
         discounts_to_apply_list = []
         logic_operator: LogicOperator = get_logic_operator(logic_operator_str)
@@ -228,21 +242,26 @@ class StoresManager:
             discounts_to_apply_list.append(discount)
 
         return jsons.dumps(store.add_composite_discount(username,
-                                                       CompositeDiscount(start_date, end_date, logic_operator, tup_list, discounts_to_apply_list)))
+                                                        CompositeDiscount(start_date, end_date, logic_operator,
+                                                                          tup_list, discounts_to_apply_list)))
 
-    def edit_visible_discount_to_product(self, store_id: int, username: str, discount_id:int, start_date, end_date, percent: int):
+    def edit_visible_discount_to_product(self, store_id: int, username: str, discount_id: int, start_date, end_date,
+                                         percent: int):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.edit_visible_discount(username, discount_id, start_date, end_date, percent))
 
-    def edit_conditional_discount_to_product(self, store_id: int, discount_id: int, username: str, start_date, end_date, percent: int,
+    def edit_conditional_discount_to_product(self, store_id: int, discount_id: int, username: str, start_date, end_date,
+                                             percent: int,
                                              min_amount: int, nums_to_apply: int):
         store = self.get_store(store_id)
         return jsons.dumps(
-            store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_amount, nums_to_apply))
+            store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_amount,
+                                                       nums_to_apply))
 
-    def edit_conditional_discount_to_store(self, store_id: int, discount_id: int, username: str, start_date, end_date, percent: int,
-                                             min_price: int):
+    def edit_conditional_discount_to_store(self, store_id: int, discount_id: int, username: str, start_date, end_date,
+                                           percent: int,
+                                           min_price: int):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.edit_conditional_discount_to_store(username, discount_id, start_date, end_date, percent, min_price))
@@ -253,19 +272,22 @@ class StoresManager:
 
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
-        return jsons.dumps(store.remove_owner(owner, to_remove))
+        return jsons.dumps(store.remove_owner(owner, to_remove, self.publisher))
 
-    def add_purchase_store_policy(self, store_id: int, permitted_user: str, min_amount_products: int, max_amount_products: int):
+    def add_purchase_store_policy(self, store_id: int, permitted_user: str, min_amount_products: int,
+                                  max_amount_products: int):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.add_purchase_store_policy(permitted_user, min_amount_products, max_amount_products))
 
-    def add_purchase_product_policy(self, store_id: int, permitted_user: str, min_amount_products: int, max_amount_products: int):
+    def add_purchase_product_policy(self, store_id: int, permitted_user: str, min_amount_products: int,
+                                    max_amount_products: int):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.add_purchase_product_policy(permitted_user, min_amount_products, max_amount_products))
 
-    def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id, logic_operator_str: str):
+    def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id,
+                                      logic_operator_str: str):
         logic_operator = get_logic_operator(logic_operator_str)
         if purchase_policies_id is None or logic_operator is None:
             return jsons.dumps({'res': False, 'desc': "The parameters are not valid"})
@@ -282,12 +304,14 @@ class StoresManager:
         return jsons.dumps(
             store.add_purchase_composite_policy(permitted_user, policies, logic_operator))
 
-    def add_policy_to_purchase_composite_policy(self, store_id: int, permitted_user: str, composite_id: int, policy_id: int):
+    def add_policy_to_purchase_composite_policy(self, store_id: int, permitted_user: str, composite_id: int,
+                                                policy_id: int):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.add_policy_to_purchase_composite_policy(permitted_user, composite_id, policy_id))
 
-    def add_product_to_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
+    def add_product_to_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str,
+                                               product_name: str):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.add_product_to_purchase_product_policy(policy_id, permitted_user, product_name))
@@ -296,7 +320,8 @@ class StoresManager:
         store = self.get_store(store_id)
         return jsons.dumps(store.remove_purchase_policy(policy_id, permitted_user))
 
-    def remove_product_from_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str, product_name: str):
+    def remove_product_from_purchase_product_policy(self, store_id: int, policy_id: int, permitted_user: str,
+                                                    product_name: str):
         store = self.get_store(store_id)
         return store.remove_product_from_purchase_product_policy(policy_id, permitted_user, product_name)
 
@@ -330,14 +355,15 @@ class StoresManager:
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
             description[store.name] = []
-            p_approved, outcome = store.check_basket_validity(basket)
+            basket_dict = self.get_basket_dict_purchase(store.inventory, basket)
+            p_approved, outcome = store.check_basket_validity(basket_dict)
 
             if not p_approved:
                 description[store.name].append(outcome)
                 is_approved = False
 
-        return jsons.dump({'ans': is_approved,
-                           'description': description})
+        return jsons.dumps({'error': not is_approved,
+                            'description': description})
 
     def get_cart_description(self, cart: Cart):
         baskets = cart.baskets
@@ -347,16 +373,21 @@ class StoresManager:
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
             updated_dict_basket = self.get_updated_basket(basket)
-            cart_price += self.get_total_basket_price(updated_dict_basket)
-            cart_discription_dict[store.name] = (self.get_basket_description(updated_dict_basket.values()))
+            basket_price = self.get_total_basket_price(updated_dict_basket)
+            cart_price += basket_price
+            cart_discription_dict[store.name] = {'store_name': store.name,
+                                                 'store_id': basket.store_id,
+                                                 'store_purchase_price': basket_price,
+                                                 'desc': (self.get_basket_description(updated_dict_basket.values()))}
 
         return jsons.dumps({'ans': True,
-                           'cart_price': cart_price,
-                           'cart_description': cart_discription_dict})
+                            'cart_price': cart_price,
+                            'cart_description': cart_discription_dict})
 
-    def get_updated_basket(self, basket: Basket):
+    def get_updated_basket(self, basket):
         store = self.get_store(basket.store_id)
-        return store.get_updated_basket(basket)  # {product_name, (Product, amount, updated_price, policy)}
+        basket_dict = self.get_basket_dict_discount(store.inventory, basket)
+        return store.get_updated_basket(basket_dict)  # {product_name, (Product, amount, updated_price, policy)}
 
     def get_total_basket_price(self, updated_basket_dict):
         price = 0.0
@@ -369,11 +400,12 @@ class StoresManager:
         for product_tup in product_tup_list:
             basket_dict[product_tup[0].name] = {"amount": product_tup[1],
                                                 "price_after_disc": product_tup[2],
-                                                "original_price": product_tup[3]}  #[product_tup[1], product_tup[2], product_tup[3]]
+                                                "original_price": product_tup[
+                                                    3]}  # [product_tup[1], product_tup[2], product_tup[3]]
         return basket_dict
 
     def get_stores_description(self):
-        stores_description = {}  #  {store_name: [store_details]}
+        stores_description = {}  # {store_name: [store_details]}
         for store in self.stores.values():
             stores_description[store.name] = store
         return jsons.dumps({'ans': True,
@@ -384,10 +416,10 @@ class StoresManager:
         return jsons.dumps({'ans': True,
                             'inventory': store.inventory})
 
-    def get_jsn_description(self, store_id):
-        store = self.get_store(store_id)
-        jsn_desc = jsons.dumps(store)
-        return jsn_desc
+    # def get_jsn_description(self, store_id):
+    #     store = self.get_store(store_id)
+    #     jsn_desc = jsons.dumps(store)
+    #     return jsn_desc
 
     def bound_publisher(self, publisher: Publisher):
         self.publisher = publisher
@@ -409,7 +441,33 @@ class StoresManager:
     def get_store_owners(self, store_id: int):
         store = self.get_store(store_id)
         return jsons.dumps({'ans': True,
-                'store_owners': store.store_owners})
+                            'store_owners': store.store_owners})
 
     def get_store_description_by_id(self, store_id):
         return self.get_store(store_id).get_jsn_description()
+
+    def get_basket_dict(self, inventory, basket):
+        products = basket.products
+        products_dict = {}
+        for product in products.keys():
+            products_dict[product] = (
+            inventory.products[product], (products[product], inventory.products[product].original_price))
+        return products_dict
+
+    def get_basket_dict_purchase(self, inventory, basket):
+        products = basket.products
+        products_dict = {}
+        for product in products.keys():
+            products_dict[product] = (inventory.products[product], products[product])
+        return products_dict
+
+    def get_basket_dict_discount(self, inventory, basket):
+        products = basket.products
+        products_dict = {}
+        for product in products.keys():
+            products_dict[product] = (inventory.products[product], products[product],
+                                      products[product] * inventory.products[product].original_price,
+                                      products[product] * inventory.products[product].original_price)
+        return products_dict
+
+# {product_name, (Product, amount, updated_price, original_price)}

@@ -18,7 +18,8 @@ class PurchaseProductPolicy(PurchasePolicy):
         for product_name in product_price_dict.keys():
             product_tup = product_price_dict[product_name]
             if not self.min_amount_products <= self.get_product_amount(product_tup) <= self.max_amount_products:
-                outcome_description = outcome_description + (self.add_fail_description(product_name, self.get_product_amount(product_tup)))
+                outcome_description = outcome_description + \
+                                      (self.add_fail_description(product_name, self.get_product_amount(product_tup)))
                 is_approved = False
         return is_approved, outcome_description
 
@@ -41,7 +42,7 @@ class PurchaseProductPolicy(PurchasePolicy):
         else:
             max_string = str(self.max_amount_products)
 
-        desc = "{} can only be purchased in amount of minimum {} and maximum {} units, and you tried {}!\n".format\
+        desc = "{} can only be purchased in amount of minimum [{}] and maximum [{}] units, and you tried [{}]!\n".format\
             (product_name, min_string, max_string, str(product_amount))
         return desc
 
@@ -76,21 +77,3 @@ class PurchaseProductPolicy(PurchasePolicy):
 
         return [self.id, self.purchase_type, min_string, max_string, self.products_in_policy]
 
-    def get_jsn_description(self):
-        min_string = ""
-        max_string = ""
-        if self.min_amount_products == self.MIN_SIZE:
-            min_string = "no min limit"
-        else:
-            min_string = str(self.min_amount_products)
-
-        if self.min_amount_products == self.MAX_SIZE:
-            max_string = "no max limit"
-        else:
-            max_string = str(self.max_amount_products)
-
-        return {"Purchase ID": self.id,
-                "Min amount of products": self.min_amount_products,
-                "Max amount of products": self.max_amount_products,
-                "Products In Policy": self.products_in_policy.keys(),
-                "Purchase Type": self.purchase_type}

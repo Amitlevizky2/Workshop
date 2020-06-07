@@ -1,20 +1,25 @@
+from datetime import datetime
+
+import jsons
 from spellchecker import SpellChecker
 
 from project import logger
 from project.domain_layer.communication_managment import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.StoresGetters import StoresGetters
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 
 
 class StoresManagerInterface:
     def __init__(self, users_manager):
         self.stores_manager = StoresManager()
+        self.stores_getters = StoresGetters(self.stores_manager)
         self.spell_checker = SpellChecker()
         self.users_manager = users_manager
+        self.publisher = None
 
-    def search_product(self, search_term: str = "", categories: [str] = [], key_words: [str] = []) \
-            -> {int: [Product]}:
+    def search_product(self, search_term: str = "", categories: [str] = [], key_words: [str] = []):
         """
 
         Args:
@@ -34,21 +39,24 @@ class StoresManagerInterface:
 
         return self.stores_manager.add_purchase_to_store(store_id, purchase)
 
-    # def search(self, search_term: str = "", categories: [str] = None, key_words: [str] = None) -> {Store: [Product]}:
-    #     return self.stores_manager.search(search_term, categories, key_words)
+    def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []):
+        return self.stores_manager.search(search_term, categories, key_words)
 
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
-                             key_words: [str], amount) -> bool:
+                             key_words: [str], amount):
         logger.log(
-            "user %s called add product to store no.%d. product name:%s"
-            " product price:%d product categories:%s,key words:%s, amount:%d",
+            "user %s called add product to store no.%s. product name:%s"
+            " product price:%s product categories:%s,key words:%s, amount:%s",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
+        if store_id in self.users_manager.get_managed_stores(user_name)[1]:
 
-        if store_id in self.users_manager.get_managed_stores(user_name):
-            return self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
-                                                            product_categories, key_words, amount)
-        return False
+            return jsons.loads(self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
+                                                            product_categories, key_words, amount))
+        return {
+            'error': True,
+            'error_msg': 'User ' + user_name + ' is not associated with the store.'
+        }
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint manager %s to store no.%d", owner, to_appoint, store_id)
@@ -92,7 +100,7 @@ class StoresManagerInterface:
         return -1
 
     def buy(self, cart):
-        self.stores_manager.buy(cart)
+        return self.stores_manager.buy(cart)
 
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
@@ -103,8 +111,8 @@ class StoresManagerInterface:
     def remove_product(self, store_id, product_name, username):
         return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
 
-    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+    # def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
+    #     return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
 
     def update_product(self, store_id, username, product_name, attribute, updated):
         """
@@ -159,16 +167,16 @@ class StoresManagerInterface:
         return self.stores_manager.remove_product_from_purchase_product_policy(store_id, policy_id, permitted_user, product_name)
 
     def get_discounts(self, store_id: int = None):
-        return self.stores_manager.get_discounts(store_id)
+        return self.stores_getters.get_store_discounts("", store_id)
 
     def get_discount_details(self, store_id: int = None, discount_id: int = None):
-        return self.stores_manager.get_discount_details(store_id, discount_id)
+        return self.stores_getters.get_store_discount('', store_id, discount_id)
 
     def get_purchases_policies(self, store_id: int = None):
-        return self.stores_manager.get_purchases_policies(store_id)
+        return self.stores_getters.get_purchases_policies('', store_id)
 
     def get_purchase_policy_details(self, store_id: int = None, purchase_policy_id: int = None):
-        return self.stores_manager.get_purchase_policy_by_id(store_id, purchase_policy_id)
+        return self.stores_getters.get_purchase_policy('', store_id, purchase_policy_id)
 
     def get_cart_description(self, cart = None):  #NEED_TO_CHECK
         return self.stores_manager.get_cart_description(cart)
@@ -177,8 +185,11 @@ class StoresManagerInterface:
         return self.stores_manager.get_updated_basket(basket)
 
     def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
-                                        end_date = None, percent: int = None):
-        return self.stores_manager.add_visible_product_discount(store_id, username, start_date, end_date, percent)
+                                        end_date = None, percent: int = None, products: [str] = None):
+        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _percent = int(percent)
+        return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent, products)
 
     def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
                                             end_date = None, percent: int = None,
@@ -222,18 +233,20 @@ class StoresManagerInterface:
         return self.edit_conditional_discount_to_store(store_id, discount_id, username, start_date, end_date, percent, min_price)
 
     def get_store_description(self, store_id):
-        return self.stores_manager.get_store_description_by_id(store_id)
+        return self.stores_getters.get_store_description(store_id)
+
+    def get_stores(self):
+        return self.stores_getters.get_stores_description()
 
     def get_inventory_description(self, store_id):
-        return self.stores_manager.get_inventory_description(store_id)
+        return self.stores_getters.get_inventory_description('', store_id)
 
-    # TODO: implement
     def get_store_owners(self, store_id):
         """
         :param store_id:
         :return: array of store owners user names
         """
-        pass
+        return self.stores_getters.get_store_owners('', store_id)
 
     # TODO: implement
     def get_store_managers(self, store_id):
@@ -241,15 +254,18 @@ class StoresManagerInterface:
         :param store_id:
         :return: array of store managers user names
         """
-        pass
+        return self.stores_getters.get_store_managers('', store_id)
 
     # TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
     #  TODO: and returns the product.
     def get_product_from_store(self, store_id, product_name) -> Product:
-        return self.stores_manager.get_product_from_store(store_id, product_name)
+        return self.stores_getters.get_product_from_store('', store_id, product_name)
 
     def bound_publisher(self, publisher: Publisher):
         self.stores_manager.bound_publisher(publisher)
 
     def get_stores_manager(self) -> StoresManager:
         return self.stores_manager
+
+    def check_cart_validity(self, cart):
+        return self.stores_manager.check_cart_validity(cart)
