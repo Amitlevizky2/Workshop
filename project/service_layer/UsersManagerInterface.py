@@ -112,7 +112,11 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases_admin(username, admin)
 
     def is_admin(self, username):
-        return self.user_manager.is_admin(username)
+        answer = self.user_manager.is_admin(username)
+        return {
+            'error': False,
+            'data': answer
+        }
 
     def add_managed_store(self, username, store_id):
         """
@@ -126,10 +130,10 @@ class UsersManagerInterface:
         return self.user_manager.remove_managed_store(username, store_id)
 
     def get_managed_stores_description(self, username):
-        ans, stores = self.user_manager.get_managed_stores(username)
-        if ans is True:
+        ans = jsons.loads(self.user_manager.get_managed_stores(username))
+        if ans.error is False:
             stores_des = []
-            for store in stores:
+            for store in ans.data:
                 res_store = self.stores_manager.get_store_description(store)
                 print(res_store)
                 stores_des.append(res_store)
@@ -140,10 +144,16 @@ class UsersManagerInterface:
         else:
             return({
                 'error': True,
-                'error_msg': stores['error_msg']
+                'error_msg': ans.error_msg
             })
 
     def get_managed_stores(self, username):
+        ans = jsons.loads(self.user_manager.get_managed_stores(username))
+        if ans.error is True:
+            return []
+        return ans.data
+
+    def get_stores_managed_by_user(self, username):
         return self.user_manager.get_managed_stores(username)
 
     def check_if_registered(self, username):

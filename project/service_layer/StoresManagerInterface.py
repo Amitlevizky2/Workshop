@@ -49,7 +49,7 @@ class StoresManagerInterface:
             "user %s called add product to store no.%s. product name:%s"
             " product price:%s product categories:%s,key words:%s, amount:%s",
             user_name, store_id, product_name, product_price, product_categories, key_words, amount)
-        if store_id in self.users_manager.get_managed_stores(user_name)[1]:
+        if store_id in self.users_manager.get_managed_stores(user_name):
 
             return jsons.loads(self.stores_manager.add_product_to_store(store_id, user_name, product_name, product_price,
                                                             product_categories, key_words, amount))
@@ -62,29 +62,38 @@ class StoresManagerInterface:
         logger.log("user %s call appoint manager %s to store no.%d", owner, to_appoint, store_id)
         if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
                 to_appoint):
-            if self.stores_manager.appoint_manager_to_store(store_id, owner, to_appoint):
+            appointment = jsons.loads(self.stores_manager.appoint_manager_to_store(store_id, owner, to_appoint))
+            if appointment['error'] is False:
                 self.users_manager.add_managed_store(to_appoint, store_id)
-                return True
-
-        return False
+            return appointment
+        return {
+            'error': True,
+            'error_msg': 'error'
+        }
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         logger.log("user %s call appoint owner %s to store no.%d", owner, to_appoint, store_id)
-        if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
-                to_appoint):
-            if self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint):
+        stores = self.users_manager.get_managed_stores(owner)
+        if store_id in stores and self.users_manager.check_if_registered(to_appoint):
+            appointment = jsons.loads(self.stores_manager.appoint_owner_to_store(store_id, owner, to_appoint))
+            if appointment['error'] is False:
                 self.users_manager.add_managed_store(to_appoint, store_id)
-                return True
-
-        return False
+            return appointment
+        return {
+            'error': True,
+            'error_msg': 'error'
+        }
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s add %s permission to %s in store no.%d", owner, permission, manager, store_id)
-        if store_id in self.users_manager.get_managed_stores(
-                owner) and store_id in self.users_manager.get_managed_stores(manager):
+        if store_id in self.users_manager.get_managed_stores(owner) and store_id in self.users_manager.get_managed_stores(manager):
             return self.stores_manager.add_permission_to_manager_in_store(store_id, owner, manager, permission)
-        return False
+        return {
+            'error': True,
+            'error_msg': 'error'
+        }
 
+# TODO: DOSE NOT RETURN A VALUE.
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(
@@ -125,6 +134,7 @@ class StoresManagerInterface:
         """
         return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)
 
+# TODO: CHANGE RETURN VALS.
     def remove_manager(self, store_id, owner, to_remove):
         if self.stores_manager.remove_manager(store_id, owner, to_remove):
             self.users_manager.remove_managed_store(to_remove, store_id)
@@ -194,12 +204,23 @@ class StoresManagerInterface:
     def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date = None,
                                             end_date = None, percent: int = None,
                                             min_amount: int = None, num_prods_to_apply: int = None):
-        return self.stores_manager.add_conditional_discount_to_product(store_id, username, start_date, end_date, percent, min_amount, num_prods_to_apply)
+        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _percent = int(percent)
+        _min_amount = int(min_amount)
+        _num_prods_to_apply = int(num_prods_to_apply)
+        return self.stores_manager.add_conditional_discount_to_product(store_id, username, _start_date, _end_date,
+                                                                       _percent, _min_amount, _num_prods_to_apply)
 
     def add_conditional_discount_to_store(self, store_id: int = None, username: str = None, start_date = None,
                                           end_date = None, percent: int = None,
                                           min_price: int = None):
-        return self.stores_manager.add_conditional_discount_to_store(store_id, username, start_date, end_date, percent, min_price)
+        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _percent = int(percent)
+        _min_price = int(min_price)
+        return self.stores_manager.add_conditional_discount_to_store(store_id, username, _start_date, _end_date,
+                                                                     _percent, _min_price)
 
     def add_product_to_discount(self, store_id: int = None, permitted_user: str = None, discount_id: int = None,
                                 product_name: str = None):
@@ -226,6 +247,7 @@ class StoresManagerInterface:
         return self.stores_manager.edit_conditional_discount_to_product(store_id, discount_id, username, start_date,
                                                                         end_date, percent, min_amount, nums_to_apply)
 
+# endless recursive function
     def edit_conditional_discount_to_store(self, store_id: int = None, discount_id: int = None, username: str = None,
                                            start_date = None, end_date = None,
                                            percent: int = None,
@@ -248,7 +270,6 @@ class StoresManagerInterface:
         """
         return self.stores_getters.get_store_owners('', store_id)
 
-    # TODO: implement
     def get_store_managers(self, store_id):
         """
         :param store_id:
@@ -256,8 +277,6 @@ class StoresManagerInterface:
         """
         return self.stores_getters.get_store_managers('', store_id)
 
-    # TODO: implement - this method get store id, product name (name is unique? if not, we might have a problem..)
-    #  TODO: and returns the product.
     def get_product_from_store(self, store_id, product_name) -> Product:
         return self.stores_getters.get_product_from_store('', store_id, product_name)
 

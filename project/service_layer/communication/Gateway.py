@@ -141,12 +141,6 @@ def view_cart():
     return jsonify(answer)
 
 
-# TODO: implement
-@app.route('/remove_managed_store', methods=['POST', 'GET'])
-def remove_managed_store():
-    pass
-
-
 @app.route('/get_managed_stores', methods=['POST', 'GET'])
 def get_managed_stores():
     message = request.get_json()
@@ -184,11 +178,14 @@ def buy():
 def appoint_store_manager():
     message = request.get_json()
     answer = stores_manager.appoint_manager_to_store(message['store_id'], message['owner'], message['to_appoint'])
-    if answer is True:
-        return jsonify({'error': False,
-                        'data': 'appointed successfully'})
-    return jsonify({'error': True,
-                    'error_msg': 'appointment failed'})
+    return jsonify(answer)
+
+
+@app.route('/remove_store_manager', methods=['POST', 'GET'])
+def remove_store_manager():
+    message = request.get_json()
+    answer = stores_manager.remove_manager(message['store_id'], message['owner'], message['to_remove'])
+    return answer
 
 
 @app.route('/add_product_to_store', methods=['POST', 'GET'])
@@ -205,18 +202,14 @@ def add_product_to_store():
 def get_store_managers():
     message = request.get_json()
     answer = stores_manager.get_store_managers(message['store_id'])
-    return jsonify({
-        'managers': answer
-    })
+    return answer
 
 
 @app.route('/get_store_owners', methods=['POST', 'GET'])
 def get_store_owners():
     message = request.get_json()
     answer = stores_manager.get_store_owners(message['store_id'])
-    return jsonify({
-        'owners': answer
-    })
+    return answer
 
 
 @app.route('/open_store', methods=['POST', 'GET'])
@@ -235,9 +228,14 @@ def open_store():
 def appoint_store_owner():
     message = request.get_json()
     answer = stores_manager.appoint_owner_to_store(message['store_id'], message['owner'], message['to_appoint'])
-    if answer is False:
-        return 'error', 400
-    return 'done', 201
+    return jsonify(answer)
+
+
+@app.route('/remove_store_owner', methods=['POST', 'GET'])
+def remove_managed_store():
+    message = request.get_json()
+    answer = stores_manager.remove_owner(message['store_id'], message['owner'], message['to_remove'])
+    return answer
 
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -258,9 +256,14 @@ def update_store_product():
     message = request.get_json()
     answer = stores_manager.update_product(message['store_id'], message['username'], message['product_name'],
                                            message['attribute'], message['updated'])
-    if answer is True:
-        return 'done', 200
-    return 'error', 400
+    return answer
+
+
+@app.route('/remove_product_from_store', methods=['POST', 'GET'])
+def remove_product_from_store():
+    message = request.get_json()
+    answer = stores_manager.remove_product(message['store_id'], message['product_name'], message['username'])
+    return answer
 
 
 @app.route('/get_stores', methods=['POST', 'GET'])
@@ -273,6 +276,13 @@ def get_stores():
         'error': False,
         'data': answer
     })
+
+
+@app.route('/get_store_sales_history', methods=['POST', 'GET'])
+def get_store_sales_history():
+    message = request.get_json()
+    answer = stores_manager.get_sales_history(message['store_id'], message['username'])
+    return jsonify({answer})
 
 
 @app.route('/add_visible_discount', methods=['POST', 'GET'])
@@ -298,21 +308,189 @@ def get_discounts():
     })
 
 
+@app.route('/edit_conditional_store_discount', methods=['POST', 'GET'])
+def edit_conditional_store_discount():
+    message = request.get_json()
+    answer = stores_manager.edit_conditional_discount_to_store(message['store_id'], message['discount_id'],
+                                                               message['username'], message['start_date'],
+                                                               message['end_date'], message['percent'],
+                                                               message['min_price'])
+    return jsonify(answer)
+
+
+@app.route('/edit_conditional_product_discount', methods=['POST', 'GET'])
+def edit_conditional_product_discount():
+    message = request.get_json()
+    answer = stores_manager.edit_conditional_discount_to_product(message['store_id'], message['discount_id'],
+                                                                 message['username'], message['start_date'],
+                                                                 message['end_date'], message['percent'],
+                                                                 message['min_price'], message['nums_to_apply'])
+    return answer
+
+
+@app.route('/edit_visible_product_discount', methods=['POST', 'GET'])
+def edit_visible_product_discount():
+    message = request.get_json()
+    answer = stores_manager.edit_visible_discount_to_product(message['store_id'], message['discount_id'],
+                                                             message['username'], message['start_date'],
+                                                             message['end_date'], message['percent'])
+
+    return answer
+
+
+@app.route('/add_composite_discount', methods=['POST', 'GET'])
+def add_composite_discount():
+    message = request.get_json()
+    answer = stores_manager.add_composite_discount(message['store_id'], message['username'], message['start_date'],
+                                                   message['end_date'], message['logic_operator'],
+                                                   message['discounts_products_dict'], message['discounts_to_apply_id'])
+    return answer
+
+
+@app.route('/add_product_conditional_discount', methods=['POST', 'GET'])
+def add_product_conditional_discount():
+    message = request.get_json()
+    answer = stores_manager.add_conditional_discount_to_product(message['store_id'], message['username'],
+                                                                message['start_date'], message['end_date'],
+                                                                message['percent'], message['min_amount'],
+                                                                message['num_prods_to_apply'])
+    return answer
+
+
+@app.route('/add_store_conditional_discount', methods=['POST', 'GET'])
+def add_store_conditional_discount():
+    message = request.get_json()
+    answer = stores_manager.add_conditional_discount_to_store(message['store_id'], message['username'],
+                                                              message['start_date'], message['end_date'],
+                                                              message['percent'], message['min_price'])
+
+    return answer
+
+
+@app.route('/get_purchases_policies', methods=['POST', 'GET'])
+def get_purchases_policies():
+    message = request.get_json()
+    return stores_manager.get_purchases_policies(message['store_id'])
+
+
+@app.route('/get_purchase_policy_details', methods=['POST', 'GET'])
+def get_purchase_policy_details():
+    message = request.get_json()
+    return stores_manager.get_purchase_policy_details(message['store_id'], message['purchase_policy_id'])
+
+
+@app.route('/remove_product_from_discount', methods=['POST', 'GET'])
+def remove_product_from_discount():
+    message = request.get_json()
+    return stores_manager.remove_product_from_discount(message['store_id'], message['permitted_user'],
+                                                       message['discount_id'], message['product_name'])
+
+
+@app.route('/get_discount_details', methods=['POST', 'GET'])
+def get_discount_details():
+    message = request.get_json()
+    return stores_manager.get_discount_details(message['store_id'], message['discount_id'])
+
+
+@app.route('/remove_product_from_purchase_product_policy', methods=['POST', 'GET'])
+def remove_product_from_purchase_product_policy():
+    message = request.get_json()
+    answer = stores_manager.remove_product_from_purchase_product_policy(message['store_id'], message['policy_id'],
+                                                                        message['permitted_user'],
+                                                                        message['product_name'])
+    return jsonify(answer)
+
+
+@app.route('/remove_purchase_policy', methods=['POST', 'GET'])
+def remove_purchase_policy():
+    message = request.get_json()
+    answer = stores_manager.remove_purchase_policy(message['store_id'], message['permitted_user'], message['policy_id'])
+
+    return answer
+
+
+@app.route('/add_product_to_purchase_product_policy', methods=['POST', 'GET'])
+def add_product_to_purchase_product_policy():
+    message = request.get_json()
+    answer = stores_manager.add_product_to_purchase_product_policy(message['store_id'], message['policy_id'],
+                                                                   message['permitted_user'],
+                                                                   message['product_name'])
+    return answer
+
+
+@app.route('/add_policy_to_purchase_composite_policy', methods=['POST', 'GET'])
+def add_policy_to_purchase_composite_policy():
+    message = request.get_json()
+    answer = stores_manager.add_policy_to_purchase_composite_policy(message['store_id'], message['permitted_user'],
+                                                                    message['composite_id'],
+                                                                    message['policy_id'])
+    return answer
+
+
+@app.route('/add_purchase_composite_policy', methods=['POST', 'GET'])
+def add_purchase_composite_policy():
+    message = request.get_json()
+    answer = stores_manager.add_purchase_composite_policy(message['store_id'], message['permitted_user'],
+                                                          message['purchase_policies_id'],
+                                                          message['logic_operator'])
+    return answer
+
+
+@app.route('/add_purchase_product_policy', methods=['POST', 'GET'])
+def add_purchase_product_policy():
+    message = request.get_json()
+    answer = stores_manager.add_purchase_product_policy(message['store_id'], message['permitted_user'],
+                                                        message['min_amount_products'],
+                                                        message['max_amount_products'])
+    return answer
+
+
+@app.route('/add_purchase_store_policy', methods=['POST', 'GET'])
+def add_purchase_store_policy():
+    message = request.get_json()
+    answer = stores_manager.add_purchase_store_policy(message['store_id'], message['permitted_user'],
+                                                      message['min_amount_products'],
+                                                      message['max_amount_products'])
+    return answer
+
+
+# TODO: the function remove_permission_from_manager_in_store in stores manager interface dose not return a value.
+@app.route('/remove_store_manager_permission', methods=['POST', 'GET'])
+def remove_store_manager_permission():
+    message = request.get_json()
+    answer = stores_manager.remove_permission_from_manager_in_store(message['store_id'], message['owner'],
+                                                                    message['manager'],
+                                                                    message['permission'])
+    return answer
+
+
+@app.route('/add_store_manager_permission', methods=['POST', 'GET'])
+def add_store_manager_permission():
+    message = request.get_json()
+    answer = stores_manager.add_permission_to_manager_in_store(message['store_id'], message['owner'],
+                                                               message['manager'],
+                                                               message['permission'])
+    return jsonify(answer)
+
+
 """---------------------------------------------------------------------"""
 """-------------------------------ADMIN EVENTS------------------------------"""
 """---------------------------------------------------------------------"""
 
 
-# TODO: implement
 @app.route('/is_admin', methods=['POST', 'GET'])
 def is_admin():
-    pass
+    message = request.get_json()
+    data = users_manager.is_admin(message['username'])
+    return jsonify(data)
 
 
 # TODO: implement
 @app.route('/view_purchases_admin', methods=['POST', 'GET'])
 def view_purchases_admin():
-    pass
+    message = request.get_json()
+    data = users_manager.view_purchases_admin(message['username'], message['admin'])
+    return jsonify(data)
 
 
 """---------------------------------------------------------------------"""

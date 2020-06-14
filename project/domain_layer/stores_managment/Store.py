@@ -41,12 +41,12 @@ class Store:
         """
         if owner in self.store_owners and \
                 to_appoint not in self.store_owners:
-            return {'ans': True,
-                    'desc': self.appoint_owner_helper(owner, to_appoint)}
+            return {'error': False,
+                    'data': self.appoint_owner_helper(owner, to_appoint)}
         else:
             logger.error("%s is not a store owner or %s is already owner", owner, to_appoint)
-            return {'ans': False,
-                    'desc': owner + "is not a store owner or " + to_appoint + " is already owner"}
+            return {'error': True,
+                    'error_msg': owner + "is not a store owner or " + to_appoint + " is already owner"}
 
     def appoint_owner_helper(self, owner, to_appoint):
         self.store_owners.append(to_appoint)
@@ -295,11 +295,11 @@ class Store:
 
     def update_product(self, user, product_name, attribute, updated):
         if self.check_permission(user, getattr(Store, "update_product")):
-            return {'ans': self.inventory.update_product(product_name, attribute, updated),
-                    'desc': 'updated'}
+            return {'error': not self.inventory.update_product(product_name, attribute, updated),
+                    'data': 'updated'}
         logger.error("%s don't have this permission", user)
-        return {'ans': False,
-                'desc': user + " don't have this permission"}
+        return {'error': True,
+                'error_msg': user + " don't have this permission"}
 
     def add_new_sale(self, purchase: Purchase, publisher: Publisher):
         """
@@ -528,13 +528,13 @@ class Store:
 
     def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
         if policy_id is None:
-            return {'ans': False, 'desc': "No such policy"}
+            return {'error': True, 'error_msg': "No such policy"}
         if policy_id not in self.purchase_policies.keys():
-            return {'ans': False, 'desc': "policy is not exist for this store\n"}
+            return {'error': True, 'error_msg': "policy is not exist for this store\n"}
         if not self.check_permission(permitted_user,getattr(Store, "remove_product_from_purchase_product_policy")):
-            return {'ans': False, 'desc': "User dont have permission\n"}
+            return {'error': True, 'error_msg': "User dont have permission\n"}
         self.purchase_policies[policy_id].remove_product(product_name)
-        return {'ans': True, 'desc': product_name + " has been removed from policy \n"}
+        return {'error': False, 'data': product_name + " has been removed from policy \n"}
 
     def get_discounts(self):
         return {'ans': True,
@@ -606,5 +606,5 @@ class Store:
             store_managers_dict[manager] = []
             for perm in self.store_managers[manager]:
                 store_managers_dict[manager].append(perm.__name__)
-        return {'ans': True,
-                'res': store_managers_dict}
+        return {'error': False,
+                'data': store_managers_dict}

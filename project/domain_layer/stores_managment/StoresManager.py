@@ -442,8 +442,8 @@ class StoresManager:
 
     def get_store_owners(self, store_id: int):
         store = self.get_store(store_id)
-        return jsons.dumps({'ans': True,
-                            'store_owners': store.store_owners})
+        return jsons.dumps({'error': False,
+                            'data': store.store_owners})
 
     def get_store_description_by_id(self, store_id):
         return self.get_store(store_id).get_jsn_description()

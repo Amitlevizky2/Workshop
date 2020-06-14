@@ -34,8 +34,8 @@ class StoresGetters:
     def get_purchases_policies(self, permitted_user: str, store_id: int):
         store = self.stores_manager.get_store(store_id)
         policies = store.get_purchase_policies()
-        return jsons.dump({'ans': True,
-                           'policies': policies})
+        return jsons.dump({'error': False,
+                           'data': policies})
 
     def get_purchase_policy(self, permitted_user: str, store_id: int, purchase_policy_id: int):
         store = self.stores_manager.get_store(store_id)
@@ -91,6 +91,5 @@ class StoresGetters:
         return jsons.dumps(managers)
 
     def get_store_owners(self, permitted_user: str, store_id: int):
-        store = self.stores_manager.get_store(store_id)
-        return jsons.dumps({'error': False,
-                            'data': store.store_owners})
+        store_owners = self.stores_manager.get_store_owners(store_id)
+        return jsons.dumps(store_owners)
