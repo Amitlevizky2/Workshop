@@ -79,3 +79,6 @@ class ConditionalStoreDiscount(Discount):
                 "Min price": self.min_price,
                 "Products In Discount": self.products_in_discount.keys(),
                 "Discount Type": self.discount_type}
+
+    def is_approved(self, original_price, amount):
+        pass

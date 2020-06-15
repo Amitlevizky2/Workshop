@@ -46,26 +46,16 @@ def guest_user_name():
 def login():
     message = request.get_json()
     print(message['username'])
-    logged_in, data = users_manager.login(message['username'], message['new_username'], message['password'])
-    print(data)
-    response = {}
-    data['error'] = not logged_in
-    print(data)
-    return jsonify(data)
-    # if logged_in is True:
-    #
-    #
-    #     return jsonify(data), 201
-    # else:
-    #     return jsonify(data), 500
+    answer = users_manager.login(message['username'], message['new_username'], message['password'])
+    print(answer)
+    return jsonify(answer)
 
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     message = request.get_json()
-    answer, data = users_manager.logout(message['username'])
-    data['error'] = not answer
-    return jsonify(data)
+    answer = users_manager.logout(message['username'])
+    return jsonify(answer)
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -341,9 +331,11 @@ def edit_visible_product_discount():
 @app.route('/add_composite_discount', methods=['POST', 'GET'])
 def add_composite_discount():
     message = request.get_json()
+    # answer = stores_manager.add_composite_discount(message['discount'], message['products'])
     answer = stores_manager.add_composite_discount(message['store_id'], message['username'], message['start_date'],
                                                    message['end_date'], message['logic_operator'],
-                                                   message['discounts_products_dict'], message['discounts_to_apply_id'])
+                                                   {message['discount']: message['products']},
+                                                   [message['discounts_to_apply_id']])
     return answer
 
 
@@ -353,7 +345,7 @@ def add_product_conditional_discount():
     answer = stores_manager.add_conditional_discount_to_product(message['store_id'], message['username'],
                                                                 message['start_date'], message['end_date'],
                                                                 message['percent'], message['min_amount'],
-                                                                message['num_prods_to_apply'])
+                                                                message['num_prods_to_apply'], message['products'])
     return answer
 
 
@@ -473,6 +465,14 @@ def add_store_manager_permission():
     return jsonify(answer)
 
 
+@app.route('/get_user_permissions', methods=['POST', 'GET'])
+def get_user_permissions():
+    message = request.get_json()
+    answer = stores_manager.get_user_permissions(message['store_id'], message['username'])
+    print(answer)
+    return answer
+
+
 """---------------------------------------------------------------------"""
 """-------------------------------ADMIN EVENTS------------------------------"""
 """---------------------------------------------------------------------"""
@@ -506,6 +506,13 @@ def join(data):
 @sio.on('leave')
 def leave(data):
     leave_room(room=data['room'])
+
+
+@sio.on('disconnect')
+def leave(data, sid):
+    leave_room(room=data['room'])
+    users_manager.logout(data['room'])
+    print('byyyyy ' + data['room'])
 
 
 def send_notification(username, message):

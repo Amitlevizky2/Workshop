@@ -22,6 +22,8 @@ class ConditionalProductDiscount(Discount):
                                        self.get_product_updated_price(product_tup), self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
                     product_price_dict[
                         product_name] = new_product_tup  # (self.discount * self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
+                    print('new_product_tup:')
+                    print(new_product_tup)
                     x = 5
 
     def get_product_object(self, product):

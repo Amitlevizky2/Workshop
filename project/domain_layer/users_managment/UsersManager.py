@@ -97,9 +97,9 @@ class UsersManager:
         if ans is True:
             if user.loggedin is True:
                 user.logout()
-                return True, {'data': self.add_guest_user()}
-            return False, {'error_msg': 'User ' + username + ' is not logged in.'}
-        return False, ans
+                return {'error': False, 'data': self.add_guest_user()}
+            return {'error': True, 'error_msg': 'User ' + username + ' is not logged in.'}
+        return {'error': True, 'error_msg': ans['error_msg']}
 
     def view_purchases(self, username):
         ans, user = self.find_user(username)

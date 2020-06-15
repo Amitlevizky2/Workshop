@@ -48,10 +48,16 @@ class UsersManagerInterface:
                 user['managed_stores'] = managed_stores
                 print("******************")
                 print(user)
-                return logged_in, {'data': user}
+                return {
+                    'error': not logged_in,
+                    'data': user}
+            return {
+                'error': True,
+                'error_msg': data['error_msg']
+            }
         else:
             print("!!!!!!!!!!!")
-            return False, {'error_msg': 'incorrect password. Try again.'}
+            return {'error': True, 'error_msg': 'incorrect password. Try again.'}
 
     def add_guest_user(self):
         return self.user_manager.add_guest_user()
@@ -131,9 +137,9 @@ class UsersManagerInterface:
 
     def get_managed_stores_description(self, username):
         ans = jsons.loads(self.user_manager.get_managed_stores(username))
-        if ans.error is False:
+        if ans['error'] is False:
             stores_des = []
-            for store in ans.data:
+            for store in ans['data']:
                 res_store = self.stores_manager.get_store_description(store)
                 print(res_store)
                 stores_des.append(res_store)
@@ -144,14 +150,14 @@ class UsersManagerInterface:
         else:
             return({
                 'error': True,
-                'error_msg': ans.error_msg
+                'error_msg': ans['error_msg']
             })
 
     def get_managed_stores(self, username):
         ans = jsons.loads(self.user_manager.get_managed_stores(username))
-        if ans.error is True:
+        if ans['error'] is True:
             return []
-        return ans.data
+        return ans['data']
 
     def get_stores_managed_by_user(self, username):
         return self.user_manager.get_managed_stores(username)
