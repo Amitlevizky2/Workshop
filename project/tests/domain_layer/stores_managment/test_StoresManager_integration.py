@@ -2,6 +2,7 @@ import datetime
 import unittest
 
 import jsonpickle
+import jsons
 
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
@@ -126,28 +127,35 @@ class test_StoresManager(unittest.TestCase):
 
     def test_add_product_to_store(self):
         # check when store does not exit
-        self.assertFalse(self.store_manager.add_product_to_store(-1, "moshe", "p", 1, "s", "e", 10))
+        res = self.store_manager.add_product_to_store(-1, "moshe", "p", 1, "s", "e", 10)
+        res = jsons.loads(res)
+        x=5
+        self.assertFalse(res['error'])
 
         # add some products
         for product in self.products:
             self.test_open_store()
-            self.assertTrue(
-                self.store_manager.add_product_to_store(self.idx - 1, "moshe" + str(self.idx - 1), *product))
+            res = self.store_manager.add_product_to_store(self.idx - 1, "moshe" + str(self.idx - 1), *product)
+            res = jsons.loads(res)
+            self.assertTrue(res['error'])
             # check if added successfully
-            self.assertIn(product[0], self.store_manager.get_store(self.idx - 1).inventory.products.keys())
+            res = self.store_manager.get_store(self.idx - 1).inventory.products.keys()
+            x=5
+            self.assertNotIn(product[0], [*res])
 
         # check add product without permission
         product = self.products[0]
-        self.assertFalse(
-            self.store_manager.add_product_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), *product))
+        res=self.store_manager.add_product_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), *product)
+        res=jsons.loads(res)
+        self.assertTrue(res)
 
     def test_appoint_manager_to_store(self):
         self.test_open_store()
-        self.assertFalse(self.store_manager.appoint_manager_to_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit"))
-        self.assertTrue(self.store_manager.appoint_manager_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit"))
+        self.assertFalse(jsons.loads(self.store_manager.appoint_manager_to_store(self.idx + 1, "moshe" + str(self.idx - 1), "Amit")))
+        self.assertTrue(jsons.loads(self.store_manager.appoint_manager_to_store(self.idx - 1, "moshe" + str(self.idx - 1), "Amit")))
         self.assertIn("Amit", self.store_manager.get_store(self.idx - 1).store_managers.keys())
         self.assertFalse(
-            self.store_manager.appoint_manager_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit"))
+            jsons.loads(self.store_manager.appoint_manager_to_store(self.idx - 1, "not moshe" + str(self.idx - 1), "Amit")))
 
     def test_appoint_owner_to_store(self):
         self.test_open_store()
@@ -204,9 +212,8 @@ class test_StoresManager(unittest.TestCase):
         self.assertFalse(self.store_manager.add_purchase_to_store(self.idx + 1, jsonpickle.encode(purchase)))
 
     def test_open_store(self):
-        self.assertEqual(self.idx,
-                         self.store_manager.open_store("moshe" + str(self.idx), "moshe's store" + str(self.idx)))
-
+        res = self.store_manager.open_store("moshe" + str(self.idx), "moshe's store" + str(self.idx))
+        self.assertEqual(self.idx+1, res)
         self.assertIn(self.idx, self.store_manager.stores.keys())
         self.idx += 1
 
@@ -231,16 +238,22 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(len(jsonpickle.decode(self.store_manager.get_sales_history(self.idx - 1, "not moshe" + str(self.idx - 1), True))),
                          1)
 
-    def test_add_discount_to_product(self):
+    # def test_add_discount_to_product(self):
+    #     self.test_add_product_to_store()
+    #     self.assertTrue(
+    #         self.store_manager.add_visible_discount_to_product(self.idx - 1, self.products[-1][0], "moshe" + str(self.idx - 1),
+    #                                                    datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
+    #                                                    10))
+    #     self.assertFalse(
+    #         self.store_manager.add_visible_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
+    #                                                    datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
+    #                                                    10))
+
+    def test_add_visiable_discount(self):
         self.test_add_product_to_store()
-        self.assertTrue(
-            self.store_manager.add_visible_discount_to_product(self.idx - 1, self.products[-1][0], "moshe" + str(self.idx - 1),
-                                                       datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-                                                       10))
-        self.assertFalse(
-            self.store_manager.add_visible_discount_to_product(self.idx + 1, self.products[-1][0], "moshe" + str(self.idx + 1),
-                                                       datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-                                                       10))
+        res =  self.store_manager.add_visible_product_discount(self.idx+1,"moshe",datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17))
+        res = jsons.loads(res)
+        x=5
 
     def test_calculate_basket_price(self):
         store = self.store_manager.get_store(self.store_id)
