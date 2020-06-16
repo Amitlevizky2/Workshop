@@ -5,6 +5,7 @@ from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
+from project.domain_layer.stores_managment.StoresGetters import StoresGetters
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
@@ -33,15 +34,15 @@ class StubStore(Store):
     def __init__(self, idx, name, owner):
         Store.__init__(self, idx, name, owner)
 
-
 class test_StoresManager(unittest.TestCase):
     def setUp(self) -> None:
         self.store_manager = StoresManager()
+        # self.stores_getters = StoresGetters(self.store_manager)
         for i in range(5):
             self.store_manager.stores[i] = Store(i, "test_store" + str(i), "test_owner" + str(i))
             self.store_manager.stores[i].store_managers["test_owner"] = [Store.add_product, Store.add_visible_product_discount, Store.add_conditional_discount_to_product,
                                                                          Store.update_product]
-        self.store_manager.stores_idx = i
+            self.store_manager.stores_idx = i
 
         products = self.init_product()
         self.insert_products_to_store(products.values(), self.store_manager.stores.values())
@@ -76,15 +77,15 @@ class test_StoresManager(unittest.TestCase):
         res = self.store_manager.add_product_to_store(7, "not real store", "what a product", 1222, ["imaginary products"],
                                                     ["no"], 20)
         res = jsons.loads(res)
-        self.assertFalse(res['ans'])
+        self.assertFalse(res['error'])
         res = self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
                                                 ["no"], 20)
         res = jsons.loads(res)
-        self.assertTrue(res['ans'])
+        self.assertFalse(res['error'])
         res = self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
                                                     ["no"], 20)
         res = jsons.loads(res)
-        self.assertTrue(res['ans'])
+        self.assertFalse(res['error'])
 
     def test_open_store(self):
         index = self.store_manager.stores_idx
@@ -152,7 +153,7 @@ class test_StoresManager(unittest.TestCase):
 
         res = self.store_manager.add_policy_to_purchase_composite_policy(
             1, "test_owner1", 5, 10)
-        # self.assertFalse(res)
+        # self.assertFalse(res['error'])
 
         res = self.store_manager.add_policy_to_purchase_composite_policy(
             1, "test_owner1", 10, 4)
@@ -231,11 +232,12 @@ class test_StoresManager(unittest.TestCase):
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
         self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
 
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "and")
+        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1, 2], "and")
 
         cart = self.init_cart()
         res = self.store_manager.check_cart_validity(cart)
-        self.assertFalse(res['ans'])
+        res = jsons.loads(res)
+        self.assertTrue(res['error'])
 
     def test_check_cart_validity_or(self):
         self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
@@ -266,14 +268,10 @@ class test_StoresManager(unittest.TestCase):
         self.assertEqual(cart['cart_price'], 1950.0)
         cart = cart['cart_description']
         store = cart['test_store1']
-        product = store['Apple']
+        desc = store['desc']
+        product = desc['Apple']
         apple_price = product['price_after_disc']
         self.assertEqual(apple_price, 136.0)
-
-
-
-    # def test_get_updated_basket(self):
-    #     self.fail()
 
     def test_get_total_basket_tup_price(self):
         cart = self.init_cart()
@@ -291,10 +289,6 @@ class test_StoresManager(unittest.TestCase):
     def test_buy(self):
         cart = self.init_cart()
         is_apply = self.store_manager.buy(cart)
-        x=5
-
-    def test_get_store_jsn_description(self):
-        store_json = self.store_manager.get_jsn_description(1)
         x=5
 
     def test_get_product_from_store(self):
@@ -340,39 +334,25 @@ class test_StoresManager(unittest.TestCase):
     def init_discounts(self):
         for store in self.store_manager.stores.values():
             str_id = str(store.store_id)
-            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 30)
-            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5)
+            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 30, [])
+            self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 2, 2)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 2, 2, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 7, 1)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 7, 1, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 6, 3)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 6, 3, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 100, 3, 1)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 100, 3, 1, [])
 
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 1, "Apple")
+            self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 1, "Banana")
+            self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 2, "Banana")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Apple")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Carrot")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Keyboard")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 5, "Apple")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 6, "Tomato")
-
-            # self.tup_disc_prod_name_list = []
-            # self.tup_disc_prod_name_list.append((self.discount3, ["Apple", "Carrot", "Keyboard"]))
-            # self.tup_disc_prod_name_list.append((self.discount4, ["Apple", "Orange"]))
-            # self.tup_disc_prod_name_list.append((self.discount5, ["Tomato"]))
-
-            # self.discount6 = CompositeDiscount(store.store_id, "test store", datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-            #                                    LogicOperator.AND,
-            #                                    self.tup_disc_prod_name_list, [self.discount, self.discount1])
-            # self.discount7 = CompositeDiscount(store.store_id, "test store", datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-            #                                    LogicOperator.OR,
-            #                                    self.tup_disc_prod_name_list, [self.discount, self.discount2])
-            # self.discount8 = CompositeDiscount(store.store_id, "test store", datetime.datetime(2018, 6, 1), datetime.datetime(2020, 5, 17),
-            #                                    LogicOperator.XOR,
-            #                                    self.tup_disc_prod_name_list, [self.discount, self.discount5])
-
             self.store_manager.add_composite_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17),
                                                       "and", {4: ["Apple", "Carrot", "Keyboard"],
                                                                           5: ["Apple", "Orange"],
@@ -381,25 +361,25 @@ class test_StoresManager(unittest.TestCase):
     def insert_products_to_store(self, products, stores):
         for store in stores:
             for product in products:
-                store.add_product("test_owner", product.name, product.original_price, product.categories,
+                store.add_product("test_owner" + str(store.store_id), product.name, product.original_price, product.categories,
                                   product.key_words, product.amount)
 
     def init_cart(self):
         basket = Basket(1)
-        basket.products["Apple"] = (self.store_manager.get_store(1).inventory.products["Apple"], 10)
-        basket.products["Keyboard"] = (self.store_manager.get_store(1).inventory.products["Keyboard"], 5)
-        basket.products["Carrot"] = (self.store_manager.get_store(1).inventory.products["Carrot"], 1)
+        basket.products["Apple"] = 10
+        basket.products["Keyboard"] = 5
+        basket.products["Carrot"] = 1
 
         basket1 = Basket(2)
-        basket1.products["Apple"] = (self.store_manager.get_store(2).inventory.products["Apple"], 10)
-        basket1.products["Keyboard"] = (self.store_manager.get_store(2).inventory.products["Keyboard"], 10)
-        basket1.products["Carrot"] = (self.store_manager.get_store(2).inventory.products["Carrot"], 10)
-        basket1.products["Banana"] = (self.store_manager.get_store(2).inventory.products["Banana"], 10)
-        basket1.products["Orange"] = (self.store_manager.get_store(2).inventory.products["Orange"], 10)
-        basket1.products["Cucumber"] = (self.store_manager.get_store(2).inventory.products["Cucumber"], 10)
-        basket1.products["Iphone"] = (self.store_manager.get_store(2).inventory.products["Iphone"], 10)
-        basket1.products["Hard Disk"] = (self.store_manager.get_store(2).inventory.products["Hard Disk"], 10)
-        basket1.products["Tomato"] = (self.store_manager.get_store(2).inventory.products["Tomato"], 10)
+        basket1.products["Apple"] = 10
+        basket1.products["Keyboard"] = 10
+        basket1.products["Carrot"] = 10
+        basket1.products["Banana"] = 10
+        basket1.products["Orange"] = 10
+        basket1.products["Cucumber"] = 10
+        basket1.products["Iphone"] = 10
+        basket1.products["Hard Disk"] = 10
+        basket1.products["Tomato"] = 10
         cart = Cart()
         cart.baskets[1] = basket
         cart.baskets[2] = basket1

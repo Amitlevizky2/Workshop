@@ -1,4 +1,6 @@
 from datetime import date, datetime
+
+from project.domain_layer.stores_managment import Product
 from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 
@@ -94,3 +96,6 @@ class CompositeDiscount(Discount):                                    #[(Discoun
                 "Discount to check and products description": discount_to_check_and_products_description,
                 "Products In Discount": self.products_in_discount.keys(),
                 "Discount Type": self.discount_type}
+
+    def get_updated_price(self, product: Product):
+        return product.original_price

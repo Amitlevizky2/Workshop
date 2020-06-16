@@ -1,3 +1,4 @@
+from project.domain_layer.stores_managment import Product
 from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 from datetime import date, datetime
 
@@ -22,6 +23,8 @@ class ConditionalProductDiscount(Discount):
                                        self.get_product_updated_price(product_tup), self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
                     product_price_dict[
                         product_name] = new_product_tup  # (self.discount * self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
+                    print('new_product_tup:')
+                    print(new_product_tup)
                     x = 5
 
     def get_product_object(self, product):
@@ -106,6 +109,9 @@ class ConditionalProductDiscount(Discount):
 
     def get_description(self):
         return [self.id, self.discount_type, self.start, self.end, self.discount, self.products_in_discount]
+
+    def get_updated_price(self, product: Product):
+        return product.original_price
 
     def get_jsn_description(self):
         return {"Start Date": self.start.strftime('%m/%d/%Y'),

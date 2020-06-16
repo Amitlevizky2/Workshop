@@ -3,7 +3,7 @@ from project.domain_layer.stores_managment.Product import Product
 
 class Inventory:
     def __init__(self):
-        # products = {"product name",(Product,amount,price,?discount?)}
+        # products = {"product name", Product}
         self.products = {}
 
     def add_product(self, product_name, product: Product, amount=0, price=0):
@@ -45,26 +45,6 @@ class Inventory:
             self.products.pop(product_name)
             return True
         return False
-
-    def add_visible_discount_to_product(self, product_name, discount):
-        if product_name in self.products.keys():
-            self.products[product_name].add_visible_discount(discount)
-            return True
-        return False
-
-    def add_conditional_discount_to_product(self, product_name, discount):
-        if product_name in self.products.keys():
-            self.products[product_name].add_conditional_product_discount(discount)
-            return True
-        return False
-
-    def edit_visible_product_discount(self, product_name, discount_id, start_date, end_date, percent):
-        if product_name in self.products.keys():
-            self.products[product_name].edit_visible_discount(discount_id, start_date, end_date, percent)
-
-    def edit_conditional_product_discount(self, product_name, discount_id, start_date, end_date, percent, condition):
-        if product_name in self.products.keys():
-            self.products[product_name].edit_conditional_product_discount(discount_id, start_date, end_date, percent, condition)
 
     def get_description(self):
         products = {}

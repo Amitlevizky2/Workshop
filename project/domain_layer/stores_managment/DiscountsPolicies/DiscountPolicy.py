@@ -8,8 +8,7 @@ class Discount(ABC):
     _ID = 0
 
     def __init__(self, start_date, end_date, percent):
-        self.id = self._ID
-        self.__class__._ID += 1
+        self.id = -1
         self.start = start_date
         self.end = end_date
         self.discount = percent / 100
@@ -22,9 +21,9 @@ class Discount(ABC):
     def commit_discount(self, product_price_dict: dict):  # {Product, (amount, updated_price)}
         pass
 
-    @abstractmethod
-    def is_approved(self, original_price, amount):
-        pass
+    # @abstractmethod
+    # def is_approved(self, original_price, amount):
+    #     pass
 
     @abstractmethod
     def is_in_discount(self, product_name: str, product_price_dict):
@@ -41,6 +40,13 @@ class Discount(ABC):
     @abstractmethod
     def get_jsn_description(self):
         pass
+
+    @abstractmethod
+    def get_updated_price(self, product: Product):
+        pass
+
+    def set_id(self, d_id: int):
+        self.id = d_id
 
     def add_product(self, product_name: str):
         self.products_in_discount[product_name] = True
