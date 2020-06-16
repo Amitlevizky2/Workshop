@@ -1,3 +1,4 @@
+from project.domain_layer.stores_managment import Product
 from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 from datetime import date, datetime
 
@@ -108,6 +109,9 @@ class ConditionalProductDiscount(Discount):
 
     def get_description(self):
         return [self.id, self.discount_type, self.start, self.end, self.discount, self.products_in_discount]
+
+    def get_updated_price(self, product: Product):
+        return product.original_price
 
     def get_jsn_description(self):
         return {"Start Date": self.start.strftime('%m/%d/%Y'),

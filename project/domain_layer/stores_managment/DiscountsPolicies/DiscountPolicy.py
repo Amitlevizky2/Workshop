@@ -41,6 +41,10 @@ class Discount(ABC):
     def get_jsn_description(self):
         pass
 
+    @abstractmethod
+    def get_updated_price(self, product: Product):
+        pass
+
     def set_id(self, d_id: int):
         self.id = d_id
 

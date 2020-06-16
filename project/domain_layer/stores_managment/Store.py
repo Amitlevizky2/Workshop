@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies import ConditionalStoreDiscount, DiscountPolicy
@@ -247,7 +249,7 @@ class Store:
         Returns:
 
         """
-        if self.check_permission(user_name, 'update_products'):
+        if self.is_owner(user_name) or self.check_permission(user_name, 'update_products'):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount))
             return {'error': False,
@@ -278,7 +280,14 @@ class Store:
         if len(key_words) > 0:
             result = [product for product in result if any(key_word in product.key_words for key_word in key_words)]
 
+        result = deepcopy(result)
+        self.products_after_discount(result)
         return result
+
+    def products_after_discount(self, result):
+        for product in result:
+            for discount in self.discounts.values():
+                product.original_price = discount.get_updated_price(product)
 
     def buy_product(self, product_name, amount):
         return self.inventory.buy_product(product_name, amount)

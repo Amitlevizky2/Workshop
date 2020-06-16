@@ -42,7 +42,7 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.stores[i] = Store(i, "test_store" + str(i), "test_owner" + str(i))
             self.store_manager.stores[i].store_managers["test_owner"] = [Store.add_product, Store.add_visible_product_discount, Store.add_conditional_discount_to_product,
                                                                          Store.update_product]
-        self.store_manager.stores_idx = i
+            self.store_manager.stores_idx = i
 
         products = self.init_product()
         self.insert_products_to_store(products.values(), self.store_manager.stores.values())
@@ -337,15 +337,17 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 30, [])
             self.store_manager.add_visible_product_discount(store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 2, 2)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 2, 2, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 7, 1)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 7, 1, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 6, 3)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 6, 3, [])
             self.store_manager.add_conditional_discount_to_product(
-                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 100, 3, 1)
+                store.store_id, "test_owner" + str_id, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 100, 3, 1, [])
 
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 1, "Apple")
+            self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 1, "Banana")
+            self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 2, "Banana")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Apple")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Carrot")
             self.store_manager.add_product_to_discount(store.store_id, "test_owner" + str_id, 4, "Keyboard")
@@ -359,7 +361,7 @@ class test_StoresManager(unittest.TestCase):
     def insert_products_to_store(self, products, stores):
         for store in stores:
             for product in products:
-                store.add_product("test_owner", product.name, product.original_price, product.categories,
+                store.add_product("test_owner" + str(store.store_id), product.name, product.original_price, product.categories,
                                   product.key_words, product.amount)
 
     def init_cart(self):

@@ -64,6 +64,12 @@ class VisibleProductDiscount(Discount):
     def get_description(self):
         return [self.id, self.discount_type, self.start, self.end, self.discount, self.products_in_discount]
 
+    def get_updated_price(self, product: Product):
+        if product.name in self.products_in_discount.keys():
+            return (product.original_price - product.original_price * self.discount)
+        else:
+            return product.original_price
+
     def get_jsn_description(self):
         return {"Start Date": self.start.strftime('%m/%d/%Y'),
                 "End Date": self.end.strftime('%m/%d/%Y'),
