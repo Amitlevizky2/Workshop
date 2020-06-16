@@ -72,6 +72,9 @@ class ConditionalStoreDiscount(Discount):
     def get_description(self):
         return [self.id, self.discount_type, self.start, self.end, self.discount, self.min_price]
 
+    def get_updated_price(self, product: Product):
+        return product.original_price
+
     def get_jsn_description(self):
         return {"Start Date": self.start.strftime('%m/%d/%Y'),
                 "End Date": self.end.strftime('%m/%d/%Y'),
@@ -79,3 +82,6 @@ class ConditionalStoreDiscount(Discount):
                 "Min price": self.min_price,
                 "Products In Discount": self.products_in_discount.keys(),
                 "Discount Type": self.discount_type}
+
+    def is_approved(self, original_price, amount):
+        pass

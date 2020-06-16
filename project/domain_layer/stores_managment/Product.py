@@ -2,15 +2,6 @@ from functools import reduce
 import datetime
 
 
-
-
-class Discount(object):
-    def __init__(self, start_date, end_date, percent):
-        self.start = start_date
-        self.end = end_date
-        self.discount = 1 - percent / 100
-
-
 class Product:
     def __init__(self, name, price, categories, key_words, amount, store_id, orm = None):
         from project.data_access_layer.ProductORM import ProductORM
@@ -55,40 +46,14 @@ class Product:
     def get_price_before_discount(self):
         return self.original_price
 
-    def add_visible_discount(self, discount):
-        self.visible_discount.append(discount)
-
-    def add_conditional_product_discount(self, discount):
-        self.conditional_product_discount.append(discount)
-
-    # def add_conditional_store_discount(self, discount):
-    #     self.conditional_store_discount.append(discount)
-
-    def edit_visible_discount(self, discount_id, start_date, end_date, percent):
-        cur_disc = None
-        for disc in self.visible_discount:
-            if disc.id == discount_id:
-                cur_disc = disc
-
-        if cur_disc:
-            cur_disc.edit_visible_discount(start_date, end_date, percent)
-            return True
-        return False
-
     def get_price_by_amount(self, amount):
         return amount * self.original_price
 
     def reduce_amount(self, to_reduce):
         if to_reduce > self.amount:
-            return False
+            return {'error': True,
+                    'error_msg': 'There is not enough quantity in store'}
         self.amount -= to_reduce
         self.orm.update_product_amount(self.name, self.orm.store_id, self.amount)
-        x = 5
-
-    def get_jsn_description(self):
-        return {"Name": self.name,
-                "Original Price": self.original_price,
-                "Categories": self.categories,
-                "Keywords": self.key_words,
-                "Rate": self.rate,
-                "Amount": self.amount}
+        return {'error': False,
+                'data': 'Product amount reduced'}

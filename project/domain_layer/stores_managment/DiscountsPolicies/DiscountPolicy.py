@@ -21,9 +21,9 @@ class Discount(ABC):
     def commit_discount(self, product_price_dict: dict):  # {Product, (amount, updated_price)}
         pass
 
-    @abstractmethod
-    def is_approved(self, original_price, amount):
-        pass
+    # @abstractmethod
+    # def is_approved(self, original_price, amount):
+    #     pass
 
     @abstractmethod
     def is_in_discount(self, product_name: str, product_price_dict):
@@ -39,6 +39,10 @@ class Discount(ABC):
 
     @abstractmethod
     def get_jsn_description(self):
+        pass
+
+    @abstractmethod
+    def get_updated_price(self, product: Product):
         pass
 
     def set_id(self, d_id: int):

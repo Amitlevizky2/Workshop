@@ -23,7 +23,7 @@ class Initializer:
                 if ret is not None:
                     sid = ret
 
-            print(self.stores_manager.stores_manager.get_store(0).store_managers)
+            # print(self.stores_manager.stores_manager.get_store(0).store_managers)
         else:
             file1 = open('init.txt', 'w')
             L = ""
@@ -88,6 +88,22 @@ class Initializer:
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_permission_to_manager_in_store((store_id), username, manager, permission)
+        self.users_manager.logout(username)
+
+    def add_product_discount(self, username, store_id, start_date, end_date, percent, products):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        discount = self.stores_manager.add_visible_discount_to_product(store_id, username, start_date, end_date,
+                                                                       percent, products)
+        print(discount)
+        self.users_manager.logout(username)
+
+    def add_conditional_discount_to_store(self, username, store_id, start_date, end_date, percent, min_price):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        discount = self.stores_manager.add_conditional_discount_to_store(store_id, username, start_date, end_date,
+                                                                         percent, min_price)
+        print(discount)
         self.users_manager.logout(username)
 
     def add_product_to_basket(self, username, store_id, product_name, quantity ):

@@ -48,10 +48,16 @@ class UsersManagerInterface:
                 user['managed_stores'] = managed_stores
                 print("******************")
                 print(user)
-                return logged_in, {'data': user}
+                return {
+                    'error': not logged_in,
+                    'data': user}
+            return {
+                'error': True,
+                'error_msg': data['error_msg']
+            }
         else:
             print("!!!!!!!!!!!")
-            return False, {'error_msg': 'incorrect password. Try again.'}
+            return {'error': True, 'error_msg': 'incorrect password. Try again.'}
 
     def add_guest_user(self):
         return self.user_manager.add_guest_user()
@@ -81,9 +87,19 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
 # TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
-    def add_product(self, username, store_id, product_name, quantity) -> bool:
+    def add_product(self, username, store_id, product_name, quantity):
         logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product_name, quantity)
-        return self.user_manager.add_product(username, store_id, product_name, quantity)
+        valid = self.stores_manager.is_valid_amount(store_id, product_name, quantity)
+        if valid['error'] is False:
+            return {
+                'error': not self.user_manager.add_product(username, store_id, product_name, quantity),
+                'error_msg': 'error',
+                'data': 'added!'
+            }
+        return {
+            'error': True,
+            'error_msg': valid['error_msg']
+        }
 
     # TODO: remove_product receive actual product. change to product_name
     def remove_product(self, username, store_id, product, quantity):
@@ -112,7 +128,11 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases_admin(username, admin)
 
     def is_admin(self, username):
-        return self.user_manager.is_admin(username)
+        answer = self.user_manager.is_admin(username)
+        return {
+            'error': False,
+            'data': answer
+        }
 
     def add_managed_store(self, username, store_id):
         """
@@ -126,10 +146,10 @@ class UsersManagerInterface:
         return self.user_manager.remove_managed_store(username, store_id)
 
     def get_managed_stores_description(self, username):
-        ans, stores = self.user_manager.get_managed_stores(username)
-        if ans is True:
+        ans = jsons.loads(self.user_manager.get_managed_stores(username))
+        if ans['error'] is False:
             stores_des = []
-            for store in stores:
+            for store in ans['data']:
                 res_store = self.stores_manager.get_store_description(store)
                 print(res_store)
                 stores_des.append(res_store)
@@ -140,10 +160,16 @@ class UsersManagerInterface:
         else:
             return({
                 'error': True,
-                'error_msg': stores['error_msg']
+                'error_msg': ans['error_msg']
             })
 
     def get_managed_stores(self, username):
+        ans = jsons.loads(self.user_manager.get_managed_stores(username))
+        if ans['error'] is True:
+            return []
+        return ans['data']
+
+    def get_stores_managed_by_user(self, username):
         return self.user_manager.get_managed_stores(username)
 
     def check_if_registered(self, username):

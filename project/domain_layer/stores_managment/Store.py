@@ -91,7 +91,7 @@ class Store:
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
 
-                        self.__remove_owner_all_appointed(to_remove)
+                        self.__remove_owner_all_appointed(to_remove, publisher)
                         self.orm.remove_owner(to_remove)
                     return {'ans': True,
                             'desc': 'product has been removed'}

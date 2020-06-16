@@ -97,9 +97,9 @@ class UsersManager:
         if ans is True:
             if user.loggedin is True:
                 user.logout()
-                return True, {'data': self.add_guest_user()}
-            return False, {'error_msg': 'User ' + username + ' is not logged in.'}
-        return False, ans
+                return {'error': False, 'data': self.add_guest_user()}
+            return {'error': True, 'error_msg': 'User ' + username + ' is not logged in.'}
+        return {'error': True, 'error_msg': ans['error_msg']}
 
     def view_purchases(self, username):
         ans, user = self.find_user(username)
@@ -111,6 +111,7 @@ class UsersManager:
 
     def add_product(self, username, store_id, product, quantity):
         ans, user = self.find_user(username)
+
         if ans is True:
             return user.add_product(store_id, product, quantity)
         else:
@@ -169,8 +170,13 @@ class UsersManager:
     def get_managed_stores(self, username, view_format=''):
         ans, user = self.find_reg_user(username)
         if ans is True:
-            return True, (user.get_managed_store())
-        return ans, user
+            return jsons.dumps({
+                'error': False,
+                'data': user.get_managed_store()})
+        return jsons.dumps({
+            'error': True,
+            'error_msg': user
+        })
 
     def check_if_registered(self, username):
         return username in self.reg_user_list.keys()
