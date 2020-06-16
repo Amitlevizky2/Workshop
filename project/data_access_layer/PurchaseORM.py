@@ -8,10 +8,9 @@ from project.data_access_layer.ProductsInPurchasesORM import ProductsInPurchases
 
 class PurchaseORM(Base):
     __tablename__ = 'purchases'
-    id = Column(Integer, primary_key=True)
-    username = Column(String, ForeignKey('regusers.username'))
-    store_id = Column(Integer, ForeignKey('stores.id'))
-    date = Column(DateTime)
+    username = Column(String, ForeignKey('regusers.username'), primary_key=True)
+    store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
+    date = Column(DateTime, primry_key=True)
 
     def find_user_purchases(self, username):
         return session.query(PurchaseORM).filter_by(username=username)
@@ -27,7 +26,11 @@ class PurchaseORM(Base):
 
     def add_products_to_purchase(self, products):
         for product in products:
-            productinpurchase = ProductsInPurchasesORM(purchase_id=self.id, product_name=product.product_name, store_id=product.store_id, quantity = pquantity)
+            productinpurchase = ProductsInPurchasesORM(purchase_id=self.id, product_name=product.product_name, store_id=product.store_id, quantity = product.amount)
             session.add(productinpurchase)
             session.commit()
 
+    def createObject(self):
+        ##what is products?!
+        products = []
+        #purchase = Purchase()

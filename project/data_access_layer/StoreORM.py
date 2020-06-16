@@ -81,3 +81,40 @@ class StoreORM(Base):
         return session.query(PurchaseORM).filter_by(store_id=id)
 
 
+    def createObject(self):
+        from project.domain_layer.stores_managment.Store import Store
+        store = Store(self.id, self.name, self.owned_by[0].username)
+        store.discount_idx = self.discount_index
+        store.purchases_idx = self.purchase_index
+        owners = []
+        appointed_by = {}
+        for owner in self.owned_by:
+            owners.append(owner.username)
+            if owner.username not in appointed_by.keys():
+                appointed_by[owner.username] = []
+            if owner.appointed_by not in appointed_by.keys():
+                appointed_by[owner.appointed_by]=[owner.username]
+            else:
+                appointed_by[owner.appointed_by].append(owner.username)
+        store.store_owners = owners
+        managers = {}
+        for manager in self.managers:
+            name = manager.username
+            appointed_by[manager.appointed_by].append(name)
+            permissions = session.query(ManagerPermissionORM).filter_by(username=name)
+            for permission in permissions:
+                managers[name].append(permission)
+        store.store_managers = managers
+        discounts = {}
+        for discount in self.discounts:
+            discounts[discount.id]=discount.createObject()
+        store.discounts = discounts
+        ## inventory
+        from project.data_access_layer.ProductORM import ProductORM
+        inventory = {}
+        products = session.query(ProductORM).filter_by(store_id=self.id)
+        for product in products:
+            prod = product.createObject()
+            inventory[product.name] = prod
+        store.inventory.products = inventory
+        return store

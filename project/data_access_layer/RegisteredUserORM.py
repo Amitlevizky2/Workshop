@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from project.data_access_layer import Base, session,engine
 
 #from project.data_access_layer.OwnerORM import OwnerORM
-
+from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 
 
 def find_by_username(username):
@@ -35,3 +35,22 @@ class RegisteredUserORM(Base):
         notif = UserNotificationORM(username=username, notification=message)
         session.add(notif)
         session.commit()
+
+    def createObject(self):
+        user = RegisteredUser(self.username, self)
+        managed_stores = []
+        for owner in self.owns:
+            managed_stores.append(owner.store_id)
+        for manager in self.manages:
+            managed_stores.append(manager.store_id)
+        user.managed_stores = managed_stores
+        notifies =[]
+        for noti in self.notifications:
+            notifies.append(noti.notification)
+        user.notifications = notifies
+        basks = {}
+        for basket in self.baskets:
+            basks[basket.store_id] = basket.createObject()
+        user.cart.baskets = basks
+        ##ADD PURCHASE LIST?
+        return user

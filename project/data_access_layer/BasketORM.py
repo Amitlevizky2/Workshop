@@ -38,13 +38,20 @@ class BasketORM(Base):
 
 
     def remove_product_from_basket(self, product_name):
-        session.query(ProductsInBasketORM).delete.where(basket_id=self.id, product_name=product_name)
+        session.query(ProductsInBasketORM).delete.where(username= self.username, store_id=self.store_id, product_name=product_name)
         session.commit()
 
     def remove_basket(self):
-        session.query(ProductsInBasketORM).delete.where(basket_id = self.id)
-        session.query(BasketORM).delete.where(id=self.id)
+        session.query(ProductsInBasketORM).delete.where(username= self.username, store_id=self.store_id)
+        session.query(BasketORM).delete.where(username= self.username, store_id=self.store_id)
         session.commit()
 
     def createObject(self):
-        session.query(ProductsInBasketORM).filter_by()
+        from project.domain_layer.users_managment.Basket import Basket
+        basket = Basket(self.username, self.store_id)
+        products = session.query(ProductsInBasketORM).filter_by(username= self.username, store_id=self.store_id)
+        prods ={}
+        for product in products:
+            prods[product.name] = product.amount
+        basket.products = prods
+        return basket
