@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from project.data_access_layer.StoreORM import StoreORM
 from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
@@ -40,23 +42,7 @@ class Store:
             self.orm = orm
         self.publisher = None
 
-    # def __init__(self, store_id, name, store_owner, orm):
-    #     self.store_id = store_id
-    #     self.name = name
-    #     self.inventory = Inventory()
-    #     self.discounts = {}  # {discount_id: Discount}
-    #     self.discount_idx = 0
-    #     self.purchase_policies = {}  # {purchase_policy_id: PurchasePolicy}
-    #     self.purchases_idx = 0
-    #     self.store_owners = [store_owner]
-    #     self.store_managers = {}  # {manager_name:functions}
-    #     self.sales = []
-    #     self.rate = 0
-    #     self.appointed_by = {store_owner: []}
-    #     self.orm = orm
-    #     self.publisher = None
-
-    def appoint_sowner(self, owner, to_appoint):
+    def appoint_owner(self, owner, to_appoint):
         """
 
         Args:
@@ -68,12 +54,12 @@ class Store:
         """
         if owner in self.store_owners and \
                 to_appoint not in self.store_owners:
-            return {'ans': True,
-                    'desc': self.appoint_owner_helper(owner, to_appoint)}
+            return {'error': False,
+                    'data': self.appoint_owner_helper(owner, to_appoint)}
         else:
             logger.error("%s is not a store owner or %s is already owner", owner, to_appoint)
-            return {'ans': False,
-                    'desc': owner + "is not a store owner or " + to_appoint + " is already owner"}
+            return {'error': True,
+                    'error_msg': owner + "is not a store owner or " + to_appoint + " is already owner"}
 
     def appoint_owner_helper(self, owner, to_appoint):
         self.store_owners.append(to_appoint)
@@ -180,28 +166,28 @@ class Store:
         if owner in self.store_owners:
             if manager in self.appointed_by.get(owner):
                 if manager in self.store_managers.keys():
-                    permission_function = getattr(Store, permission)
-                    if permission_function not in self.store_managers.get(manager):
-                        self.store_managers[manager].append(permission_function)
+                    # permission_function = getattr(Store, permission)
+                    if permission not in self.store_managers.get(manager):
+                        self.store_managers[manager].append(permission)
                         self.orm.add_permission(manager, permission)
-                        return {'ans': True,
-                                'desc': permission + ' has been added to ' + manager}
+                        return {'error': False,
+                                'data': permission + ' has been added to ' + manager}
                     else:
-                        return {'ans': False,
-                                'desc': manager + ' has already this permission'}
+                        return {'error': True,
+                                'error_msg': manager + ' has already this permission'}
 
                 else:
-                    return {'ans': False,
-                            'desc': manager + ' is not a manager'}
+                    return {'error': True,
+                            'error_msg': manager + ' is not a manager'}
 
             else:
-                return {'ans': False,
-                        'desc': manager + ' not appointed by ' + owner}
+                return {'error': True,
+                        'error_msg': manager + ' not appointed by ' + owner}
 
         else:
             logger.error("%s is not a store owner", owner)
-            return {'ans': False,
-                    'desc': owner + ' is not an owner of this store'}
+            return {'error': True,
+                    'error_msg': owner + ' is not an owner of this store'}
 
     def remove_permission_from_manager(self, owner, manager, permission):
         """
@@ -216,30 +202,30 @@ class Store:
         """
 
         if owner in self.store_owners:
-                if manager in self.store_managers.keys():
-                    if manager in self.appointed_by[owner]:
-                        permission_function = getattr(Store, permission)
-                        if permission_function in self.store_managers.get(manager):
-                            self.store_managers[manager].remove(permission_function)
-                            self.orm.remove_permission(manager, permission)
-                            return {'ans': True,
-                                    'desc': permission + ' has been removed from ' + manager}
-
-                        else:
-                            return {'ans': False,
-                                    'desc': manager + ' dont has this permission'}
+            if manager in self.store_managers.keys():
+                if manager in self.appointed_by[owner]:
+                    # permission_function = getattr(Store, permission)
+                    if permission in self.store_managers.get(manager):
+                        self.store_managers[manager].remove(permission)
+                        self.orm.remove_permission(manager, permission)
+                        return {'error': False,
+                                'data': permission + ' has been removed from ' + manager}
 
                     else:
-                        return {'ans': False,
-                                'desc': manager + ' not appointed by ' + owner}
+                        return {'error': True,
+                                'error_msg': manager + ' dont has this permission'}
+
                 else:
-                    return {'ans': False,
-                            'desc': manager + ' is not a manager'}
+                    return {'error': True,
+                            'error_msg': manager + ' not appointed by ' + owner}
+            else:
+                return {'error': False,
+                        'error_msg': manager + ' is not a manager'}
 
         else:
             logger.error("%s is not a store owner", owner)
-            return {'ans': False,
-                    'desc': owner + 'is not an owner of this store'}
+            return {'error': True,
+                    'error_msg': owner + 'is not an owner of this store'}
 
     def appoint_manager(self, owner, to_appoint):
         """
@@ -256,15 +242,15 @@ class Store:
                 self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
                 self.appointed_by[owner].append(to_appoint)
                 self.orm.appoint_manager(owner, to_appoint)
-                return {'ans': True,
-                        'desc': to_appoint + ' has become a manager'}
+                return {'error': False,
+                        'data': to_appoint + ' has become a manager'}
             else:
-                return {'ans': False,
-                        'desc': to_appoint + ' is already a manager'}
+                return {'error': True,
+                        'error_msg': to_appoint + ' is already a manager'}
         else:
             logger.error("%s is not a store owner", owner)
-            return {'ans': False,
-                    'desc': to_appoint + ' is not an owner'}
+            return {'error': True,
+                    'error_msg': to_appoint + ' is not an owner'}
 
     def add_product(self, user_name: str, product_name: str, product_price: int, product_categories,
                     key_words: [str], amount):
@@ -281,7 +267,7 @@ class Store:
         Returns:
 
         """
-        if self.check_permission(user_name, getattr(Store, "add_product")):
+        if self.is_owner(user_name) or self.check_permission(user_name, 'update_products'):
             self.inventory.add_product(product_name,
                                        Product(product_name, product_price, product_categories, key_words, amount, self.store_id))
             return {'error': False,
@@ -291,7 +277,7 @@ class Store:
             return {'error': True,
                     'error_msg': "User don't have permission"}
 
-    def search(self, search_term: str = "", categories = [], key_words = []) -> [Product]:
+    def search(self, search_term: str = "", categories=[], key_words=[]) -> [Product]:
         """
 
         Args:
@@ -306,34 +292,40 @@ class Store:
             if search_term in product_name:
                 result.append(self.inventory.get_products().get(product_name))
 
-        if len(categories)>0:
+        if len(categories) > 0:
             result = [product for product in result if any(category in product.categories for category in categories)]
 
-        if len(key_words)>0:
+        if len(key_words) > 0:
             result = [product for product in result if any(key_word in product.key_words for key_word in key_words)]
 
+        result = deepcopy(result)
+        self.products_after_discount(result)
         return result
 
+    def products_after_discount(self, result):
+        for product in result:
+            for discount in self.discounts.values():
+                product.original_price = discount.get_updated_price(product)
+
     def buy_product(self, product_name, amount):
-        return self.inventory.buy_product(product_name, amount)
+        res = self.inventory.buy_product(product_name, amount)
+        return res
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
-        if self.check_permission(user, getattr(Store, "get_sales_history")) or is_admin:
+        if self.check_permission(user, 'view_purchase_history') or is_admin:
             self.sales = self.orm.getPurchases()
-            return {'ans': True,
-                    'sales': self.sales,
-                    'desc': ''}
-        return {'ans': False,
-                'sales': [],
-                'desc': 'User dont have the permission'}
+            return {'error': False,
+                    'data': self.sales}
+        return {'error': True,
+                'error_msg': 'User dont have the permission'}
 
     def update_product(self, user, product_name, attribute, updated):
-        if self.check_permission(user, getattr(Store, "update_product")):
-            return {'ans': self.inventory.update_product(product_name, attribute, updated),
-                    'desc': 'updated'}
+        if self.check_permission(user, "update_products"):
+            return {'error': not self.inventory.update_product(product_name, attribute, updated),
+                    'data': 'updated'}
         logger.error("%s don't have this permission", user)
-        return {'ans': False,
-                'desc': user + " don't have this permission"}
+        return {'error': True,
+                'error_msg': user + " don't have this permission"}
 
     def add_new_sale(self, purchase: Purchase, publisher: Publisher):
         """
@@ -343,6 +335,8 @@ class Store:
              purchase: Holds the store products bought by the user
          Returns:
                  True if @new_sale was added to @self.sales list, else false
+                 :param purchase:
+                 :param publisher:
          """
         if purchase is not None:
             self.sales.append(purchase)
@@ -362,84 +356,81 @@ class Store:
                 'desc': self.inventory.get_products()}
 
     def remove_product(self, product_name, username):
-        if self.is_owner(username) or self.check_permission(username, getattr(Store, "remove_product")):
-            return {'ans': self.inventory.remove_product(product_name),
-                    'desc': 'product removed'}
-        return {'ans': False,
-                'desc': username + ' do not have permission'}
+        if self.is_owner(username) or self.check_permission(username, "update_products"):
+            return {'error': not self.inventory.remove_product(product_name),
+                    'data': 'product removed'}
+        return {'error': True,
+                'error_msg': username + ' do not have permission'}
 
     def add_visible_product_discount(self, permitted_username, discount: Discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_visible_discount_to_product")):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
             return {'error': False,
-                    'data': 'visible discount has been added',
-                    'discount_id': self.discount_idx}
+                    'data': {'discount_id': self.discount_idx}}
         return {'error': True,
                 'error_msg': permitted_username + ' do not have this permission'}
 
     def add_conditional_discount_to_product(self, permitted_username, discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_product")):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
-            return {'ans': True,
-                    'desc': 'conditional discount has been added',
-                    'discount_id': self.discount_idx}
-        return {'ans': False,
-                'desc': permitted_username + ' do not have this permission'}
+            return {'error': False,
+                    'data':
+                        {'discount_id': self.discount_idx}}
+        return {'error': True,
+                'error_msg': permitted_username + ' do not have this permission'}
 
     def add_conditional_discount_to_store(self, permitted_username, discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_conditional_discount_to_store")):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
-            return {'ans': True,
-                    'desc': 'conditional discount has been added',
-                    'discount_id': self.discount_idx}
-        return {'ans': False,
-                'desc': permitted_username + ' do not have this permission'}
+            return {'error': False,
+                    'data':
+                        {'discount_id': self.discount_idx}}
+        return {'error': True,
+                'error_msg': permitted_username + ' do not have this permission'}
 
     def add_composite_discount(self, permitted_username: str, discount: Discount):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username, getattr(Store, "add_composite_discount")):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
-            return {'ans': True,
-                    'desc': 'composite discount has been added',
-                    'discount_id': self.discount_idx}
-        return {'ans': False,
-                'desc': permitted_username + ' do not have this permission'}
+            return {'error': False,
+                    'data':
+                        {'discount_id': self.discount_idx}}
+        return {'error': True,
+                'error_msg': permitted_username + ' do not have this permission'}
 
     def edit_visible_discount(self, permitted_username, discount_id, start_date,
                               end_date, percent):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username,
-                                                                      getattr(Store, "edit_visible_discount")):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount = self.discounts[discount_id]
-            return {'ans': discount.edit_discount(start_date, end_date, percent),
-                    'desc': ''}
-        return {'ans': False,
-                'desc': permitted_username + ' do not have this permission'}
+            return {'error': not discount.edit_discount(start_date, end_date, percent),
+                    'data': 'done'}
+        return {'error': True,
+                'error_msg': permitted_username + ' do not have this permission'}
 
     def edit_conditional_discount_to_product(self, permitted_username: str, discount_id: int, start_date, end_date,
-                                  percent, min_amount: int, nums_to_apply: int):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username,
-                                                                      getattr(Store, "edit_conditional_discount_to_product")):
+                                             percent, min_amount: int, nums_to_apply: int):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount = self.discounts[discount_id]
-            return {'ans': discount.edit_discount(discount_id, start_date, end_date, percent, min_amount, nums_to_apply),
-                    'desc': ''}
-        return {'ans': False,
-                'desc': permitted_username + ' do not have this permission'}
+            return {
+                'error': not discount.edit_discount(discount_id, start_date, end_date, percent, min_amount, nums_to_apply),
+                'data': 'done'}
+        return {'error': True,
+                'error_msg': permitted_username + ' do not have this permission'}
 
     def edit_conditional_discount_to_store(self, permitted_username: str, discount_id: int, start_date, end_date,
-                                  percent: int, min_price: int):
-        if self.is_owner(permitted_username) or self.check_permission(permitted_username,
-                                                                      getattr(Store, "edit_conditional_discount_to_store")):
+                                           percent: int, min_price: int):
+        if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount: ConditionalStoreDiscount = self.discounts[discount_id]
             return discount.edit_discount(discount_id, start_date, end_date, percent, min_price)
         return False
@@ -452,8 +443,9 @@ class Store:
     def get_updated_basket(self, basket):
         product_price_dict = {}
         for product in basket.values():
-
-            product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]), product[0].original_price * product[1])  #{product_name, (amount, updated_price)}
+            product_price_dict[product[0].name] = (product[0], product[1], product[0].get_price_by_amount(product[1]),
+                                                   product[0].original_price * product[
+                                                       1])  # {product_name, (amount, updated_price)}
 
         for discount in self.discounts.values():
             discount.commit_discount(product_price_dict)
@@ -461,29 +453,27 @@ class Store:
         return product_price_dict  # {product_name, (Product, amount, updated_price, original_price)}
 
     def add_product_to_discount(self, permitted_user: str, discount_id: int, product_name: str):
-        is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user,
-                                                                      getattr(Store, "add_product_to_discount"))
+        is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user, 'update_discounts')
         is_in_inventory = product_name in self.inventory.products.keys()
         discount: Discount = self.discounts[discount_id]
         if is_permitted and is_in_inventory:
             discount.add_product(product_name)
-            return {'ans': True,
-                    'desc': 'product has been added to discount'}
-        return {'ans': False,
-                'desc': permitted_user + ' do not has this permission'}
+            return {'error': False,
+                    'data': 'product has been added to discount'}
+        return {'error': True,
+                'error_msg': permitted_user + ' do not has this permission'}
 
     def remove_product_from_discount(self, permitted_user, discount_id, product_name):
-        is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user,
-                                                                      getattr(Store, "remove_product_from_discount"))
+        is_permitted = self.is_owner(permitted_user) or self.check_permission(permitted_user, 'update_discounts')
         is_in_inventory = product_name in self.inventory.products.keys()
         discount: Discount = self.discounts[discount_id]
         if is_permitted and is_in_inventory:
             discount.remove_product(product_name)
-            return {'ans': True,
-                    'desc': 'product has been removed'}
+            return {'error': False,
+                    'data': 'product has been removed'}
 
-        return {'ans': False,
-                'desc': permitted_user + ' do not has this permission'}
+        return {'error': True,
+                'error_msg': permitted_user + ' do not has this permission'}
 
     def add_purchase_store_policy(self, permitted_user, min_amount_products, max_amount_products):
         MAX_SIZE = 100000
@@ -491,7 +481,7 @@ class Store:
 
         if min_amount_products is None and max_amount_products is None:
             return {'ans': False, 'desc': "The parameters are not valid \n"}
-        if not self.check_permission(permitted_user, getattr(Store, "add_purchase_store_policy")):
+        if not self.check_permission(permitted_user, 'update_policy'):
             return {'ans': False, 'desc': "User dont have permission\n"}
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
@@ -502,30 +492,34 @@ class Store:
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 
-        return {'ans': True, 'desc': "Policy as been added"}
+        return {'error': False, 'data': "Policy as been added"}
 
     def add_purchase_product_policy(self, permitted_user, min_amount_products, max_amount_products):
         MAX_SIZE = 100000
         MIN_SIZE = 0
 
         if min_amount_products is None and max_amount_products is None:
-            return {'res': False, 'desc': "The parameters are not valid \n"}
-        if not self.check_permission(permitted_user, getattr(Store, "add_purchase_product_policy")):
-            return {'res': False, 'desc': "User dont have permission\n"}
+            return {'error': True, 'error_msg': "The parameters are not valid \n"}
+        if not self.check_permission(permitted_user, 'update_policy'):
+            return {'error': True, 'error_msg': "User dont have permission\n"}
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
 
         policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx)
+        print("add_purchase_product_policy: policy")
+        print(policy)
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 
-        return {'ans': True, 'desc': "Policy as been added"}
+        return {'error': False,
+                'data': {'msg': "Policy as been added",
+                         'policy_id': policy.id}}
 
     def add_purchase_composite_policy(self, permitted_user: str, policies: list, logic_operator: LogicOperator):
-        if not self.check_permission(permitted_user, getattr(Store, "add_purchase_composite_policy")):
-            return {'ans': False, 'desc': "User dont have permission\n"}
+        if not self.check_permission(permitted_user, 'update_policy'):
+            return {'error': True, 'error_msg': "User dont have permission\n"}
 
         self.purchases_idx += 1
 
@@ -536,37 +530,37 @@ class Store:
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 
-        return {'ans': True, 'desc': "Policy as been added"}
+        return {'error': False, 'data': "Policy as been added"}
 
     def add_policy_to_purchase_composite_policy(self, permitted_user: str, composite_id, policy_id: int):
         if composite_id not in self.purchase_policies.keys() or policy_id not in self.purchase_policies.keys():
-            return {'ans': False, 'desc': "One of the policies is not exist for this store"}
+            return {'error': True, 'error_msg': "One of the policies is not exist for this store"}
 
-        if not self.check_permission(permitted_user, getattr(Store, "add_policy_to_purchase_composite_policy")):
-            return {'ans': False, 'desc': "policy is not exist for this store\n"}
+        if not self.check_permission(permitted_user, 'update_policy'):
+            return {'error': True, 'error_msg': "policy is not exist for this store\n"}
 
         self.purchase_policies[composite_id].add_policy(self.purchase_policies[policy_id])
-        return {'ans': True, 'desc': "Policy as been added"}
+        return {'error': False, 'data': "Policy as been added"}
 
     def add_product_to_purchase_product_policy(self, policy_id, permitted_user: str, product_name: str):
         if policy_id not in self.purchase_policies.keys():
-            return {'ans': False, 'desc': "policy is not exist for this store\n"}
+            return {'error': True, 'error_msg': "policy is not exist for this store\n"}
 
-        if not self.check_permission(permitted_user, getattr(Store, "add_product_to_purchase_product_policy")):
-            return {'ans': False, 'desc': "policy is not exist for this store\n"}
+        if not self.check_permission(permitted_user, 'update_policy'):
+            return {'error': True, 'error_msg': "policy is not exist for this store\n"}
 
         self.purchase_policies[policy_id].add_product(product_name)
-        return {'ans': True, 'desc': "Product has been added to policy"}
+        return {'error': False, 'data': "Product has been added to policy"}
 
     def remove_product_from_purchase_product_policy(self, policy_id, permitted_user, product_name):
         if policy_id is None:
-            return {'ans': False, 'desc': "No such policy"}
+            return {'error': True, 'error_msg': "No such policy"}
         if policy_id not in self.purchase_policies.keys():
-            return {'ans': False, 'desc': "policy is not exist for this store\n"}
-        if not self.check_permission(permitted_user,getattr(Store, "remove_product_from_purchase_product_policy")):
-            return {'ans': False, 'desc': "User dont have permission\n"}
+            return {'error': True, 'error_msg': "policy is not exist for this store\n"}
+        if not self.check_permission(permitted_user, 'update_policy'):
+            return {'error': True, 'error_msg': "User dont have permission\n"}
         self.purchase_policies[policy_id].remove_product(product_name)
-        return {'ans': True, 'desc': product_name + " has been removed from policy \n"}
+        return {'error': False, 'data': product_name + " has been removed from policy \n"}
 
     def get_discounts(self):
         return {'ans': True,
@@ -601,11 +595,17 @@ class Store:
                 description += outcome
                 is_approved = False
 
+        for product_name in basket.keys():
+            valid = self.is_valid_amount(product_name, basket[product_name])
+            if valid['error'] is True:
+                description += valid['error_msg']
+                is_approved = False
+
         return is_approved, description
 
     def remove_purchase_policy(self, policy_id, permitted_user):
         if policy_id is None or permitted_user is None:
-            return {'ans': False, 'desc':  "The parameters are not valid \n"}
+            return {'ans': False, 'desc': "The parameters are not valid \n"}
 
         if policy_id not in self.purchase_policies.keys():
             return {'ans': False, 'desc': "No such policy in this store \n"}
@@ -633,10 +633,41 @@ class Store:
         return self.inventory.get_product(product_name)
 
     def get_store_managers(self):
-        store_managers_dict = {}
-        for manager in self.store_managers.keys():
-            store_managers_dict[manager] = []
-            for perm in self.store_managers[manager]:
-                store_managers_dict[manager].append(perm.__name__)
-        return {'ans': True,
-                'res': store_managers_dict}
+        # store_managers_dict = {}
+        # for manager in self.store_managers.keys():
+        #     store_managers_dict[manager] = []
+        #     for perm in self.store_managers[manager]:
+        #         store_managers_dict[manager].append(perm)
+        return {'error': False,
+                'data': list(self.store_managers.keys())}
+
+    def get_user_permissions(self, username):
+        permissions = {'username': username}
+        return_val = {}
+        if username in self.store_owners:
+            permissions['permissions'] = self.get_all_permissions()
+            return_val['error'] = False
+            return_val['data'] = permissions
+        else:
+            if username in self.store_managers.keys():
+                permissions['permissions'] = self.store_managers[username]
+                return_val['error'] = False
+                return_val['data'] = permissions
+            else:
+                return_val['error'] = True
+                return_val['error_msg'] = 'The user' + username + 'does not have any permissions.'
+        return return_val
+
+    def get_all_permissions(self):
+        return [
+            "update_products",
+            "update_policy",
+            "update_discounts",
+            "edit_owners",
+            "appoint_owner",
+            "edit_managers",
+            "apporint_managers",
+            "view_purchase_history"]
+
+    def is_valid_amount(self, product_name, quantity):
+        return self.inventory.is_valid_amount(product_name, quantity)
