@@ -1,3 +1,4 @@
+sqlalchemy
 jsonpickle==1.4.1
 pyspellchecker==0.5.4
 eventlet~=0.25.2
