@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
 
-
 class TestRegisteredUser(TestCase):
     def setUp(self) -> None:
         self.reg_user = RegisteredUser("user1")

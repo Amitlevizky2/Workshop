@@ -6,9 +6,9 @@ class Cart:
         self.baskets = {}
         #{store_id, basket}
 
-    def add_basket(self, store_id):
+    def add_basket(self, username, store_id):
         if store_id not in self.baskets.keys():
-            basket = Basket(store_id)
+            basket = Basket(username, store_id)
             self.baskets[store_id] = basket
             return basket
 
@@ -35,10 +35,10 @@ class Cart:
         else:
             return False
 
-    def add_product(self, store_id, product, quantity) -> bool:
+    def add_product(self, username, store_id, product, quantity) -> bool:
         basket = self.get_basket(store_id)
         if basket is None:
-            basket = self.add_basket(store_id)
+            basket = self.add_basket(username, store_id)
         basket.add_product(product, quantity)
         return True
 
