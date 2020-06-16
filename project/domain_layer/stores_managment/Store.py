@@ -290,7 +290,8 @@ class Store:
                 product.original_price = discount.get_updated_price(product)
 
     def buy_product(self, product_name, amount):
-        return self.inventory.buy_product(product_name, amount)
+        res = self.inventory.buy_product(product_name, amount)
+        return res
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, 'view_purchase_history') or is_admin:
@@ -479,19 +480,23 @@ class Store:
         MIN_SIZE = 0
 
         if min_amount_products is None and max_amount_products is None:
-            return {'res': False, 'desc': "The parameters are not valid \n"}
+            return {'error': True, 'error_msg': "The parameters are not valid \n"}
         if not self.check_permission(permitted_user, 'update_policy'):
-            return {'res': False, 'desc': "User dont have permission\n"}
+            return {'error': True, 'error_msg': "User dont have permission\n"}
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
 
         policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx)
+        print("add_purchase_product_policy: policy")
+        print(policy)
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 
-        return {'error': False, 'data': "Policy as been added"}
+        return {'error': False,
+                'data': {'msg': "Policy as been added",
+                         'policy_id': policy.id}}
 
     def add_purchase_composite_policy(self, permitted_user: str, policies: list, logic_operator: LogicOperator):
         if not self.check_permission(permitted_user, 'update_policy'):
@@ -571,6 +576,12 @@ class Store:
                 description += outcome
                 is_approved = False
 
+        for product_name in basket.keys():
+            valid = self.is_valid_amount(product_name, basket[product_name])
+            if valid['error'] is True:
+                description += valid['error_msg']
+                is_approved = False
+
         return is_approved, description
 
     def remove_purchase_policy(self, policy_id, permitted_user):
@@ -603,13 +614,13 @@ class Store:
         return self.inventory.get_product(product_name)
 
     def get_store_managers(self):
-        store_managers_dict = {}
-        for manager in self.store_managers.keys():
-            store_managers_dict[manager] = []
-            for perm in self.store_managers[manager]:
-                store_managers_dict[manager].append(perm.__name__)
+        # store_managers_dict = {}
+        # for manager in self.store_managers.keys():
+        #     store_managers_dict[manager] = []
+        #     for perm in self.store_managers[manager]:
+        #         store_managers_dict[manager].append(perm)
         return {'error': False,
-                'data': store_managers_dict}
+                'data': list(self.store_managers.keys())}
 
     def get_user_permissions(self, username):
         permissions = {'username': username}
@@ -638,3 +649,6 @@ class Store:
             "edit_managers",
             "apporint_managers",
             "view_purchase_history"]
+
+    def is_valid_amount(self, product_name, quantity):
+        return self.inventory.is_valid_amount(product_name, quantity)

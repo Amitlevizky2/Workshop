@@ -287,10 +287,16 @@ class StoresManager:
             store.add_purchase_store_policy(permitted_user, min_amount_products, max_amount_products))
 
     def add_purchase_product_policy(self, store_id: int, permitted_user: str, min_amount_products: int,
-                                    max_amount_products: int):
+                                    max_amount_products: int, products: list):
+        _min_amount_products = int(min_amount_products)
+        _max_amount_products = int(max_amount_products)
         store = self.get_store(store_id)
-        return jsons.dumps(
-            store.add_purchase_product_policy(permitted_user, min_amount_products, max_amount_products))
+        answer = store.add_purchase_product_policy(permitted_user, _min_amount_products, _max_amount_products)
+        if answer['error'] is False:
+            for product_name in products:
+                store.add_product_to_purchase_product_policy(answer['data']['policy_id'], permitted_user, product_name)
+
+        return jsons.dumps(answer)
 
     def add_purchase_composite_policy(self, store_id: int, permitted_user: str, purchase_policies_id,
                                       logic_operator_str: str):
@@ -356,16 +362,16 @@ class StoresManager:
         baskets = cart.baskets
 
         is_approved = True
-        description = {}
+        description = ''
 
         for basket in baskets.values():
             store = self.get_store(basket.store_id)
-            description[store.name] = []
+            description = ''
             basket_dict = self.get_basket_dict_purchase(store.inventory, basket)
             p_approved, outcome = store.check_basket_validity(basket_dict)
 
             if not p_approved:
-                description[store.name].append(outcome)
+                description += store.name + '\n' + outcome + '\n\n'
                 is_approved = False
 
         return jsons.dumps({'error': not is_approved,
@@ -489,4 +495,9 @@ class StoresManager:
     def get_user_permissions(self, store_id, username):
         store = self.get_store(store_id)
         return jsons.dumps(store.get_user_permissions(username))
+
+    def is_valid_amount(self, store_id, product_name, quantity):
+        store = self.get_store(store_id)
+        return store.is_valid_amount(product_name, quantity)
+
 # {product_name, (Product, amount, updated_price, original_price)}

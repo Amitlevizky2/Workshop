@@ -13,6 +13,10 @@ class PurchaseProductPolicy(PurchasePolicy):
         self.purchase_type = "Purchase Product Policy"
 
     def is_approved(self, product_price_dict: dict):    # {product_name, (Product, amount, updated_price, original)}
+        print("in is approved, product_price_dict")
+        print(product_price_dict)
+        print("products_in_policy")
+        print(self.products_in_policy)
         outcome_description = ""
         is_approved = True
         for product_name in product_price_dict.keys():
@@ -21,6 +25,8 @@ class PurchaseProductPolicy(PurchasePolicy):
                 outcome_description = outcome_description + \
                                       (self.add_fail_description(product_name, self.get_product_amount(product_tup)))
                 is_approved = False
+        print("in is approved, is_approved", is_approved)
+        print(product_price_dict)
         return is_approved, outcome_description
 
     def get_product_object(self, product):
@@ -44,7 +50,7 @@ class PurchaseProductPolicy(PurchasePolicy):
 
         desc = "{} can only be purchased in amount of minimum [{}] and maximum [{}] units, and you tried [{}]!\n".format\
             (product_name, min_string, max_string, str(product_amount))
-        return desc
+        return 'Policy:' + str(self.id) + '\n' + desc
 
     def add_product(self, product_name: str):
         self.products_in_policy[product_name] = True

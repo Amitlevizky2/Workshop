@@ -31,11 +31,12 @@ class Inventory:
 
     def buy_product(self, product_name, amount):
         if product_name not in self.products.keys():
-            return False
-        if amount > self.products.get(product_name).amount or amount < 0:
-            return False
-        self.products[product_name].reduce_amount(amount)
-        return True
+            return {'error': True,
+                    'error_msg': 'No such product: ' + product_name}
+        if amount < 0:
+            return {'error': True,
+                    'error_msg': 'amount < 0'}
+        return self.products[product_name].reduce_amount(amount)
 
     def get_products(self):
         return self.products
@@ -61,3 +62,14 @@ class Inventory:
     def get_product(self, product_name):
         product = self.products[product_name]
         return product
+
+    def is_valid_amount(self, product_name, quantity):
+        product = self.get_product(product_name)
+        valid_amount = -1
+        if product is not None:
+            valid_amount = product.amount - quantity
+        return {
+            'error': not (valid_amount >= 0),
+            'error_msg': 'Sorry, we have only {} pieces of the product {}.'.format(str(product.amount), product_name),
+            'data': 'valid amount'
+        }

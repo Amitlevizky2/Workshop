@@ -111,6 +111,7 @@ class UsersManager:
 
     def add_product(self, username, store_id, product, quantity):
         ans, user = self.find_user(username)
+
         if ans is True:
             return user.add_product(store_id, product, quantity)
         else:

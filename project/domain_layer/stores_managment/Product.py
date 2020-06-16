@@ -28,5 +28,8 @@ class Product:
 
     def reduce_amount(self, to_reduce):
         if to_reduce > self.amount:
-            return False
+            return {'error': True,
+                    'error_msg': 'There is not enough quantity in store'}
         self.amount -= to_reduce
+        return {'error': False,
+                'data': 'Product amount reduced'}

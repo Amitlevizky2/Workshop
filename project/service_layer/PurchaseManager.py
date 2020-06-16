@@ -72,6 +72,8 @@ class PurchaseManager:
                     return {'error': True,
                             'error_msg': 'User does not have enough credit!'}
             else:
+                print('description_validity')
+                print(description_validity)
                 return {'error': True,
                         'error_msg': description_validity}
         else:

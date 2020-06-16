@@ -84,16 +84,7 @@ def add_product():
     print(message)
     data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
                                      message['quantity'])
-
-    if data is True:
-        print('data is True')
-    else:
-        print('data is False')
-    return jsonify({
-        'error': not data,
-        'error_msg': 'error',
-        'data': 'added!'
-    })
+    return jsonify(data)
 
 
 @app.route('/remove_product', methods=['POST', 'GET'])
@@ -396,7 +387,7 @@ def remove_product_from_purchase_product_policy():
 @app.route('/remove_purchase_policy', methods=['POST', 'GET'])
 def remove_purchase_policy():
     message = request.get_json()
-    answer = stores_manager.remove_purchase_policy(message['store_id'], message['permitted_user'], message['policy_id'])
+    answer = stores_manager.remove_purchase_policy(message['store_id'], message['applying_username'], message['policy_id'])
 
     return answer
 
@@ -413,7 +404,7 @@ def add_product_to_purchase_product_policy():
 @app.route('/add_policy_to_purchase_composite_policy', methods=['POST', 'GET'])
 def add_policy_to_purchase_composite_policy():
     message = request.get_json()
-    answer = stores_manager.add_policy_to_purchase_composite_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_policy_to_purchase_composite_policy(message['store_id'], message['applying_username'],
                                                                     message['composite_id'],
                                                                     message['policy_id'])
     return answer
@@ -422,7 +413,7 @@ def add_policy_to_purchase_composite_policy():
 @app.route('/add_purchase_composite_policy', methods=['POST', 'GET'])
 def add_purchase_composite_policy():
     message = request.get_json()
-    answer = stores_manager.add_purchase_composite_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_purchase_composite_policy(message['store_id'], message['applying_username'],
                                                           message['purchase_policies_id'],
                                                           message['logic_operator'])
     return answer
@@ -431,16 +422,16 @@ def add_purchase_composite_policy():
 @app.route('/add_purchase_product_policy', methods=['POST', 'GET'])
 def add_purchase_product_policy():
     message = request.get_json()
-    answer = stores_manager.add_purchase_product_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_purchase_product_policy(message['store_id'], message['applying_username'],
                                                         message['min_amount_products'],
-                                                        message['max_amount_products'])
+                                                        message['max_amount_products'], message['products'])
     return answer
 
 
 @app.route('/add_purchase_store_policy', methods=['POST', 'GET'])
 def add_purchase_store_policy():
     message = request.get_json()
-    answer = stores_manager.add_purchase_store_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_purchase_store_policy(message['store_id'], message['applying_username'],
                                                       message['min_amount_products'],
                                                       message['max_amount_products'])
     return answer
@@ -509,10 +500,11 @@ def leave(data):
 
 
 @sio.on('disconnect')
-def leave(data, sid):
-    leave_room(room=data['room'])
-    users_manager.logout(data['room'])
-    print('byyyyy ' + data['room'])
+def disconnect():
+    # leave_room(room=data['room'])
+    # users_manager.logout(data['room'])
+    # print('byyyyy ' + data['room'])
+    print('maso')
 
 
 def send_notification(username, message):

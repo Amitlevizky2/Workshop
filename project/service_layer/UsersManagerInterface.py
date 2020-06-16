@@ -87,9 +87,19 @@ class UsersManagerInterface:
         return self.user_manager.view_purchases(username)
 
 # TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
-    def add_product(self, username, store_id, product_name, quantity) -> bool:
+    def add_product(self, username, store_id, product_name, quantity):
         logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product_name, quantity)
-        return self.user_manager.add_product(username, store_id, product_name, quantity)
+        valid = self.stores_manager.is_valid_amount(store_id, product_name, quantity)
+        if valid['error'] is False:
+            return {
+                'error': not self.user_manager.add_product(username, store_id, product_name, quantity),
+                'error_msg': 'error',
+                'data': 'added!'
+            }
+        return {
+            'error': True,
+            'error_msg': valid['error_msg']
+        }
 
     # TODO: remove_product receive actual product. change to product_name
     def remove_product(self, username, store_id, product, quantity):

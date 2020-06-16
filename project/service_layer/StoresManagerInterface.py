@@ -151,14 +151,16 @@ class StoresManagerInterface:
 
     def add_purchase_store_policy(self, store_id: int = None, permitted_user: str = None,
                                   min_amount_products: int = None, max_amount_products: int = None):
-        return self.stores_manager.add_purchase_store_policy(store_id, permitted_user, min_amount_products,
-                                                             max_amount_products)
+        _min_amount_products = int(min_amount_products)
+        _max_amount_products = int(max_amount_products)
+        return self.stores_manager.add_purchase_store_policy(store_id, permitted_user, _min_amount_products,
+                                                             _max_amount_products)
 
     def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None,
                                     min_amount_products: int = None,
-                                    max_amount_products: int = None):
+                                    max_amount_products: int = None, products: list = []):
         return self.stores_manager.add_purchase_product_policy(store_id, permitted_user, min_amount_products,
-                                                               max_amount_products)
+                                                               max_amount_products, products)
 
     def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
                                       purchase_policies_id=None,
@@ -203,6 +205,7 @@ class StoresManagerInterface:
 
     def get_purchase_policy_details(self, store_id: int = None, purchase_policy_id: int = None):
         return self.stores_getters.get_purchase_policy('', store_id, purchase_policy_id)
+
 
     def get_cart_description(self, cart=None):  # NEED_TO_CHECK
         return self.stores_manager.get_cart_description(cart)
@@ -317,3 +320,6 @@ class StoresManagerInterface:
 
     def get_user_permissions(self, store_id, username):
         return self.stores_manager.get_user_permissions(store_id, username)
+
+    def is_valid_amount(self, store_id, product_name, quantity):
+        return self.stores_manager.is_valid_amount(store_id, product_name, quantity)
