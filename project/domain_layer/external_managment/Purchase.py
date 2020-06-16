@@ -4,7 +4,7 @@ from project.domain_layer.stores_managment.Product import Product
 
 
 class Purchase:
-    def __init__(self, products: {str: (Product, int)}, buyer_name, store_id, purchase_id):
+    def __init__(self, products, buyer_name, store_id, purchase_id):
         self.buyer = buyer_name
         self.store_id = store_id
         self.products = products

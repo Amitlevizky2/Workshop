@@ -21,25 +21,21 @@ class Cart:
             return self.baskets[store_id]
         return None
 
-    def get_total(self):
-        total = 0
-        for basket in self.baskets.values():
-            total += basket.get_total()
-        return total
-
     def view(self):
         return self.baskets
 
-    def remove_product(self, store_id, product, quantity):
+# TODO: remove product receive actual product. change to product_name
+    def remove_product(self, store_id, product, quantity) -> bool:
         basket = self.get_basket(store_id)
         if basket is not None:
-            basket.remove_product(product, quantity)
+            removed = basket.remove_product(product, quantity)
             if basket.products == {}:
                 self.baskets.pop(store_id)
+            return removed
         else:
             return False
 
-    def add_product(self, store_id, product, quantity):
+    def add_product(self, store_id, product, quantity) -> bool:
         basket = self.get_basket(store_id)
         if basket is None:
             basket = self.add_basket(store_id)
@@ -48,3 +44,29 @@ class Cart:
 
     def clear_cart(self):
         self.baskets = {}
+
+    def merge_carts(self, other):
+        pass
+
+    def get_jsn_description(self):
+        """
+        :return: cart =
+        {
+            baskets:
+            [
+                basket1 (json),
+                basket2 (json)
+                ...
+                basketN (json)
+            ]
+
+        }
+        """
+        baskets_description = []
+        for value in self.baskets.values():
+            baskets_description.append({
+                value.get_jsn_description()
+            })
+        return {
+            'baskets': baskets_description
+        }

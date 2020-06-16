@@ -3,7 +3,7 @@ from project.domain_layer.stores_managment.Product import Product
 
 class Inventory:
     def __init__(self):
-        # products = {"product name",(Product,amount,price,?discount?)}
+        # products = {"product name", Product}
         self.products = {}
 
     def add_product(self, product_name, product: Product, amount=0, price=0):
@@ -23,7 +23,7 @@ class Inventory:
     def update_product(self, product_name, attribute, updated):
         if product_name in self.products.keys():
             if attribute == "discount":
-                self.products.get(product_name).discount.append(updated)
+                self.products.get(product_name).visible_discount.append(updated)
             else:
                 setattr(self.products.get(product_name), attribute, updated)
             return True
@@ -31,11 +31,12 @@ class Inventory:
 
     def buy_product(self, product_name, amount):
         if product_name not in self.products.keys():
-            return False
-        if amount > self.products.get(product_name).amount or amount < 0:
-            return False
-        self.products.get(product_name).amount -= amount
-        return True
+            return {'error': True,
+                    'error_msg': 'No such product: ' + product_name}
+        if amount < 0:
+            return {'error': True,
+                    'error_msg': 'amount < 0'}
+        return self.products[product_name].reduce_amount(amount)
 
     def get_products(self):
         return self.products
@@ -46,11 +47,29 @@ class Inventory:
             return True
         return False
 
-    def add_discount_to_product(self, product_name, discount):
-        if product_name in self.products.keys():
-            self.products[product_name].add_discount(discount)
-            return True
-        return False
+    def get_description(self):
+        products = {}
+        for product in self.products.values():
+            products[product.name] = [product.amount, product.original_price]
+        return products
 
-    def edit_product_discount(self, product_name, discount_id):
-        pass
+    def get_jsn_description(self):
+        products_dict_list = []
+        for tup in self.products.values():
+            products_dict_list.append(tup.get_jsn_description())
+        return products_dict_list
+
+    def get_product(self, product_name):
+        product = self.products[product_name]
+        return product
+
+    def is_valid_amount(self, product_name, quantity):
+        product = self.get_product(product_name)
+        valid_amount = -1
+        if product is not None:
+            valid_amount = product.amount - quantity
+        return {
+            'error': not (valid_amount >= 0),
+            'error_msg': 'Sorry, we have only {} pieces of the product {}.'.format(str(product.amount), product_name),
+            'data': 'valid amount'
+        }
