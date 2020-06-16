@@ -90,7 +90,7 @@ class Initializer:
         self.stores_manager.add_permission_to_manager_in_store((store_id), username, manager, permission)
         self.users_manager.logout(username)
 
-    def add_product(self, username, store_id, product_name, quantity ):
+    def add_product_to_basket(self, username, store_id, product_name, quantity ):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.users_manager.add_product(username, store_id, product_name, quantity)
