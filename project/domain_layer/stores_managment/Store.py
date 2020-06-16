@@ -15,7 +15,7 @@ from project.domain_layer.users_managment import Basket
 
 
 class Store:
-    def __init__(self, store_id, name, store_owner):
+    def __init__(self, store_id, name, store_owner, orm=None):
         self.store_id = store_id
         self.name = name
         self.inventory = Inventory()
@@ -28,18 +28,35 @@ class Store:
         self.sales = []
         self.rate = 0
         self.appointed_by = {store_owner: []}
-        self.orm = StoreORM()
-        self.orm.id = store_id
-        self.orm.name = name
-        self.orm.discount_index = 0
-        self.orm.appoint_owner(store_owner, "")
-        self.orm.purchase_index = 0
-        self.orm.add()
-
-
+        if orm is None:
+            self.orm = StoreORM()
+            self.orm.id = store_id
+            self.orm.name = name
+            self.orm.discount_index = 0
+            self.orm.appoint_owner(store_owner, "")
+            self.orm.purchase_index = 0
+            self.orm.add()
+        else:
+            self.orm = orm
         self.publisher = None
 
-    def appoint_owner(self, owner, to_appoint):
+    # def __init__(self, store_id, name, store_owner, orm):
+    #     self.store_id = store_id
+    #     self.name = name
+    #     self.inventory = Inventory()
+    #     self.discounts = {}  # {discount_id: Discount}
+    #     self.discount_idx = 0
+    #     self.purchase_policies = {}  # {purchase_policy_id: PurchasePolicy}
+    #     self.purchases_idx = 0
+    #     self.store_owners = [store_owner]
+    #     self.store_managers = {}  # {manager_name:functions}
+    #     self.sales = []
+    #     self.rate = 0
+    #     self.appointed_by = {store_owner: []}
+    #     self.orm = orm
+    #     self.publisher = None
+
+    def appoint_sowner(self, owner, to_appoint):
         """
 
         Args:
@@ -266,8 +283,7 @@ class Store:
         """
         if self.check_permission(user_name, getattr(Store, "add_product")):
             self.inventory.add_product(product_name,
-                                       Product(product_name, product_price, product_categories, key_words, amount))
-            self.orm.add_product(product_name, product_price, product_categories, key_words, amount)
+                                       Product(product_name, product_price, product_categories, key_words, amount, self.store_id))
             return {'error': False,
                     'data': "Product has been added"}
         else:
@@ -303,6 +319,7 @@ class Store:
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, getattr(Store, "get_sales_history")) or is_admin:
+            self.sales = self.orm.getPurchases()
             return {'ans': True,
                     'sales': self.sales,
                     'desc': ''}

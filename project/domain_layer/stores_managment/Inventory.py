@@ -26,6 +26,7 @@ class Inventory:
                 self.products.get(product_name).visible_discount.append(updated)
             else:
                 setattr(self.products.get(product_name), attribute, updated)
+
             return True
         return False
 
@@ -35,6 +36,7 @@ class Inventory:
         if amount > self.products.get(product_name).amount or amount < 0:
             return False
         self.products[product_name].reduce_amount(amount)
+
         return True
 
     def get_products(self):
@@ -43,6 +45,7 @@ class Inventory:
     def remove_product(self, product_name):
         if product_name in self.products.keys():
             self.products.pop(product_name)
+            self.products[product_name].orm.delete()
             return True
         return False
 

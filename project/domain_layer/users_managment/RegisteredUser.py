@@ -6,16 +6,19 @@ from project.domain_layer.users_managment.User import User
 
 class RegisteredUser(User):
 
-    def __init__(self, username):
+    def __init__(self, username, orm = None):
         super().__init__(username)
         self.username = username
         self.purchase_history = []
         self.loggedin = False
         self.managed_stores = []
         self.notifications = []
-        self.orm = RegisteredUserORM()
-        self.orm.username = username
-        self.orm.add()
+        if orm is None:
+            self.orm = RegisteredUserORM()
+            self.orm.username = username
+            self.orm.add()
+        else:
+            self.orm = orm
 
     def add_purchase(self, purchase):
         self.purchase_history.append(purchase)

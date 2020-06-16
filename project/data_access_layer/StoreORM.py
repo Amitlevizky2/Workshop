@@ -9,6 +9,7 @@ from project.data_access_layer.OwnerORM import OwnerORM
 #from project.data_access_layer.RegisteredUserORM import association_owners, association_managers
 # from project.data_access_layer.RegisteredUserORM import association_owners, association_managers
 from project.data_access_layer.DiscountORM import DiscountORM
+from project.data_access_layer.PurchaseORM import PurchaseORM
 
 
 def find_store(store_id):
@@ -22,9 +23,6 @@ class StoreORM(Base):
     name = Column(String)
     discount_index = Column(Integer)
     purchase_index = Column(Integer)
-    # owned_by = relationship("RegisteredUserORM", secondary=association_owners, back_populates="owns")
-    # managed_by = relationship("RegisteredUserORM", secondary=association_managers, back_populates="manages")
-    ## OR THIS OR THIS
     owned_by = relationship("OwnerORM", back_populates="store")
     managed_by = relationship("ManagerORM", back_populates="manages")
     discounts = relationship("DiscountORM")
@@ -78,4 +76,8 @@ class StoreORM(Base):
         self.managed_by.append(manager)
         session.add(manager)
         session.commit()
+
+    def getPurchases(self):
+        return session.query(PurchaseORM).filter_by(store_id=id)
+
 

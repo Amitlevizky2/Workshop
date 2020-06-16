@@ -30,3 +30,4 @@ class PurchaseORM(Base):
             productinpurchase = ProductsInPurchasesORM(purchase_id=self.id, product_name=product.product_name, store_id=product.store_id, quantity = pquantity)
             session.add(productinpurchase)
             session.commit()
+

@@ -2,21 +2,24 @@ from project.data_access_layer.BasketORM import BasketORM
 
 
 class Basket:
-
+#NO GOOD NEED TO CHANGE THE INCREMENTAL
     incremental = 0
     # send the initial product to init????
-    def __init__(self, username, store_id):
+    def __init__(self, username, store_id, orm=None):
         # products = {"product name",amount}
         self.products = {}
         self.store_id = store_id
         self.username = username
         if not username.startswith('guest'):
-            self.orm = BasketORM()
-            self.orm.id = Basket.incremental
-            Basket.incremental += 1
-            self.orm.username = username
-            self.orm.store_id = store_id
-            self.orm.add()
+            if orm is None:
+                self.orm = BasketORM()
+                self.orm.id = Basket.incremental
+                Basket.incremental += 1
+                self.orm.username = username
+                self.orm.store_id = store_id
+                self.orm.add()
+            else:
+                self.orm = orm
 
     # check += ???????
     def add_product(self, product_name, quantity) -> bool:
