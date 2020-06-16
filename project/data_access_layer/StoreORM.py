@@ -24,7 +24,7 @@ class StoreORM(Base):
     discount_index = Column(Integer)
     purchase_index = Column(Integer)
     owned_by = relationship("OwnerORM", back_populates="store")
-    managed_by = relationship("ManagerORM", back_populates="manages")
+    managed_by = relationship("ManagerORM", back_populates="store")
     discounts = relationship("DiscountORM")
 
 

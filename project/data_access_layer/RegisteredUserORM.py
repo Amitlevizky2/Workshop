@@ -23,7 +23,7 @@ class RegisteredUserORM(Base):
     notifications = relationship('UserNotificationORM')
 
     owns = relationship('OwnerORM', back_populates="user",foreign_keys="OwnerORM.username")
-    manages = relationship("ManagerORM", back_populates="managed_by",foreign_keys="ManagerORM.username")
+    manages = relationship("ManagerORM", back_populates="user",foreign_keys="ManagerORM.username")
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)

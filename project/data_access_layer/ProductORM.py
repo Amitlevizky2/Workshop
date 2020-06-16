@@ -22,6 +22,7 @@ class ProductORM(Base):
     price = Column(Integer)
     quantity = Column(Integer)
 
+
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
         session.add(self)
