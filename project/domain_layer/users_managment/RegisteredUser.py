@@ -22,7 +22,6 @@ class RegisteredUser(User):
 
     def add_purchase(self, purchase):
         self.purchase_history.append(purchase)
-        purchase.orm.add_products_to_purchase(purchase.products)
 
     def logout(self):
         self.loggedin = False

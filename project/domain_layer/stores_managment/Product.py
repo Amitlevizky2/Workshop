@@ -11,6 +11,7 @@ class Product:
         self.key_words = key_words
         self.rate = 0
         self.amount = amount
+        self.store_id = store_id
         if orm is None:
             self.orm = ProductORM()
             self.orm.name = name
@@ -22,15 +23,6 @@ class Product:
             self.orm.add()
         else:
             self.orm = orm
-
-    # def __init__(self, name, price, categories, key_words, amount, store_id, orm):
-    #     self.name = name
-    #     self.original_price = price
-    #     self.categories = categories
-    #     self.key_words = key_words
-    #     self.rate = 0
-    #     self.amount = amount
-    #     self.orm = orm
 
 
 

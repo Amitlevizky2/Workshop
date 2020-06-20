@@ -13,7 +13,7 @@ class StorePolicyORM(PolicyORM):
     store_id = Column(Integer, ForeignKey('policies.id'), primary_key=True)
     min_amount = Column(Integer)
     max_amount = Column(Integer)
-    policy_in = relationship("StoreORM", back_populates="policy")
+
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['storepolicies']], checkfirst=True)

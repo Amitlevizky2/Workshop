@@ -4,9 +4,10 @@ from datetime import date, datetime
 
 
 class VisibleProductDiscount(Discount):
-    def __init__(self, start_date, end_date, percent):
-        super().__init__(start_date, end_date, percent)
+    def __init__(self, start_date, end_date, percent, store_id, orm=None):
+        super().__init__(start_date, end_date, percent, store_id)
         self.discount_type = "Visible Discount"
+        self.orm = orm
         # self.products_in_discount = {}  # {product_name: bool}
 
     def commit_discount(self, product_price_dict: dict):  # {product_name, (Product, amount, updated_price, original)}
@@ -47,12 +48,15 @@ class VisibleProductDiscount(Discount):
         if start_date is not None and end_date is not None:
             if start_date > end_date:
                 return False
-        if start_date is not None and is_valid_start_date(start_date):
+        if start_date is not None and self.is_valid_start_date(start_date):
             self.start = start_date
-        if end_date is not None and is_valid_end_date(end_date):
+            self.orm.update_start(start_date)
+        if end_date is not None and self.is_valid_end_date(end_date):
             self.end = end_date
-        if percent is not None and is_valid_percent(percent):
+            self.orm.update_end(end_date)
+        if percent is not None and self.is_valid_percent(percent):
             self.discount = 1 - percent / 100
+            self.orm.update_percent(self.discount)
 
     def is_in_discount(self, product_name: str, product_price_dict: dict):
         return product_name in self.products_in_discount and \
@@ -76,3 +80,13 @@ class VisibleProductDiscount(Discount):
                 "Percent": self.discount,
                 "Products In Discount": self.products_in_discount.keys(),
                 "Discount Type": self.discount_type}
+
+    def createORM(self):
+        if self.orm is None:
+            from project.data_access_layer.VisibleProductDiscountORM import VisibleProductDiscountORM
+            self.orm = VisibleProductDiscountORM()
+            self.orm.discount_id = self.id
+            self.orm.start_date = self.start
+            self.orm.end_date = self.end
+            self.orm.percent = self.discount
+            self.orm.add()

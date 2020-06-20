@@ -191,7 +191,7 @@ class StoresManager:
     def add_visible_product_discount(self, store_id: int, username: str, start_date, end_date, percent: int, products):
         store = self.get_store(store_id)
         answer = store.add_visible_product_discount(username,
-                                                    VisibleProductDiscount(start_date, end_date, percent))
+                                                    VisibleProductDiscount(start_date, end_date, percent, store_id))
         if answer['error'] is False:
             for product_name in products:
                 self.add_product_to_discount(store_id, username, answer['data']['discount_id'], product_name)
@@ -202,7 +202,7 @@ class StoresManager:
         store = self.get_store(store_id)
         answer = store.add_conditional_discount_to_product(username, ConditionalProductDiscount(start_date, end_date,
                                                                                                 percent, min_amount,
-                                                                                                num_prods_to_apply))
+                                                                                                num_prods_to_apply, store_id))
         if answer['error'] is False:
             for product_name in products:
                 self.add_product_to_discount(store_id, username, answer['data']['discount_id'], product_name)
@@ -213,7 +213,7 @@ class StoresManager:
         store = self.get_store(store_id)
         return jsons.dumps(store.add_conditional_discount_to_store(username,
                                                                    ConditionalStoreDiscount(start_date, end_date,
-                                                                                            percent, min_price)))
+                                                                                            percent, min_price, store_id)))
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
@@ -247,7 +247,7 @@ class StoresManager:
 
         return jsons.dumps(store.add_composite_discount(username,
                                                         CompositeDiscount(start_date, end_date, logic_operator,
-                                                                          tup_list, discounts_to_apply_list)))
+                                                                          tup_list, discounts_to_apply_list, store_id)))
 
     def edit_visible_discount_to_product(self, store_id: int, username: str, discount_id: int, start_date, end_date,
                                          percent: int):

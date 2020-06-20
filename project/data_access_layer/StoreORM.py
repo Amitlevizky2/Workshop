@@ -83,7 +83,7 @@ class StoreORM(Base):
 
     def createObject(self):
         from project.domain_layer.stores_managment.Store import Store
-        store = Store(self.id, self.name, self.owned_by[0].username)
+        store = Store(self.id, self.name, self.owned_by[0].username, self)
         store.discount_idx = self.discount_index
         store.purchases_idx = self.purchase_index
         owners = []

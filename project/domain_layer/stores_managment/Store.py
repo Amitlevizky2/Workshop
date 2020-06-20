@@ -314,6 +314,7 @@ class Store:
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, 'view_purchase_history') or is_admin:
             self.sales = self.orm.getPurchases()
+            #TODO: fix purchase maybe handler maybe add function to store
             return {'error': False,
                     'data': self.sales}
         return {'error': True,
@@ -488,7 +489,7 @@ class Store:
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
 
-        policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx)
+        policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 
@@ -507,7 +508,7 @@ class Store:
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
 
-        policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx)
+        policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
         print("add_purchase_product_policy: policy")
         print(policy)
         self.purchase_policies[self.purchases_idx] = policy
@@ -526,7 +527,7 @@ class Store:
         for policy in policies:
             del self.purchase_policies[policy.id]
 
-        policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx)
+        policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx, self.store_id)
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 

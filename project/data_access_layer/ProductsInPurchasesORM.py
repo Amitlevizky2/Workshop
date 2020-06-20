@@ -1,5 +1,6 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
+from sqlalchemy.orm import relationship
 
 from project.data_access_layer import session, Base, engine
 
@@ -11,6 +12,7 @@ class ProductsInPurchasesORM(Base):
     product_name = Column(String, ForeignKey('products.username'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     quantity = Column(Integer)
+    product = relationship("ProductORM")
 
     # create products in purchaseORM and send to this function
     def add(self):

@@ -48,7 +48,7 @@ class BasketORM(Base):
 
     def createObject(self):
         from project.domain_layer.users_managment.Basket import Basket
-        basket = Basket(self.username, self.store_id)
+        basket = Basket(self.username, self.store_id, self)
         products = session.query(ProductsInBasketORM).filter_by(username= self.username, store_id=self.store_id)
         prods ={}
         for product in products:

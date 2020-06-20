@@ -5,10 +5,11 @@ from project.domain_layer.stores_managment.Product import Product
 
 
 class ConditionalStoreDiscount(Discount):
-    def __init__(self, start_date, end_date, percent, min_price):
-        super().__init__(start_date, end_date, percent)
+    def __init__(self, start_date, end_date, percent, min_price, store_id, orm=None):
+        super().__init__(start_date, end_date, percent, store_id)
         # self.products_in_discount = {}  # {product_name: bool}
         self.min_price = min_price
+        self.orm = orm
         self.discount_type = "Conditional Store Discount"
 
     def commit_discount(self, product_price_dict: dict):
@@ -50,15 +51,19 @@ class ConditionalStoreDiscount(Discount):
                 return False
         if start_date is not None and start_date > datetime.today():
             self.start = start_date
+            self.orm.update_start(start_date)
             is_edited = True
         if end_date is not None and end_date > self.start and end_date > datetime.today():
             self.end = end_date
+            self.orm.update_end(end_date)
             is_edited = True
         if percent is not None and 0 <= percent <= 100:
             self.discount = percent / 100
+            self.orm.update_prcent(self.discount)
             is_edited = True
         if min_price is not None and 0 < min_price:
             self.min_price = min_price
+            self.orm.Update_min_price(min_price)
             is_edited = True
 
         return is_edited
@@ -85,3 +90,18 @@ class ConditionalStoreDiscount(Discount):
 
     def is_approved(self, original_price, amount):
         pass
+
+    def createORM(self):
+        if self.orm is None:
+            from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountsORM
+            self.orm = ConditionalStoreDiscountsORM()
+            self.orm.discount_id= self.id
+            self.orm.start_date = self.start
+            self.orm.end_date = self.end
+            self.orm.percent = self.discount
+            self.orm.min_price = self.min_price
+            for prod in self.products_in_discount.keys():
+                from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
+                pidorm = ProductsInDiscountsORM(discount_id=self.discount_id, product_name=prod, store_id=self.store_id)
+                pidorm.add()
+            self.orm.add()

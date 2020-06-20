@@ -1,5 +1,5 @@
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String
+from sqlalchemy import Table, Column, Integer, ForeignKey, String, exc
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session,engine
@@ -27,8 +27,13 @@ class RegisteredUserORM(Base):
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        try:
+            session.add(self)
+            session.commit()
+        except exc.SQLAlchemyError:
+            pass
+            #try catch what do i do with catch
+
 
     def add_notification(self, username, message):
         from project.data_access_layer.UserNotificationsORM import UserNotificationORM

@@ -1,8 +1,9 @@
+from project.data_access_layer.StorePolicyORM import StorePolicyORM
 from project.domain_layer.stores_managment.PurchasesPolicies.PurchasePolicy import PurchasePolicy
 
 
 class PurchaseStorePolicy(PurchasePolicy):
-    def __init__(self, min_amount_products, max_amount_products, id: int):
+    def __init__(self, min_amount_products, max_amount_products, id: int, store_id, orm=None):
         super().__init__()
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
@@ -10,7 +11,15 @@ class PurchaseStorePolicy(PurchasePolicy):
         # self.products_int_policy = {}  # {product_name, bool}
         self.MAX_SIZE = 100000
         self.MIN_SIZE = 0
+        self.store_id =store_id
         self.purchase_type = "Purchase Store Policy"
+        if orm is None:
+            self.orm = StorePolicyORM()
+            self.orm.policy_id = id
+            self.orm.store_id = store_id
+            self.orm.min_amount = min_amount_products
+            self.orm.max_amount = max_amount_products
+            self.orm.add()
 
     def is_approved(self, product_price_dict: dict):    #    {"product name",(Product, amount)}
         outcome_description = ""
