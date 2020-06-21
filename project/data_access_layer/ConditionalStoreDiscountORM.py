@@ -16,10 +16,11 @@ class ConditionalStoreDiscountORM(DiscountORM):
     }
 
     def Update_min_price(self, min):
-        update('conditionalstorediscount').where(discount_id=self.discount_id).values(min_price=min)
+        self.min_price =min
         session.commit()
 
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['conditionalstoredicounts']], checkfirst=True)
         session.add(self)
         session.commit()

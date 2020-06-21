@@ -16,6 +16,7 @@ class VisibleProductDiscountORM(DiscountORM):
     }
 
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscounts']], checkfirst=True)
         session.add(self)
         session.commit()

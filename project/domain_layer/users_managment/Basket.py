@@ -25,7 +25,7 @@ class Basket:
             amount += quantity
             self.products[product_name] = amount
             if not self.username.startswith('guest'):
-                self.orm.update_basket_product_quantity(product_name, quantity)
+                self.orm.update_basket_product_quantity(product_name, amount)
         else:
             self.products[product_name] = quantity
             if not self.username.startswith('guest'):

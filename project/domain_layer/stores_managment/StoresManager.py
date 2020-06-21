@@ -289,6 +289,7 @@ class StoresManager:
         _min_amount_products = int(min_amount_products)
         _max_amount_products = int(max_amount_products)
         store = self.get_store(store_id)
+        print("GOT HERE MOTHERFUCKERRRRRRRRR3")
         answer = store.add_purchase_product_policy(permitted_user, _min_amount_products, _max_amount_products)
         if answer['error'] is False:
             for product_name in products:

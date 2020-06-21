@@ -4,7 +4,7 @@ from project.domain_layer.stores_managment.PurchasesPolicies.PurchasePolicy impo
 
 class PurchaseProductPolicy(PurchasePolicy):
     def __init__(self, min_amount_products, max_amount_products, id, store_id, orm = None):
-        super().__init__()
+        super().__init__(id, store_id)
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
         self.id = id
@@ -15,10 +15,10 @@ class PurchaseProductPolicy(PurchasePolicy):
         self.purchase_type = "Purchase Product Policy"
         if orm is None:
             self.orm = ProductPoliciesORM()
-            self.orm.policy_id = self.id
+            self.orm.policy_id = id
             self.orm.store_id = self.store_id
-            self.orm.max_amount=max_amount_products
-            self.orm.min_amout = min_amount_products
+            self.orm.max_amount = max_amount_products
+            self.orm.min_amount = min_amount_products
             self.orm.add()
         else:
             self.orm = orm

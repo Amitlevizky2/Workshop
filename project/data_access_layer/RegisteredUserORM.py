@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from project.data_access_layer import Base, session,engine
 
 #from project.data_access_layer.OwnerORM import OwnerORM
-from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
+
 
 
 def find_by_username(username):
@@ -21,9 +21,9 @@ class RegisteredUserORM(Base):
     username = Column(String, primary_key=True)
     baskets = relationship('BasketORM', back_populates="user")
     notifications = relationship('UserNotificationORM')
+    owns = relationship('OwnerORM', foreign_keys="OwnerORM.username")
+    manages = relationship("ManagerORM", foreign_keys="ManagerORM.username")
 
-    owns = relationship('OwnerORM', back_populates="user",foreign_keys="OwnerORM.username")
-    manages = relationship("ManagerORM", back_populates="user",foreign_keys="ManagerORM.username")
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
@@ -42,6 +42,7 @@ class RegisteredUserORM(Base):
         session.commit()
 
     def createObject(self):
+        from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
         user = RegisteredUser(self.username, self)
         managed_stores = []
         for owner in self.owns:

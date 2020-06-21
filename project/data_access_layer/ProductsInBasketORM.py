@@ -12,8 +12,8 @@ class ProductsInBasketORM(Base):
     product_name = Column(String, ForeignKey('products.name'), primary_key=True)
     quantity = Column(Integer)
 
-    def update_quantity(self, id, product_name, amount):
-        update('productsinbaskets').where(basket_id=id, product_name=product_name).values(quantity=amount)
+    def update_quantity(self, amount):
+        self.quantity = amount
         session.commit()
 
     def add(self):

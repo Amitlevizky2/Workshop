@@ -2,7 +2,7 @@ from datetime import datetime
 
 import jsons
 
-from project.data_access_layer.PurchaseORM import PurchaseORM
+
 from project.domain_layer.stores_managment.Product import Product
 
 
@@ -14,6 +14,7 @@ class Purchase:
         self.purchase_id = purchase_id
         self.date = datetime.now()
         if orm is None:
+            from project.data_access_layer.PurchaseORM import PurchaseORM
             self.orm = PurchaseORM()
             self.orm.username = buyer_name
             self.orm.id = purchase_id

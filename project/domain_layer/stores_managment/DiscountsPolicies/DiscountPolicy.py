@@ -72,7 +72,8 @@ class Discount(ABC):
 
     def is_valid_percent(self, percent):
         return 0 <= percent <= 100
-
+#datetime.strptime(string, "%Y-%m-%d") from string to date time
+#date
     def createORM(self):
         if self.orm is None:
             self.orm = DiscountORM()

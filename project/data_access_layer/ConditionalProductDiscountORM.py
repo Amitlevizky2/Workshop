@@ -18,16 +18,17 @@ class ConditionalProductDiscountsORM(DiscountORM):
     }
 
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['conditionalproductdiscounts']], checkfirst=True)
         session.add(self)
         session.commit()
 
     def update_min_amount(self, min):
-        update('conditionalproductdiscounts').where(discount_id=self.discount_id).values(min_amount=min)
+        self.min_amount = min
         session.commit()
 
     def update_num_to_apply(self, num):
-        update('conditionalproductdiscounts').where(discount_id=self.discount_id).values(num_products_to_apply=num)
+        self.num_products_to_apply = num
         session.commit()
 
     def createObject(self):

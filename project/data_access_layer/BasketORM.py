@@ -1,5 +1,6 @@
+
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String
+from sqlalchemy import Table, Column, Integer, ForeignKey, String, update, text
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine
@@ -30,7 +31,9 @@ class BasketORM(Base):
     #add commit
     #update quantity for adding and removing
     def update_basket_product_quantity(self, product_name, amount):
-        ProductsInBasketORM.update_quantity(self.id, product_name, amount)
+        piborm = session.query(ProductsInBasketORM).filter_by(username=self.username, store_id=self.store_id, product_name=product_name).first()
+        piborm.update_quantity(amount)
+       # ProductsInBasketORM.update_quantity(self.username, self.store_id, product_name, amount)
 
     def update_basket_add_product(self, product_name, amount):
         productinbasket = ProductsInBasketORM(username= self.username, store_id=self.store_id, product_name = product_name, quantity = amount)

@@ -3,19 +3,19 @@ from project.domain_layer.stores_managment.PurchasesPolicies.PurchasePolicy impo
 
 
 class PurchaseStorePolicy(PurchasePolicy):
-    def __init__(self, min_amount_products, max_amount_products, id: int, store_id, orm=None):
-        super().__init__()
+    def __init__(self, min_amount_products, max_amount_products, p_id: int, store_id, orm=None):
+        super().__init__(p_id, store_id)
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
         self.id = id
         # self.products_int_policy = {}  # {product_name, bool}
         self.MAX_SIZE = 100000
         self.MIN_SIZE = 0
-        self.store_id =store_id
+        self.store_id = store_id
         self.purchase_type = "Purchase Store Policy"
         if orm is None:
             self.orm = StorePolicyORM()
-            self.orm.policy_id = id
+            self.orm.policy_id = p_id
             self.orm.store_id = store_id
             self.orm.min_amount = min_amount_products
             self.orm.max_amount = max_amount_products

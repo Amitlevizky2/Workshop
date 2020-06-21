@@ -24,7 +24,7 @@ class StoreORM(Base):
     discount_index = Column(Integer)
     purchase_index = Column(Integer)
     owned_by = relationship("OwnerORM", back_populates="store")
-    managed_by = relationship("ManagerORM", back_populates="store")
+    managed_by = relationship("ManagerORM")
     discounts = relationship("DiscountORM")
 
 
@@ -33,7 +33,7 @@ class StoreORM(Base):
         session.add(self)
         session.commit()
 
-    def appoint_owner(self, owner, appointed_by):
+    def appoint_owner(self,  appointed_by,owner):
         Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)

@@ -14,6 +14,7 @@ class Initializer:
         self.users_manager.set_stores_manager(self.stores_manager)
         self.stores_manager.bound_publisher(self.publisher)
         self.bound_managers()
+        print(path.exists("../../tradeSystem.db"))
         if path.exists("init.txt"):
             file1 = open('init.txt', 'r')
             Lines = file1.readlines()
@@ -110,4 +111,24 @@ class Initializer:
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.users_manager.add_product(username, store_id, product_name, quantity)
+        self.users_manager.logout(username)
+
+    def add_purchase_product_policy_to_store(self, username, store_id, min_amount_products, max_amount_products, products):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        self.stores_manager.add_purchase_product_policy(store_id, username, min_amount_products, max_amount_products, products)
+        print("GOT HERE MOTHERFUCKERRRRRRRRR1")
+        self.users_manager.logout(username)
+
+    def add_purchase_store_policy(self, username, store_id, min_amount_products, max_amount_products):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+
+        self.stores_manager.add_purchase_store_policy(store_id, username, min_amount_products, max_amount_products)
+        self.users_manager.logout(username)
+
+    def add_conditional_product_discount(self, username, store_id, start_date, end_date, percent, min_amount, num_prods_to_apply, products):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        self.stores_manager.add_conditional_discount_to_product(store_id, username, start_date, end_date, percent, min_amount, num_prods_to_apply, products)
         self.users_manager.logout(username)

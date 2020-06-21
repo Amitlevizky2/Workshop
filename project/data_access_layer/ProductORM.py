@@ -32,15 +32,17 @@ class ProductORM(Base):
         return session.query(ProductORM).filter_by(name=name, store_id=store_id).first()
 
     def update_product_amount(self, name, store_id, amount):
-        update('products').where(name=name, store_id=store_id).value(quantity=amount)
+        self.quantity = amount
+        session.commit()
 
-    def update_product(self, name, store_id, attribute, updated):
+    def update_product(self, attribute, updated):
         if attribute == self.categories:
-            update('products').where(name=name, store_id=store_id).value(categories=updated)
+            self.categories = updated
         if attribute == self.key_words:
-            update('products').where(name=name, store_id=store_id).value(key_words=updated)
+            self.key_words = updated
         if attribute == self.price:
-            update('products').where(name=name, store_id=store_id).value(price=updated)
+            self.price = updated
+        session.commit()
 
     def delete(self):
         session.query(ProductORM).delete.where(name=self.name, store_id=self.store_id)

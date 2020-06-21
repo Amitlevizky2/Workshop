@@ -1,5 +1,5 @@
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String,update
+from sqlalchemy import Table, Column, Integer, ForeignKey, String, update, DateTime
 from sqlalchemy.orm import relationship
 from datetime import  datetime
 
@@ -17,8 +17,8 @@ class DiscountORM(Base):
     #maybenot needed?
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     #MODIFY TO STRING
-    start_date = Column(String)
-    end_date = Column(String)
+    start_date = Column(DateTime)
+    end_date = Column(DateTime)
     percent = Column(Integer)
     products = relationship("ProductsInDiscountsORM")
     discriminator = Column('type', String(50))
@@ -29,21 +29,21 @@ class DiscountORM(Base):
     }
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         session.add(self)
         session.commit()
 
 
-    def update_precent(self, precent):
-        update('discounts').where(discount_id=self.discount_id).values(precent=precent)
+    def update_precent(self, percent):
+        self.percent = percent
         session.commit()
 
     def update_start(self, start):
-        update('discounts').where(discount_id=self.discount_id).values(stat_date=start)
+        self.start_date = start
         session.commit()
 
     def update_end(self, end):
-        update('discounts').where(discount_id=self.discount_id).values(end_date=end)
+        self.end_date = end
         session.commit()
 
     def add_product(self, product_name):

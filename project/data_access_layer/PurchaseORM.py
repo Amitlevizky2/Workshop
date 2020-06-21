@@ -14,6 +14,7 @@ class PurchaseORM(Base):
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     date = Column(DateTime, primary_key=True)
     id = Column(Integer)
+    products = Column(String)
 
 
 #create purchaseORM and send to this function

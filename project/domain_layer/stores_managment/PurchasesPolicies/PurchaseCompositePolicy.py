@@ -1,17 +1,18 @@
-from project.data_access_layer.CompositePolicyORM import CompositePolicyORM
+
 from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.PurchasesPolicies.PurchasePolicy import PurchasePolicy
 
 
 class PurchaseCompositePolicy(PurchasePolicy):
     def __init__(self, purchase_policies: list, logic_operator: LogicOperator, id: int, store_id, orm=None):
-        super().__init__()
+        super().__init__(id, store_id)
         self.logic_operator = logic_operator
         self.purchase_policies = purchase_policies
         self.id = id
         self.purchase_type = "Purchase Composite Policy"
         self.store_id=store_id
         if orm is None:
+            from project.data_access_layer.CompositePolicyORM import CompositePolicyORM
             self.orm = CompositePolicyORM()
             self.orm.policy_id = self.id
             self.orm.store_id = self.store_id

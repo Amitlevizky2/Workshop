@@ -321,15 +321,15 @@ class test_StoresManager(unittest.TestCase):
     #     self.fail()
 
     def init_product(self):
-        return {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 30),
-                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10),
-                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10),
-                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10),
-                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10),
-                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10),
-                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10),
-                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10),
-                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10)}
+        return {"Apple": Product("Apple", 20, ["Food"], ["Fruits"], 30, 0),
+                                         "Banana": Product("Banana", 20, ["Food"], ["Fruits"], 10, 0),
+                                         "Orange": Product("Orange", 20, ["Food"], ["Fruits"], 10, 0),
+                                         "Tomato": Product("Tomato", 20, ["Food"], ["Vegetables"], 10, 0),
+                                         "Cucumber": Product("Cucumber", 20, ["Food"], ["Vegetables"], 10, 0),
+                                         "Carrot": Product("Carrot", 20, ["Food"], ["Vegetables"], 10, 0),
+                                         "Iphone": Product("Iphone", 20, ["Electronics"], ["Computers"], 10, 0),
+                                         "Hard Disk": Product("Hard Disk", 20, ["Electronics"], ["Computers"], 10, 0),
+                                         "Keyboard": Product("Keyboard", 20, ["Electronics"], ["Computers"], 10, 0)}
 
     def init_discounts(self):
         for store in self.store_manager.stores.values():

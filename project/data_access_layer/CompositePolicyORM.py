@@ -18,13 +18,14 @@ policies_in_composite_association = Table('Policies_in_Composite', Base.metadata
 
 class CompositePolicyORM(PolicyORM):
     __tablename__ = 'CompositePolicies'
-    id = Column(Integer, ForeignKey('discounts.id'), primary_key=True)
-    store_id = Column(Integer, ForeignKey('policies.id'), primary_key=True)
+    policy_id = Column(Integer, ForeignKey('policies.policy_id'), primary_key=True)
+    store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     logic_operator = Column(Integer)
     policies_in_here = relationship("PoliciesORM", secondary=policies_in_composite_association)
 
-    def change_logic_operaor(self, id,store_id, lo):
-        update('CompositeDiscounts').where(id=id, store_id=store_id).value(logic_operator=lo)
+    def change_logic_operaor(self, lo):
+        self.logic_operator = lo
+        session.commit()
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['CompositePolicies']], checkfirst=True)

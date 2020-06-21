@@ -63,7 +63,11 @@ class Handler:
         return session.query(PurchaseORM).filter_by(store_id=store_id)
 
 
+#TODO:
     #def buy(self):
 
 
     #def login(self,username):
+
+
+    #def viewcart(self, username):

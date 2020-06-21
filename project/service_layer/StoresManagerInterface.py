@@ -159,6 +159,7 @@ class StoresManagerInterface:
     def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None,
                                     min_amount_products: int = None,
                                     max_amount_products: int = None, products: list = []):
+        print("GOT HERE MOTHERFUCKERRRRRRRRR2")
         return self.stores_manager.add_purchase_product_policy(store_id, permitted_user, min_amount_products,
                                                                max_amount_products, products)
 

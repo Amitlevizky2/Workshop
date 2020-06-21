@@ -63,6 +63,8 @@ class Store:
 
     def appoint_owner_helper(self, owner, to_appoint):
         self.store_owners.append(to_appoint)
+        print("**********************************")
+        print("me:"+owner +" to_appoint "+to_appoint)
         self.orm.appoint_owner(owner, to_appoint)
         self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
@@ -488,10 +490,11 @@ class Store:
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
-
+        print("GOT HERE MOTHERFUCKERRRRRRRRR")
+        print("id is: " +str(self.purchases_idx))
         policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
         self.purchase_policies[self.purchases_idx] = policy
-        policy.set_id(self.purchases_idx)
+        #policy.set_id(self.purchases_idx)
 
         return {'error': False, 'data': "Policy as been added"}
 
@@ -507,7 +510,7 @@ class Store:
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
-
+        print("GOT HERE MOTHERFUCKERRRRRRRRR4")
         policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
         print("add_purchase_product_policy: policy")
         print(policy)

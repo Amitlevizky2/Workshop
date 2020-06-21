@@ -2,10 +2,17 @@ from abc import ABC, abstractmethod
 
 
 class PurchasePolicy(ABC):
-    def __init__(self, store_id, orm = None):
+    def __init__(self, p_id, store_id, orm = None):
         self.purchase_type = ""
-        self.id = -1
+        self.id = p_id
         self.store_id = store_id
+        # if orm is None:
+        #     from project.data_access_layer.PolicyORM import PolicyORM
+        #     self.orm = PolicyORM()
+        #     self.orm.p_id = p_id
+        #     self.orm.store_id = self.store_id
+        #     self.orm.add()
+        # else:
         self.orm = orm
 
     @abstractmethod
@@ -28,6 +35,6 @@ class PurchasePolicy(ABC):
         if self.orm is None:
             from project.data_access_layer.PolicyORM import PolicyORM
             self.orm = PolicyORM()
-            self.orm.id = self.id
+            self.orm.policy_id = self.id
             self.orm.store_id = self.store_id
 

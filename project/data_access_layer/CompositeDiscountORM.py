@@ -8,12 +8,7 @@ from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 from project.data_access_layer import Base, session, engine
 
-predicates_association = Table('Predicates', Base.metadata,
-                               Column('composite_discount_id', Integer, ForeignKey('CompositeDiscounts.discount_id')),
-                               Column('discount_id', Integer, ForeignKey('discounts.discount_id')),
-                               Column('product_name', String, ForeignKey('products.name')),
-                               Column('store_id', Integer, ForeignKey('stores.id'))
-                               )
+
 
 to_apply_association = Table('To_apply', Base.metadata,
                              Column('composite_discount_id', Integer, ForeignKey('CompositeDiscounts.discount_id')),
@@ -29,18 +24,19 @@ class CompositeDiscountORM(DiscountORM):
     __tablename__ = 'CompositeDiscounts'
     discount_id = Column(Integer, ForeignKey('discounts.id'), primary_key=True)
     logic_operator = Column(Integer)
-    products_in_predicates = relationship("ProductInDiscountsORM", secondary=predicates_association)
+    products_in_predicates = relationship("PredicateORM")
     discounts_to_apply = relationship("DiscountORM", secondary=to_apply_association)
     __mapper_args__ = {
         'polymorphic_identity': 'CompositeDiscount'
     }
 
     def change_logic_operaor(self, lo):
-        update('CompositeDiscounts').where(discount_id = self.discount_id).value(logic_operator = lo)
+        self.logic_operator = lo
         session.commit()
 
 
     def add(self):
+        Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['CompositeDiscounts']], checkfirst=True)
         session.add(self)
         session.commit()
@@ -48,12 +44,22 @@ class CompositeDiscountORM(DiscountORM):
     def createObject(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import \
             CompositeDiscount
-        compodis = CompositeDiscount(self.start_date, self.end_date, self.percent, self.min_amount, self.num_products_to_apply, self.store_id, self)
+        to_apply =[]
+        for dis in self.discounts_to_apply:
+            real = dis.createObject()
+            to_apply.append(to_apply)
+        pred = []
+        pred_map_discount={}
+        pred_map_prods={}
+        for pre in self.products_in_predicates:
+            real_discount = pre.discount.createObject()
+            if real_discount.discount_id not in pred_map_discount.keys():
+                pred_map_discount[real_discount.discount_id] = real_discount
+            pred_map_prods[real_discount.discount_id].append(pre.product_name)
+        for dis_id in pred_map_discount.keys():
+            pred.append((pred_map_discount[dis_id], pred_map_prods[dis_id]))
+        compodis = CompositeDiscount(self.start_date, self.end_date, self.logic_operator, pred, to_apply, self.store_id, self)
         compodis.set_id(self.discount_id)
-        prods = {}
-        for pidorm in self.products:
-            prods[pidorm.product_name] = True
-        compodis.products_in_discount = prods
         return compodis
 
     #TODO: check assosicaiton tables or change to assosication objects

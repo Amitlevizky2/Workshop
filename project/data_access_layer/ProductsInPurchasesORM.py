@@ -9,7 +9,7 @@ from project.data_access_layer import session, Base, engine
 class ProductsInPurchasesORM(Base):
     __tablename__ = 'productsinpurcases'
     purchase_id = Column(Integer, ForeignKey('purchases.id'), primary_key=True)
-    product_name = Column(String, ForeignKey('products.username'), primary_key=True)
+    product_name = Column(String, ForeignKey('products.name'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     quantity = Column(Integer)
     product = relationship("ProductORM")

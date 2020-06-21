@@ -96,6 +96,7 @@ class ConditionalStoreDiscount(Discount):
             from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountsORM
             self.orm = ConditionalStoreDiscountsORM()
             self.orm.discount_id= self.id
+            self.orm.store_id = self.store_id
             self.orm.start_date = self.start
             self.orm.end_date = self.end
             self.orm.percent = self.discount
