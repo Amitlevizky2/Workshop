@@ -111,17 +111,18 @@ class CompositeDiscount(Discount):                                    #[(Discoun
             self.orm.start_date = self.start
             self.orm.end_date = self.end
             self.orm.percent = self.discount
-            self.orm.logic_operator = self.logic_operator
+            self.orm.logic_operator = str(self.logic_operator)
             for prod in self.products_in_discount.keys():
                 from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
-                pidorm = ProductsInDiscountsORM(discount_id=self.discount_id, product_name=prod, store_id=self.store_id)
+                pidorm = ProductsInDiscountsORM(discount_id=self.id, product_name=prod, store_id=self.store_id)
                 pidorm.add()
             for dis in self.discounts_to_apply:
-                disorm = dis.createORM()
-                self.orm.discounts_to_apply.append(disorm)
+                from project.data_access_layer.DiscountToApplyORM import DiscountToApplyORM
+                dtoaorm = DiscountToApplyORM(composite_discount_id = self.id, discount_id=dis.id, store_id=self.store_id)
+                dtoaorm.add()
             for tup in self.cond_prod_tup_list:
                 for p in tup[1]:
                     from project.data_access_layer.PredicateORM import PredicateORM
-                predorm = PredicateORM(composite_discount_id=self.id, discount_id=tup[0].id, product_name=p, store_id=self.store_id)
-                predorm.add()
+                    predorm = PredicateORM(composite_discount_id=self.id, discount_id=tup[0].id, product_name=p, store_id=self.store_id)
+                    predorm.add()
             self.orm.add()

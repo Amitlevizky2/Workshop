@@ -237,13 +237,14 @@ class StoresManager:
             discount: Discount = store.discounts[discount_id]
             products_to_check_list = discounts_products_dict[discount_id]
             tup_list.append((discount, products_to_check_list))  # (Discount, (products_names))
-
+        print("MAYBE HEREEEEE")
         for discount_id in discounts_to_apply_id:
             if discount_id not in store.discounts.keys():
                 return jsons.dumps(False)
             discount = store.discounts[discount_id]
             discounts_to_apply_list.append(discount)
             del store.discounts[discount_id]
+        print("MAYBE HEREEEEE2")
 
         return jsons.dumps(store.add_composite_discount(username,
                                                         CompositeDiscount(start_date, end_date, logic_operator,

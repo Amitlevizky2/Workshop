@@ -11,6 +11,7 @@ from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscounts
 class VisibleProductDiscountORM(DiscountORM):
     __tablename__ = 'visibleProductDiscounts'
     discount_id = Column(Integer, ForeignKey("discounts.discount_id"), primary_key=True)
+    store_id = Column(Integer, ForeignKey("stores.id"), primary_key=True)
     __mapper_args__ = {
         'polymorphic_identity': 'Visible Discount'
     }

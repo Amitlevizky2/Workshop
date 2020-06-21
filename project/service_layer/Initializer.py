@@ -133,3 +133,10 @@ class Initializer:
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_conditional_discount_to_product(store_id, username, start_date, end_date, percent, min_amount, num_prods_to_apply, products)
         self.users_manager.logout(username)
+
+    def add_composite_discount(self, store_id, username, start_date, end_date, logic_opr, discounts_preds, discounts_to_apply):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        self.stores_manager.add_composite_discount(store_id, username, start_date, end_date, logic_opr,
+                                                   discounts_preds, discounts_to_apply)
+        self.users_manager.logout(username)

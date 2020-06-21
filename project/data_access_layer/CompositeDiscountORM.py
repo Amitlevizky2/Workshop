@@ -4,16 +4,16 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from project.data_access_layer.DiscountORM import DiscountORM
+from project.data_access_layer.DiscountToApplyORM import DiscountToApplyORM
+from project.data_access_layer.PredicateORM import PredicateORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
+
 
 from project.data_access_layer import Base, session, engine
 
 
 
-to_apply_association = Table('To_apply', Base.metadata,
-                             Column('composite_discount_id', Integer, ForeignKey('CompositeDiscounts.discount_id')),
-                             Column('discount_id', Integer, ForeignKey('discounts.discount_id'))
-                             )
+
 
 
 def find_by_id(discount_id):
@@ -22,10 +22,10 @@ def find_by_id(discount_id):
 
 class CompositeDiscountORM(DiscountORM):
     __tablename__ = 'CompositeDiscounts'
-    discount_id = Column(Integer, ForeignKey('discounts.id'), primary_key=True)
-    logic_operator = Column(Integer)
+    discount_id = Column(Integer, ForeignKey('discounts.discount_id'), primary_key=True)
+    logic_operator = Column(String)
     products_in_predicates = relationship("PredicateORM")
-    discounts_to_apply = relationship("DiscountORM", secondary=to_apply_association)
+    discounts_to_apply = relationship("DiscountToApplyORM")
     __mapper_args__ = {
         'polymorphic_identity': 'CompositeDiscount'
     }

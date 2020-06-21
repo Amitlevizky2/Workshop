@@ -404,6 +404,7 @@ class Store:
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
             discount.id = self.discount_idx
+            print("I'M OVER HERE")
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
             return {'error': False,
