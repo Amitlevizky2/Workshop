@@ -13,7 +13,7 @@ class Discount(ABC):
         self.start = start_date
         self.end = end_date
         self.store_id = store_id
-        self.discount = percent / 100
+        self.discount = float(percent / 100)
         self.is_valid = start_date < datetime.today() < end_date
         self.is_commited = False
         self.products_in_discount = {}  # {product_name: bool}
@@ -52,10 +52,13 @@ class Discount(ABC):
         self.id = d_id
         self.createORM()
 
-
     def add_product(self, product_name: str):
         self.products_in_discount[product_name] = True
         self.orm.add_product(product_name)
+
+    def remove_products(self, products=[]):
+        for product_name in products:
+            self.remove_product(product_name)
 
     def remove_product(self, product_name: str):
         del self.products_in_discount[product_name]
@@ -72,8 +75,7 @@ class Discount(ABC):
 
     def is_valid_percent(self, percent):
         return 0 <= percent <= 100
-#datetime.strptime(string, "%Y-%m-%d") from string to date time
-#date
+
     def createORM(self):
         if self.orm is None:
             self.orm = DiscountORM()
@@ -82,3 +84,14 @@ class Discount(ABC):
             self.orm.end_date = self.end
             self.orm.percent = self.discount
             self.orm.add()
+
+    def get_set(self, _dict):
+        ret = set()
+        for element in _dict.keys():
+            if _dict[element] is True:
+                ret.add(element)
+        return ret
+
+    def get_relative_complement(self, new_products_set):
+        curr_products_in_discount = self.get_set(self.products_in_discount)
+        new_products_in_discount = self.get_set(new_products_set)

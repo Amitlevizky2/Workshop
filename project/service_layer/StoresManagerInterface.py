@@ -94,6 +94,16 @@ class StoresManagerInterface:
             'error_msg': 'error'
         }
 
+    def edit_store_manager_permissions(self, store_id, owner, manager, permissions):
+        logger.log("user %s remove %s permission to %s in store no.%d", owner, permissions, manager, store_id)
+        if store_id in self.users_manager.get_managed_stores(
+                owner) and store_id in self.users_manager.get_managed_stores(manager):
+            return self.stores_manager.edit_store_manager_permissions(store_id, owner, manager, permissions)
+        return jsons.dumps({
+            'error': True,
+            'error_msg': 'error'
+        })
+
     # TODO: DOSE NOT RETURN A VALUE.
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
@@ -116,6 +126,9 @@ class StoresManagerInterface:
     def buy(self, cart):
         return self.stores_manager.buy(cart)
 
+    def add_admin(self,admin,user_to_be_admin):
+        return self.users_manager.add_admin(admin,user_to_be_admin)
+
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
         if self.users_manager.check_if_registered(user) and (
@@ -128,16 +141,16 @@ class StoresManagerInterface:
     # def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
     #     return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
 
-    def update_product(self, store_id, username, product_name, attribute, updated):
+    def update_product(self, store_id, username, product_name, new_price, new_amount):
         """
         :param store_id: the store we want to update
         :param username: the user who wants to update
         :param product_name: product to update
-        :param attribute: the parameter we wants to update
-        :param updated: new value
+        :param new_price: the parameter we wants to update
+        :param new_amount: new value
         :return: True if succeed
         """
-        return self.stores_manager.update_product(store_id, username, product_name, attribute, updated)
+        return self.stores_manager.update_product(store_id, username, product_name, new_price, new_amount)
 
     # TODO: CHANGE RETURN VALS.
     def remove_manager(self, store_id, owner, to_remove):
@@ -207,7 +220,6 @@ class StoresManagerInterface:
     def get_purchase_policy_details(self, store_id: int = None, purchase_policy_id: int = None):
         return self.stores_getters.get_purchase_policy('', store_id, purchase_policy_id)
 
-
     def get_cart_description(self, cart=None):  # NEED_TO_CHECK
         return self.stores_manager.get_cart_description(cart)
 
@@ -218,27 +230,31 @@ class StoresManagerInterface:
                                         end_date=None, percent: int = None, products: [str] = None):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = int(percent)
+        _percent = float(percent)
         return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent,
                                                                 products)
 
     def add_conditional_discount_to_product(self, store_id: int = None, username: str = None, start_date=None,
                                             end_date=None, percent: int = None,
-                                            min_amount: int = None, num_prods_to_apply: int = None, products: list = []):
+                                            min_amount: int = None, num_prods_to_apply: int = None,
+                                            products: list = []):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = int(percent)
-        _min_amount = int(min_amount)
-        _num_prods_to_apply = int(num_prods_to_apply)
+        _percent = float(percent)
+        if min_amount:
+            min_amount = int(min_amount)
+        if num_prods_to_apply:
+            num_prods_to_apply = int(num_prods_to_apply)
         return self.stores_manager.add_conditional_discount_to_product(store_id, username, _start_date, _end_date,
-                                                                       _percent, _min_amount, _num_prods_to_apply, products)
+                                                                       _percent, min_amount, num_prods_to_apply,
+                                                                       products)
 
     def add_conditional_discount_to_store(self, store_id: int = None, username: str = None, start_date=None,
                                           end_date=None, percent: int = None,
                                           min_price: int = None):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = int(percent)
+        _percent = float(percent)
         _min_price = int(min_price)
         return self.stores_manager.add_conditional_discount_to_store(store_id, username, _start_date, _end_date,
                                                                      _percent, _min_price)
@@ -260,29 +276,36 @@ class StoresManagerInterface:
         return self.stores_manager.add_composite_discount(store_id, username, _start_date, _end_date, logic_operator,
                                                           discounts_products_dict, discounts_to_apply_id)
 
-    def edit_visible_discount_to_product(self, store_id: int = None, username: str = None,
-                                         discount_id: int = None, start_date=None, end_date=None,
-                                         percent: int = None):
+    def edit_visible_discount_to_products(self, store_id: int = None, username: str = None,
+                                          discount_id: int = None, start_date=None, end_date=None,
+                                          percent: int = None, products=[]):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        return self.stores_manager.edit_visible_discount_to_product(store_id, username, discount_id, _start_date,
-                                                                    _end_date, percent)
+        return self.stores_manager.edit_visible_discount_to_products(store_id, username, discount_id, _start_date,
+                                                                     _end_date, percent, products)
 
     def edit_conditional_discount_to_product(self, store_id: int = None, discount_id: int = None, username: str = None,
                                              start_date=None, end_date=None,
-                                             percent: int = None, min_amount: int = None, nums_to_apply: int = None):
+                                             percent: int = None, min_amount: int = None, nums_to_apply: int = None,
+                                             products=[]):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
         return self.stores_manager.edit_conditional_discount_to_product(store_id, discount_id, username, _start_date,
-                                                                        _end_date, percent, min_amount, nums_to_apply)
+                                                                        _end_date, percent, min_amount, nums_to_apply,
+                                                                        products)
 
     # endless recursive function
     def edit_conditional_discount_to_store(self, store_id: int = None, discount_id: int = None, username: str = None,
                                            start_date=None, end_date=None,
                                            percent: int = None,
                                            min_price: int = None):
-        return self.edit_conditional_discount_to_store(store_id, discount_id, username, start_date, end_date, percent,
-                                                       min_price)
+        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _percent = float(percent)
+        _min_price = int(min_price)
+        return self.stores_manager.edit_conditional_discount_to_store(store_id, discount_id, username, _start_date,
+                                                                      _end_date, _percent,
+                                                                      _min_price)
 
     def get_store_description(self, store_id):
         return self.stores_getters.get_store_description(store_id)

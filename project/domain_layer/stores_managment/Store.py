@@ -322,9 +322,11 @@ class Store:
         return {'error': True,
                 'error_msg': 'User dont have the permission'}
 
-    def update_product(self, user, product_name, attribute, updated):
+    def update_product(self, user, product_name, new_price, new_amount):
         if self.check_permission(user, "update_products"):
-            return {'error': not self.inventory.update_product(product_name, attribute, updated),
+            res1 = self.inventory.update_product(product_name, "original_price", new_price)
+            res2 = self.inventory.update_product(product_name, "amount", new_amount)
+            return {'error': not res1 and res2,
                     'data': 'updated'}
         logger.error("%s don't have this permission", user)
         return {'error': True,
@@ -414,20 +416,20 @@ class Store:
                 'error_msg': permitted_username + ' do not have this permission'}
 
     def edit_visible_discount(self, permitted_username, discount_id, start_date,
-                              end_date, percent):
+                              end_date, percent, products=[]):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount = self.discounts[discount_id]
-            return {'error': not discount.edit_discount(start_date, end_date, percent),
+            return {'error': not discount.edit_discount(start_date, end_date, percent, products),
                     'data': 'done'}
         return {'error': True,
                 'error_msg': permitted_username + ' do not have this permission'}
 
     def edit_conditional_discount_to_product(self, permitted_username: str, discount_id: int, start_date, end_date,
-                                             percent, min_amount: int, nums_to_apply: int):
+                                             percent, min_amount: int, nums_to_apply: int, products=[]):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount = self.discounts[discount_id]
             return {
-                'error': not discount.edit_discount(discount_id, start_date, end_date, percent, min_amount, nums_to_apply),
+                'error': not discount.edit_discount(discount_id, start_date, end_date, percent, min_amount, nums_to_apply, products),
                 'data': 'done'}
         return {'error': True,
                 'error_msg': permitted_username + ' do not have this permission'}
@@ -603,7 +605,7 @@ class Store:
                 is_approved = False
 
         for product_name in basket.keys():
-            valid = self.is_valid_amount(product_name, basket[product_name])
+            valid = self.is_valid_amount(product_name, basket[product_name][1])
             if valid['error'] is True:
                 description += valid['error_msg']
                 is_approved = False
@@ -612,13 +614,13 @@ class Store:
 
     def remove_purchase_policy(self, policy_id, permitted_user):
         if policy_id is None or permitted_user is None:
-            return {'ans': False, 'desc': "The parameters are not valid \n"}
+            return {'error': True, 'error_msg': "The parameters are not valid \n"}
 
         if policy_id not in self.purchase_policies.keys():
-            return {'ans': False, 'desc': "No such policy in this store \n"}
+            return {'error': False, 'error_msg': "No such policy in this store \n"}
 
         del self.purchase_policies[policy_id]
-        return {'ans': True, 'desc': "Policy has been removed \n"}
+        return {'error': False, 'data': "Policy has been removed \n"}
 
     def get_description(self):
         id = self.store_id
@@ -678,3 +680,27 @@ class Store:
 
     def is_valid_amount(self, product_name, quantity):
         return self.inventory.is_valid_amount(product_name, quantity)
+
+    def edit_store_manager_permissions(self, owner, manager, new_permissions):
+        manager_permissions = self.get_user_permissions(manager)
+        if manager_permissions['error'] is True:
+            return manager_permissions
+        curr_permissions = set(manager_permissions['data'])
+        _new_permissions = set(new_permissions)
+        add_permissions = set(_new_permissions - curr_permissions)
+        remove_permissions = set(curr_permissions - _new_permissions)
+        for new_permission in add_permissions:
+            res = self.add_permission_to_manager(owner, manager, new_permission)
+            if res['error'] is True:
+                return res
+        for remove_permission in remove_permissions:
+            res = self.remove_permission_from_manager(owner, manager, remove_permission)
+            if res['error'] is True:
+                return res
+        return {
+            'error': False,
+            'data': 'Permissions have been updated.'
+        }
+
+    def intersection(self, lst1, lst2):
+        return list(set(lst1) & set(lst2))

@@ -30,7 +30,7 @@ class PurchaseManager:
         return self.payment_system.connect()
 
 # user = username
-    def buy(self, user):
+    def buy(self, user,CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid,address,city,country,zip):
         answer, data = self.user_manager.get_cart(user)
         if answer is False:
             return {'error': not answer,
@@ -54,7 +54,7 @@ class PurchaseManager:
                     purchases = {}
                     for store_basket in cart_desc.values():
                         store_id = store_basket['store_id']
-                        self.payment_system.pay(user, store_id, store_basket['store_purchase_price'])
+                        self.payment_system.pay(user, store_id, store_basket['store_purchase_price'],CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid)
                         self.purchases_idx += 1
                         purchase = Purchase(store_basket['desc'], user, store_id, self.purchases_idx)
                         print()
@@ -80,18 +80,18 @@ class PurchaseManager:
             return {'error': True,
                     'error_msg': 'Undefined - get_cart_description'}
 
-        purchases = jsonpickle.decode(self.payment_system.pay(user, self.user_manager.get_cart(user)))
+        purchases = jsonpickle.decode(self.payment_system.pay(user,store_id,price,CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid))
         if len(purchases) > 0:
-            if self.shipment_system.ship():
+            if self.shipment_system.ship(CCholder,address,city,country,zip):
                 for purchase in purchases:
                     self.store_manager.buy(self.user_manager.get_cart(user))
                     self.store_manager.add_purchase_to_store(int(purchase.store_id), jsonpickle.encode(purchase))
                     self.user_manager.add_purchase(user, jsonpickle.encode(purchase))
                 self.user_manager.remove_cart(user)
                 return True
-            else:
-                self.payment_system.cancel(purchases)
-        return False
+            elif self.payment_system.cancel(purchases) == -1:
+                return False
+
 
     def pay(self, user, cart):
         return True

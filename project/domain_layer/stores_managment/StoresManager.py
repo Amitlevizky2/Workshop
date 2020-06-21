@@ -42,18 +42,21 @@ class StoresManager:
         self.stores = {}
         self.stores_idx = 0
 
-    def update_product(self, store_id, user, product_name, attribute, updated):
+    def update_product(self, store_id, user, product_name, new_price, new_amount):
         """
         Args:
             store_id: the store we want to update
             user: the user who wants to update
             product_name: product to update
-            attribute: the parameter we wants to update
-            updated: new value
 
         Returns:True if succeed
+        :param user:
+        :param product_name:
+        :param store_id:
+        :param new_price:
+
         """
-        return jsons.dumps(self.get_store(store_id).update_product(user, product_name, attribute, updated))
+        return jsons.dumps(self.get_store(store_id).update_product(user, product_name, new_price, new_amount))
 
     def search(self, search_term: str = "", categories=[], key_words=[]) -> {int: [Product]}:
         """
@@ -237,32 +240,31 @@ class StoresManager:
             discount: Discount = store.discounts[discount_id]
             products_to_check_list = discounts_products_dict[discount_id]
             tup_list.append((discount, products_to_check_list))  # (Discount, (products_names))
-        print("MAYBE HEREEEEE")
+
         for discount_id in discounts_to_apply_id:
             if discount_id not in store.discounts.keys():
                 return jsons.dumps(False)
             discount = store.discounts[discount_id]
             discounts_to_apply_list.append(discount)
             del store.discounts[discount_id]
-        print("MAYBE HEREEEEE2")
 
         return jsons.dumps(store.add_composite_discount(username,
                                                         CompositeDiscount(start_date, end_date, logic_operator,
                                                                           tup_list, discounts_to_apply_list, store_id)))
 
-    def edit_visible_discount_to_product(self, store_id: int, username: str, discount_id: int, start_date, end_date,
-                                         percent: int):
+    def edit_visible_discount_to_products(self, store_id: int, username: str, discount_id: int, start_date, end_date,
+                                         percent: int, products=[]):
         store = self.get_store(store_id)
         return jsons.dumps(
-            store.edit_visible_discount(username, discount_id, start_date, end_date, percent))
+            store.edit_visible_discount(username, discount_id, start_date, end_date, percent, products))
 
     def edit_conditional_discount_to_product(self, store_id: int, discount_id: int, username: str, start_date, end_date,
                                              percent: int,
-                                             min_amount: int, nums_to_apply: int):
+                                             min_amount: int, nums_to_apply: int, products=[]):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_amount,
-                                                       nums_to_apply))
+                                                       nums_to_apply, products))
 
     def edit_conditional_discount_to_store(self, store_id: int, discount_id: int, username: str, start_date, end_date,
                                            percent: int,
@@ -287,11 +289,13 @@ class StoresManager:
 
     def add_purchase_product_policy(self, store_id: int, permitted_user: str, min_amount_products: int,
                                     max_amount_products: int, products: list):
-        _min_amount_products = int(min_amount_products)
-        _max_amount_products = int(max_amount_products)
+        if min_amount_products is not None:
+            min_amount_products = int(min_amount_products)
+        if max_amount_products is not None:
+            max_amount_products = int(max_amount_products)
+
         store = self.get_store(store_id)
-        print("GOT HERE MOTHERFUCKERRRRRRRRR3")
-        answer = store.add_purchase_product_policy(permitted_user, _min_amount_products, _max_amount_products)
+        answer = store.add_purchase_product_policy(permitted_user, min_amount_products, max_amount_products)
         if answer['error'] is False:
             for product_name in products:
                 store.add_product_to_purchase_product_policy(answer['data']['policy_id'], permitted_user, product_name)
@@ -303,8 +307,7 @@ class StoresManager:
         logic_operator = get_logic_operator(logic_operator_str)
         if purchase_policies_id is None or logic_operator is None:
             return jsons.dumps({'error': True, 'error_msg': "The parameters are not valid"})
-        print("printing policy IDs ")
-        print(purchase_policies_id)
+
         store = self.get_store(store_id)
         policies = []
 
@@ -313,8 +316,7 @@ class StoresManager:
                 return jsons.dumps({'error': True, 'error_msg': "Wrong policy id was inserted \n"})
             policy: PurchasePolicy = store.purchase_policies[purch_policy_id]
             policies.append(policy)
-        print("printing policies ")
-        print(policies)
+
         return jsons.dumps(
             store.add_purchase_composite_policy(permitted_user, policies, logic_operator))
 
@@ -501,5 +503,9 @@ class StoresManager:
     def is_valid_amount(self, store_id, product_name, quantity):
         store = self.get_store(store_id)
         return store.is_valid_amount(product_name, quantity)
+
+    def edit_store_manager_permissions(self, store_id, owner, manager, permissions):
+        store = self.get_store(store_id)
+        return jsons.dumps(store.edit_store_manager_permissions(owner, manager, permissions))
 
 # {product_name, (Product, amount, updated_price, original_price)}

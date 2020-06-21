@@ -4,7 +4,7 @@ import jsonpickle
 import jsons
 from eventlet import wsgi
 from flask import Flask, jsonify, request, current_app
-from flask_socketio import SocketIO, join_room, leave_room, emit
+from flask_socketio import SocketIO, join_room, leave_room
 from flask_cors import CORS
 
 from project.service_layer.Initializer import Initializer
@@ -147,7 +147,7 @@ def add_purchase():
 @app.route('/buy', methods=['POST', 'GET'])
 def buy():
     message = request.get_json()
-    data = purchase_manager.buy(message['username'])
+    data = purchase_manager.buy(message['username'],message['store_id'],message['price'],message['number'],message['month'],message['year'],message['holder'],message['ccv'],message['id'])
     return jsonify(data)
 
 
@@ -237,7 +237,7 @@ def search():
 def update_store_product():
     message = request.get_json()
     answer = stores_manager.update_product(message['store_id'], message['username'], message['product_name'],
-                                           message['attribute'], message['updated'])
+                                           message['price'], message['amount'])
     return answer
 
 
@@ -306,17 +306,26 @@ def edit_conditional_product_discount():
     answer = stores_manager.edit_conditional_discount_to_product(message['store_id'], message['discount_id'],
                                                                  message['username'], message['start_date'],
                                                                  message['end_date'], message['percent'],
-                                                                 message['min_price'], message['nums_to_apply'])
+                                                                 message['min_price'], message['nums_to_apply'],
+                                                                 message['products'])
     return answer
 
 
 @app.route('/edit_visible_product_discount', methods=['POST', 'GET'])
 def edit_visible_product_discount():
     message = request.get_json()
-    answer = stores_manager.edit_visible_discount_to_product(message['store_id'], message['discount_id'],
-                                                             message['username'], message['start_date'],
-                                                             message['end_date'], message['percent'])
+    answer = stores_manager.edit_visible_discount_to_products(message['store_id'], message['discount_id'],
+                                                              message['username'], message['start_date'],
+                                                              message['end_date'], message['percent'],
+                                                              message['products'])
+    return answer
 
+
+@app.route('/edit_store_manager_permissions', methods=['POST', 'GET'])
+def edit_store_manager_permissions():
+    message = request.get_json()
+    answer = stores_manager.edit_store_manager_permissions(message['store_id'], message['owner'],
+                                                           message['manager'], message['permissions'])
     return answer
 
 
@@ -388,7 +397,8 @@ def remove_product_from_purchase_product_policy():
 @app.route('/remove_purchase_policy', methods=['POST', 'GET'])
 def remove_purchase_policy():
     message = request.get_json()
-    answer = stores_manager.remove_purchase_policy(message['store_id'], message['applying_username'], message['policy_id'])
+    answer = stores_manager.remove_purchase_policy(message['store_id'], message['applying_username'],
+                                                   message['policy_id'])
 
     return answer
 
@@ -507,9 +517,11 @@ def leave(data):
 @sio.on('disconnect')
 def disconnect():
     sid = request.sid
-    username = clients[sid]
-    guest_username = users_manager.logout(username)
-    clients.pop(sid)
+    if sid in clients.keys():
+        username = clients[sid]
+        guest_username = users_manager.logout(username)
+        clients.pop(sid)
+        print('user {} is logged out!'.format(username))
 
 
 def send_notification(username, message):
