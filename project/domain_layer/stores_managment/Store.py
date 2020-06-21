@@ -577,7 +577,7 @@ class Store:
                 is_approved = False
 
         for product_name in basket.keys():
-            valid = self.is_valid_amount(product_name, basket[product_name])
+            valid = self.is_valid_amount(product_name, basket[product_name][1])
             if valid['error'] is True:
                 description += valid['error_msg']
                 is_approved = False
