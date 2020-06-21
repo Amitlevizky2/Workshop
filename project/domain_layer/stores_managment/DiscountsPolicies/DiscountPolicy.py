@@ -11,7 +11,7 @@ class Discount(ABC):
         self.id = -1
         self.start = start_date
         self.end = end_date
-        self.discount = percent / 100
+        self.discount = float(percent / 100)
         self.is_valid = start_date < datetime.today() < end_date
         self.is_commited = False
         self.products_in_discount = {}  # {product_name: bool}
@@ -51,8 +51,9 @@ class Discount(ABC):
     def add_product(self, product_name: str):
         self.products_in_discount[product_name] = True
 
-    def remove_product(self, product_name: str):
-        del self.products_in_discount[product_name]
+    def remove_products(self, products=[]):
+        for product_name in products:
+            del self.products_in_discount[product_name]
 
     def get_products(self):
         return self.products_in_discount.keys()
@@ -65,3 +66,16 @@ class Discount(ABC):
 
     def is_valid_percent(self, percent):
         return 0 <= percent <= 100
+
+    def get_set(self, _dict):
+        ret = set()
+        for element in _dict.keys():
+            if _dict[element] is True:
+                ret.add(element)
+        return ret
+
+    def get_relative_complement(self, new_products_set):
+        curr_products_in_discount = self.get_set(self.products_in_discount)
+        new_products_in_discount = self.get_set(new_products_set)
+
+

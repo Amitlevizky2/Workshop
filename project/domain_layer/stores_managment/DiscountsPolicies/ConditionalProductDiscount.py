@@ -63,7 +63,7 @@ class ConditionalProductDiscount(Discount):
 
         return counter
 
-    def edit_discount(self, start_date, end_date, percent, min_amount, num_prods_to_apply):
+    def edit_discount(self, start_date, end_date, percent, min_amount, num_prods_to_apply, new_products=[]):
         is_edited = False
         if start_date is not None and end_date is not None:
             if start_date > end_date:
@@ -83,6 +83,11 @@ class ConditionalProductDiscount(Discount):
         if num_prods_to_apply is not None and 0 < num_prods_to_apply:
             self.num_prods_to_apply = num_prods_to_apply
             is_edited = True
+        if new_products is not None:
+            prod_dict = {}
+            for product in new_products:
+                prod_dict[product] = True
+            self.products_in_discount = prod_dict
 
     def is_valid_condition(self, discount_conditions):
         return discount_conditions[0] > 0 and 0 <= discount_conditions <= 100

@@ -17,9 +17,12 @@ class VisibleProductDiscount(Discount):
 
                 if product_name in self.products_in_discount.keys():
                     new_product_tup = (self.get_product_object(product_tup), self.get_product_amount(product_tup),
-                                       self.get_product_updated_price(product_tup, self.discount), self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
-                    product_price_dict[product_name] = new_product_tup  # (self.discount * self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
-                    x=5
+                                       self.get_product_updated_price(product_tup, self.discount),
+                                       self.get_product_object(product_tup).original_price * self.get_product_amount(
+                                           product_tup))
+                    product_price_dict[
+                        product_name] = new_product_tup  # (self.discount * self.get_product_object(product_tup).original_price * self.get_product_amount(product_tup))
+                    x = 5
 
     def get_product_object(self, product):
         return product[0]
@@ -28,7 +31,8 @@ class VisibleProductDiscount(Discount):
         return product[1]
 
     def get_product_updated_price(self, product, discount):
-        new_price = product[2] - (self.discount * self.get_product_object(product).original_price * self.get_product_amount(product))
+        new_price = product[2] - (
+                    self.discount * self.get_product_object(product).original_price * self.get_product_amount(product))
         return new_price
 
     def is_valid_start_date(self, _date):
@@ -43,16 +47,21 @@ class VisibleProductDiscount(Discount):
     def is_approved(self, original_price, amount):
         pass
 
-    def edit_discount(self, start_date=None, end_date=None, percent=None):
+    def edit_discount(self, start_date=None, end_date=None, percent=None, new_products=[]):
         if start_date is not None and end_date is not None:
             if start_date > end_date:
                 return False
-        if start_date is not None and is_valid_start_date(start_date):
+        if start_date is not None and self.is_valid_start_date(start_date):
             self.start = start_date
-        if end_date is not None and is_valid_end_date(end_date):
+        if end_date is not None and self.is_valid_end_date(end_date):
             self.end = end_date
-        if percent is not None and is_valid_percent(percent):
+        if percent is not None and self.is_valid_percent(percent):
             self.discount = 1 - percent / 100
+        if new_products is not None:
+            prod_dict = {}
+            for product in new_products:
+                prod_dict[product] = True
+            self.products_in_discount = prod_dict
 
     def is_in_discount(self, product_name: str, product_price_dict: dict):
         return product_name in self.products_in_discount and \
@@ -66,7 +75,8 @@ class VisibleProductDiscount(Discount):
 
     def get_updated_price(self, product: Product):
         if product.name in self.products_in_discount.keys():
-            return (product.original_price - product.original_price * self.discount)
+            print('in get_updated_price. price is: {}'.format(str(product.original_price - float(product.original_price) * self.discount)))
+            return (product.original_price - float(product.original_price) * self.discount)
         else:
             return product.original_price
 

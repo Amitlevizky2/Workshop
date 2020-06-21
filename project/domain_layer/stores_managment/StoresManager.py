@@ -42,20 +42,22 @@ class StoresManager:
         self.stores = {}
         self.stores_idx = 0
 
-    def update_product(self, store_id, user, product_name, attribute, updated):
+    def update_product(self, store_id, user, product_name, new_price, new_amount):
         """
 
         Args:
             store_id: the store we want to update
             user: the user who wants to update
             product_name: product to update
-            attribute: the parameter we wants to update
-            updated: new value
 
         Returns:True if succeed
+        :param user:
+        :param product_name:
+        :param store_id:
+        :param new_price:
 
         """
-        return jsons.dumps(self.get_store(store_id).update_product(user, product_name, attribute, updated))
+        return jsons.dumps(self.get_store(store_id).update_product(user, product_name, new_price, new_amount))
 
     def search(self, search_term: str = "", categories=[], key_words=[]) -> {int: [Product]}:
         """
@@ -251,19 +253,19 @@ class StoresManager:
                                                         CompositeDiscount(start_date, end_date, logic_operator,
                                                                           tup_list, discounts_to_apply_list)))
 
-    def edit_visible_discount_to_product(self, store_id: int, username: str, discount_id: int, start_date, end_date,
-                                         percent: int):
+    def edit_visible_discount_to_products(self, store_id: int, username: str, discount_id: int, start_date, end_date,
+                                         percent: int, products=[]):
         store = self.get_store(store_id)
         return jsons.dumps(
-            store.edit_visible_discount(username, discount_id, start_date, end_date, percent))
+            store.edit_visible_discount(username, discount_id, start_date, end_date, percent, products))
 
     def edit_conditional_discount_to_product(self, store_id: int, discount_id: int, username: str, start_date, end_date,
                                              percent: int,
-                                             min_amount: int, nums_to_apply: int):
+                                             min_amount: int, nums_to_apply: int, products=[]):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.edit_conditional_discount_to_product(username, discount_id, start_date, end_date, percent, min_amount,
-                                                       nums_to_apply))
+                                                       nums_to_apply, products))
 
     def edit_conditional_discount_to_store(self, store_id: int, discount_id: int, username: str, start_date, end_date,
                                            percent: int,
@@ -502,5 +504,9 @@ class StoresManager:
     def is_valid_amount(self, store_id, product_name, quantity):
         store = self.get_store(store_id)
         return store.is_valid_amount(product_name, quantity)
+
+    def edit_store_manager_permissions(self, store_id, owner, manager, permissions):
+        store = self.get_store(store_id)
+        return jsons.dumps(store.edit_store_manager_permissions(owner, manager, permissions))
 
 # {product_name, (Product, amount, updated_price, original_price)}

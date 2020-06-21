@@ -9,7 +9,9 @@ class Basket:
     def add_product(self, product_name, quantity) -> bool:
         if product_name in self.products.keys():
             amount = self.products[product_name]
-            amount += quantity
+            if amount > quantity:
+                return self.remove_product(product_name, amount - quantity)
+            amount += (quantity - amount)
             self.products[product_name] = amount
         else:
             self.products[product_name] = quantity
