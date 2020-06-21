@@ -123,7 +123,7 @@ class StoresManagerInterface:
             return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))
 
     def remove_product(self, store_id, product_name, username):
-        return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
+        return self.stores_manager.remove_product_from_store(store_id, product_name, username)
 
     # def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
     #     return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)

@@ -183,7 +183,7 @@ class StoresManager:
     def get_store_products(self, store_id):
         return jsons.dumps(self.get_store(store_id).get_store_products())
 
-    def remove_produce_from_store(self, store_id, product_name, username):
+    def remove_product_from_store(self, store_id, product_name, username):
         store = self.get_store(store_id)
         product = store.search(product_name)
         if product:
