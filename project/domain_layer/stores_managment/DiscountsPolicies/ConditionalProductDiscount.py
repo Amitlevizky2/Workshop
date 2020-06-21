@@ -6,11 +6,12 @@ from project.domain_layer.users_managment import Basket
 
 
 class ConditionalProductDiscount(Discount):
-    def __init__(self, start_date, end_date, percent, min_amount, num_prods_to_apply):
-        super().__init__(start_date, end_date, percent)
+    def __init__(self, start_date, end_date, percent, min_amount, num_prods_to_apply, store_id, orm=None):
+        super().__init__(start_date, end_date, percent, store_id)
         self.min_amount = min_amount
         self.num_prods_to_apply = num_prods_to_apply
         # self.products_in_discount = {}  # {product: bool}
+        self.orm = orm
         self.discount_type = "Conditional Product Discount"
 
     def commit_discount(self, product_price_dict: dict):
@@ -70,18 +71,23 @@ class ConditionalProductDiscount(Discount):
                 return False
         if start_date is not None and start_date > datetime.today():
             self.start = start_date
+            self.orm.update_sart(start_date)
             is_edited = True
         if end_date is not None and end_date > self.start and end_date > datetime.today():
             self.end = end_date
+            self.orm.update_end(end_date)
             is_edited = True
         if percent is not None and 0 < percent < 100:
             self.discount = percent / 100
+            self.orm.update_percent(self.discount)
             is_edited = True
         if min_amount is not None and 0 < min_amount:
             self.min_amount = min_amount
+            self.orm.update_min_amount(min_amount)
             is_edited = True
         if num_prods_to_apply is not None and 0 < num_prods_to_apply:
             self.num_prods_to_apply = num_prods_to_apply
+            self.orm.update_num_to_apply(num_prods_to_apply)
             is_edited = True
 
     def is_valid_condition(self, discount_conditions):
@@ -121,3 +127,19 @@ class ConditionalProductDiscount(Discount):
                 "Number of products to apply": self.num_prods_to_apply,
                 "Products In Discount": self.products_in_discount.keys(),
                 "Discount Type": self.discount_type}
+
+    def createORM(self):
+        if self.orm is None:
+            from project.data_access_layer.ConditionalProductDiscountORM import ConditionalProductDiscountsORM
+            self.orm = ConditionalProductDiscountsORM()
+            self.orm.discount_id= self.id
+            self.orm.start_date = self.start
+            self.orm.end_date = self.end
+            self.orm.percent = self.discount
+            self.orm.min_amount = self.min_amount
+            self.orm.num_prods_to_apply = self.num_prods_to_apply
+            for prod in self.products_in_discount.keys():
+                from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
+                pidorm = ProductsInDiscountsORM(discount_id=self.discount_id, product_name=prod, store_id=self.store_id)
+                pidorm.add()
+            self.orm.add()

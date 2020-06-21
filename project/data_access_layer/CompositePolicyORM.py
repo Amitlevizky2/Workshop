@@ -30,3 +30,15 @@ class CompositePolicyORM(PolicyORM):
         Base.metadata.create_all(engine, [Base.metadata.tables['CompositePolicies']], checkfirst=True)
         session.add(self)
         session.commit()
+
+    def add_policies(self, policies):
+        for poli in policies:
+            self.add_policy(poli)
+
+    def add_policy(self, policy):
+        pass
+        #TODO: check how to add to association table
+
+    def remove_policy(self, policy):
+        pass
+    #TODO: check association tables

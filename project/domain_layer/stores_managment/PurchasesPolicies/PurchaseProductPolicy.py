@@ -1,18 +1,34 @@
+from project.data_access_layer.ProductPolciesORM import ProductPoliciesORM
 from project.domain_layer.stores_managment.PurchasesPolicies.PurchasePolicy import PurchasePolicy
 
 
 class PurchaseProductPolicy(PurchasePolicy):
-    def __init__(self, min_amount_products, max_amount_products, id):
+    def __init__(self, min_amount_products, max_amount_products, id, store_id, orm = None):
         super().__init__()
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
         self.id = id
+        self.store_id = store_id
         self.products_in_policy = {}  # {product_name, bool}
         self.MAX_SIZE = 100000
         self.MIN_SIZE = 0
         self.purchase_type = "Purchase Product Policy"
+        if orm is None:
+            self.orm = ProductPoliciesORM()
+            self.orm.policy_id = self.id
+            self.orm.store_id = self.store_id
+            self.orm.max_amount=max_amount_products
+            self.orm.min_amout = min_amount_products
+            self.orm.add()
+        else:
+            self.orm = orm
+
 
     def is_approved(self, product_price_dict: dict):    # {product_name, (Product, amount, updated_price, original)}
+        print("in is approved, product_price_dict")
+        print(product_price_dict)
+        print("products_in_policy")
+        print(self.products_in_policy)
         outcome_description = ""
         is_approved = True
         for product_name in product_price_dict.keys():
@@ -21,6 +37,8 @@ class PurchaseProductPolicy(PurchasePolicy):
                 outcome_description = outcome_description + \
                                       (self.add_fail_description(product_name, self.get_product_amount(product_tup)))
                 is_approved = False
+        print("in is approved, is_approved", is_approved)
+        print(product_price_dict)
         return is_approved, outcome_description
 
     def get_product_object(self, product):
@@ -44,15 +62,17 @@ class PurchaseProductPolicy(PurchasePolicy):
 
         desc = "{} can only be purchased in amount of minimum [{}] and maximum [{}] units, and you tried [{}]!\n".format\
             (product_name, min_string, max_string, str(product_amount))
-        return desc
+        return 'Policy:' + str(self.id) + '\n' + desc
 
     def add_product(self, product_name: str):
         self.products_in_policy[product_name] = True
+        self.orm.add_product(product_name)
         return True
 
     def remove_product(self, product_name):
         if product_name in self.products_in_policy.keys():
             del self.products_in_policy[product_name]
+            self.orm.remove_product(product_name)
             return True
         return False
 

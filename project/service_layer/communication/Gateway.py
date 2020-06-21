@@ -4,7 +4,7 @@ import jsonpickle
 import jsons
 from eventlet import wsgi
 from flask import Flask, jsonify, request, current_app
-from flask_socketio import SocketIO, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask_cors import CORS
 
 from project.service_layer.Initializer import Initializer
@@ -19,6 +19,7 @@ app.secret_key = os.environ.get('SECRET')
 app.config['WTF_CSRF_SECRET_KEY'] = "b'f\xfa\x8b{X\x8b\x9eM\x83l\x19\xad\x84\x08\xaa"
 sio = SocketIO(app, logger=True, engineio_logger=True,
                cors_allowed_origins='*', async_mode='eventlet')
+clients = {}
 # current_app(app)
 with app.app_context():
     # within this block, current_app points to app.
@@ -84,16 +85,7 @@ def add_product():
     print(message)
     data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
                                      message['quantity'])
-
-    if data is True:
-        print('data is True')
-    else:
-        print('data is False')
-    return jsonify({
-        'error': not data,
-        'error_msg': 'error',
-        'data': 'added!'
-    })
+    return jsonify(data)
 
 
 @app.route('/remove_product', methods=['POST', 'GET'])
@@ -396,7 +388,7 @@ def remove_product_from_purchase_product_policy():
 @app.route('/remove_purchase_policy', methods=['POST', 'GET'])
 def remove_purchase_policy():
     message = request.get_json()
-    answer = stores_manager.remove_purchase_policy(message['store_id'], message['permitted_user'], message['policy_id'])
+    answer = stores_manager.remove_purchase_policy(message['store_id'], message['applying_username'], message['policy_id'])
 
     return answer
 
@@ -413,7 +405,7 @@ def add_product_to_purchase_product_policy():
 @app.route('/add_policy_to_purchase_composite_policy', methods=['POST', 'GET'])
 def add_policy_to_purchase_composite_policy():
     message = request.get_json()
-    answer = stores_manager.add_policy_to_purchase_composite_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_policy_to_purchase_composite_policy(message['store_id'], message['applying_username'],
                                                                     message['composite_id'],
                                                                     message['policy_id'])
     return answer
@@ -422,7 +414,7 @@ def add_policy_to_purchase_composite_policy():
 @app.route('/add_purchase_composite_policy', methods=['POST', 'GET'])
 def add_purchase_composite_policy():
     message = request.get_json()
-    answer = stores_manager.add_purchase_composite_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_purchase_composite_policy(message['store_id'], message['applying_username'],
                                                           message['purchase_policies_id'],
                                                           message['logic_operator'])
     return answer
@@ -431,16 +423,16 @@ def add_purchase_composite_policy():
 @app.route('/add_purchase_product_policy', methods=['POST', 'GET'])
 def add_purchase_product_policy():
     message = request.get_json()
-    answer = stores_manager.add_purchase_product_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_purchase_product_policy(message['store_id'], message['applying_username'],
                                                         message['min_amount_products'],
-                                                        message['max_amount_products'])
+                                                        message['max_amount_products'], message['products'])
     return answer
 
 
 @app.route('/add_purchase_store_policy', methods=['POST', 'GET'])
 def add_purchase_store_policy():
     message = request.get_json()
-    answer = stores_manager.add_purchase_store_policy(message['store_id'], message['permitted_user'],
+    answer = stores_manager.add_purchase_store_policy(message['store_id'], message['applying_username'],
                                                       message['min_amount_products'],
                                                       message['max_amount_products'])
     return answer
@@ -500,19 +492,24 @@ def view_purchases_admin():
 
 @sio.on('join')
 def join(data):
+    sid = request.sid
+    clients[sid] = data['room']
     join_room(room=data['room'])
 
 
 @sio.on('leave')
 def leave(data):
+    sid = request.sid
+    clients.pop(sid)
     leave_room(room=data['room'])
 
 
 @sio.on('disconnect')
-def leave(data, sid):
-    leave_room(room=data['room'])
-    users_manager.logout(data['room'])
-    print('byyyyy ' + data['room'])
+def disconnect():
+    sid = request.sid
+    username = clients[sid]
+    guest_username = users_manager.logout(username)
+    clients.pop(sid)
 
 
 def send_notification(username, message):

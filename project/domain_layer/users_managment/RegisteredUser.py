@@ -6,20 +6,22 @@ from project.domain_layer.users_managment.User import User
 
 class RegisteredUser(User):
 
-    def __init__(self, username):
+    def __init__(self, username, orm = None):
         super().__init__(username)
         self.username = username
         self.purchase_history = []
         self.loggedin = False
         self.managed_stores = []
         self.notifications = []
-        self.orm = RegisteredUserORM()
-        self.orm.username = username
-        self.orm.add()
+        if orm is None:
+            self.orm = RegisteredUserORM()
+            self.orm.username = username
+            self.orm.add()
+        else:
+            self.orm = orm
 
     def add_purchase(self, purchase):
         self.purchase_history.append(purchase)
-        purchase.orm.add_products_to_purchase(purchase.products)
 
     def logout(self):
         self.loggedin = False
@@ -45,7 +47,6 @@ class RegisteredUser(User):
         :return: if store_id is in managed_stores return False. Otherwise, add store_id and return True
         """
         if store_id not in self.managed_stores:
-
             self.managed_stores.append(store_id)
             return True
         return False
@@ -106,7 +107,6 @@ class RegisteredUser(User):
     def get_json_notifications(self):
         notifications = []
         for message in self.notifications:
-            notifications.append({
-                'message': message
-            })
+            notifications.append(message)
+
         return notifications

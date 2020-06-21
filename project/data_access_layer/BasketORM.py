@@ -11,7 +11,7 @@ from project.data_access_layer.ProductsInBasketORM import ProductsInBasketORM
 
 class BasketORM(Base):
     __tablename__ = 'baskets'
-    id = Column(Integer, primary_key=True)
+    #id = Column(Integer, primary_key=True)
     username = Column(String, ForeignKey('regusers.username'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     user = relationship("RegisteredUserORM", back_populates="baskets")
@@ -33,15 +33,25 @@ class BasketORM(Base):
         ProductsInBasketORM.update_quantity(self.id, product_name, amount)
 
     def update_basket_add_product(self, product_name, amount):
-        productinbasket = ProductsInBasketORM(basket_id = self.id, product_name = product_name, quantity = amount)
-        session.add(productinbasket)
-        session.commit()
+        productinbasket = ProductsInBasketORM(username= self.username, store_id=self.store_id, product_name = product_name, quantity = amount)
+        productinbasket.add()
+
 
     def remove_product_from_basket(self, product_name):
-        session.query(ProductsInBasketORM).delete.where(basket_id=self.id, product_name=product_name)
+        session.query(ProductsInBasketORM).delete.where(username= self.username, store_id=self.store_id, product_name=product_name)
         session.commit()
 
     def remove_basket(self):
-        session.query(ProductsInBasketORM).delete.where(basket_id = self.id)
-        session.query(BasketORM).delete.where(id=self.id)
+        session.query(ProductsInBasketORM).delete.where(username= self.username, store_id=self.store_id)
+        session.query(BasketORM).delete.where(username= self.username, store_id=self.store_id)
         session.commit()
+
+    def createObject(self):
+        from project.domain_layer.users_managment.Basket import Basket
+        basket = Basket(self.username, self.store_id, self)
+        products = session.query(ProductsInBasketORM).filter_by(username= self.username, store_id=self.store_id)
+        prods ={}
+        for product in products:
+            prods[product.name] = product.amount
+        basket.products = prods
+        return basket
