@@ -3,25 +3,34 @@ import jsonpickle
 from project import logger
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.users_managment.Cart import Cart
-
+from project.service_layer.ExternalserviseAPI import ExternalServiceAPI
 
 class PaymentSystem:
     def __init__(self):
         self.external_payment_system = None
         self.p_id = 0
+        self.padid = 0
+        self.supid=0
+        self.EX = ExternalServiceAPI()
 
     def set_external(self, external_payment_system):
         self.external_payment_system = external_payment_system
 
     def connect(self):
         if self.external_payment_system is not None:
-            if self.external_payment_system.connect():
+            x = str(self.EX.connect())
+            if x == "OK":
                 return True
             logger.error("Failed to connect to payment system")
         return False
 
-    def pay(self, user, store_id, price):
-        return True;
+    def pay(self, user, store_id, price,CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid):
+        try:
+            if PaymentSystem.connect(self):
+                self.padid = int(self.EX.pay(CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid))
+                return self.padid
+        except:
+            return -1
         # res = []
         # cart = jsonpickle.decode(cart)
         # if True:  # self.external_payment_system.pay(user, cart):
@@ -33,7 +42,12 @@ class PaymentSystem:
         # return jsonpickle.encode(res)
 
     def cancel(self, purchases):
-        self.external_payment_system.cancel(purchases)
+        try:
+            int(self.EX.cancelpay(self.padid))
+            return 1
+        except:
+            return -1
+            # self.external_payment_system.cancel(purchases)
 
     def check_user(self, user, cart_price):
         return True
