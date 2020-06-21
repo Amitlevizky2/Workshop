@@ -14,7 +14,7 @@ class ProductsInBasketORM(Base):
 
     def update_quantity(self, amount):
         self.quantity = amount
-        session.commit()
+        #session.commit()
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['productsinbaskets']], checkfirst=True)

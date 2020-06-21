@@ -146,3 +146,10 @@ class Initializer:
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_purchase_composite_policy(store_id, username, policies, logic_opr)
         self.users_manager.logout(username)
+
+    def add_policy_to_purchase_composite_policy(self, store_id: int, username: str, composite_id: int,
+                                                policy_id: int):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        self.stores_manager.add_policy_to_purchase_composite_policy(store_id, username, composite_id, policy_id)
+        self.users_manager.logout(username)

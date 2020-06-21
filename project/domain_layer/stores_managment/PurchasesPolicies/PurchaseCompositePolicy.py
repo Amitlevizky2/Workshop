@@ -37,10 +37,12 @@ class PurchaseCompositePolicy(PurchasePolicy):
 
     def add_policy(self, purchase_policy):
         self.purchase_policies.append(purchase_policy)
+        self.orm.add_policy(purchase_policy)
 
     def remove_policy(self, purchase_policy):
         if purchase_policy in self.purchase_policies:
             self.purchase_policies.remove(purchase_policy)
+            self.orm.remove(purchase_policy)
 
     def is_approved_and(self, product_price_dict: dict):
         outcome_description = ""

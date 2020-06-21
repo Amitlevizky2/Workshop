@@ -546,6 +546,7 @@ class Store:
             return {'error': True, 'error_msg': "policy is not exist for this store\n"}
 
         self.purchase_policies[composite_id].add_policy(self.purchase_policies[policy_id])
+
         return {'error': False, 'data': "Policy as been added"}
 
     def add_product_to_purchase_product_policy(self, policy_id, permitted_user: str, product_name: str):

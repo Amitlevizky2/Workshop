@@ -32,6 +32,14 @@ class CompositePolicyORM(PolicyORM):
 
     def add_policies(self, purchase_policies):
         for policy in purchase_policies:
-            from project.data_access_layer.PoliciesInCompositeORM import PoliciesInCompositeORM
-            poliorm = PoliciesInCompositeORM(composite_discount_id = self.policy_id, policy_id = policy.id, store_id = self.store_id)
-            poliorm.add()
+            self.add_policy(policy)
+
+    def add_policy(self, policy):
+        from project.data_access_layer.PoliciesInCompositeORM import PoliciesInCompositeORM
+        poliorm = PoliciesInCompositeORM(composite_discount_id=self.policy_id, policy_id=policy.id,
+                                         store_id=self.store_id)
+        poliorm.add()
+
+    def remove_policy(self, policy):
+        session.query(PoliciesInCompositeORM).delete.where(composite_discount_id=self.policy_id, policy_id=policy.id,
+                                         store_id=self.store_id)
