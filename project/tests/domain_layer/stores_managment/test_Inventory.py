@@ -12,16 +12,16 @@ if __name__ == '__main__':
 class TestInventory(TestCase):
     def setUp(self):
         self.inv = Inventory()
-        self.inv.products["orange"] = Product("orange", 2, "food", None, 6)
-        self.inv.products["Banana"] = Product("Banana", 2, "food", None, 2)
-        self.inv.products["Tako"] = Product("Tako", 2, "food", None, 2)
-        self.inv.products["Bamba"] = Product("Bamba", 2, "food", None, 2)
-        self.inv.products["Potato"] = Product("Potato", 2, "food", None, 2)
+        self.inv.products["orange"] = Product("orange", 2, "food", None, 6,0)
+        self.inv.products["Banana"] = Product("Banana", 2, "food", None, 2,0)
+        self.inv.products["Tako"] = Product("Tako", 2, "food", None, 2,0)
+        self.inv.products["Bamba"] = Product("Bamba", 2, "food", None, 2,0)
+        self.inv.products["Potato"] = Product("Potato", 2, "food", None, 2,0)
         self.products_list = ["orange", "Banana", "Tako", "Bamba", "Potato"]
 
     def test_add_product(self):
-        apple = Product("apple", 1, "food", None, 2)
-        self.inv.add_product(apple.name, Product("apple", 1, "food", None, 2))
+        apple = Product("apple", 1, "food", None, 2,0)
+        self.inv.add_product(apple.name, Product("apple", 1, "food", None, 2,0))
         inv_apple = self.inv.products.get(apple.name)
         self.assertTrue(apple == inv_apple)
 
