@@ -93,8 +93,8 @@ class ConditionalStoreDiscount(Discount):
 
     def createORM(self):
         if self.orm is None:
-            from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountsORM
-            self.orm = ConditionalStoreDiscountsORM()
+            from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountORM
+            self.orm = ConditionalStoreDiscountORM()
             self.orm.discount_id= self.id
             self.orm.store_id = self.store_id
             self.orm.start_date = self.start

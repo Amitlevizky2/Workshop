@@ -21,7 +21,7 @@ class ConditionalStoreDiscountORM(DiscountORM):
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
-        Base.metadata.create_all(engine, [Base.metadata.tables['conditionalstoredicounts']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['conditionalstorediscounts']], checkfirst=True)
         session.add(self)
         session.commit()
 

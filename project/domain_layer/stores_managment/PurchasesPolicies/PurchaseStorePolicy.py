@@ -20,6 +20,8 @@ class PurchaseStorePolicy(PurchasePolicy):
             self.orm.min_amount = min_amount_products
             self.orm.max_amount = max_amount_products
             self.orm.add()
+        else:
+            self.orm = orm
 
     def is_approved(self, product_price_dict: dict):    #    {"product name",(Product, amount)}
         outcome_description = ""

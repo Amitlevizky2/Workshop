@@ -1,6 +1,6 @@
 import jsons
 from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String, DateTime
+from sqlalchemy import Table, Column, Integer, ForeignKey, String, DateTime, Text
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine
@@ -14,7 +14,7 @@ class PurchaseORM(Base):
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     date = Column(DateTime, primary_key=True)
     id = Column(Integer)
-    products = Column(String)
+    products = Column(Text)
 
 
 #create purchaseORM and send to this function

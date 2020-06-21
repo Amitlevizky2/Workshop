@@ -99,6 +99,7 @@ class Initializer:
         print(discount)
         self.users_manager.logout(username)
 
+#checkkkkkk
     def add_conditional_discount_to_store(self, username, store_id, start_date, end_date, percent, min_price):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
