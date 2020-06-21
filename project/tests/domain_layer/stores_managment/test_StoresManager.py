@@ -81,7 +81,7 @@ class test_StoresManager(unittest.TestCase):
         res = self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
                                                 ["no"], 20)
         res = jsons.loads(res)
-        self.assertFalse(res['error'])
+        self.assertTrue(res['ans'])
         res = self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
                                                     ["no"], 20)
         res = jsons.loads(res)
@@ -117,13 +117,13 @@ class test_StoresManager(unittest.TestCase):
         self.assertFalse(res['ans'])
 
     def test_add_purchase_product_policy(self):
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
+        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
         # self.assertTrue(res)
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", None, None)
+        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", None, None, ['Banana'])
         # self.assertFalse(res)
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 1, None)
+        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 1, None, ['Banana'])
         # self.assertTrue(res)
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner2", 1, 2)
+        res = self.store_manager.add_purchase_product_policy(1, "test_owner2", 1, 2, ['Banana'])
         # self.assertFalse(res)
 
     def test_add_purchase_composite_policy(self):
@@ -144,7 +144,7 @@ class test_StoresManager(unittest.TestCase):
 
     def test_add_policy_to_purchase_composite_policy(self):
         policies_id = self.init_purchases_policies()
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
+        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
         self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
 
         res = self.store_manager.add_policy_to_purchase_composite_policy(
@@ -160,7 +160,7 @@ class test_StoresManager(unittest.TestCase):
         # self.assertFalse(res)
 
     def test_add_product_to_purchase_product_policy(self):
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
+        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
 
         res = self.store_manager.add_product_to_purchase_product_policy(
             1, 1, "test_owner1", "Apple")
@@ -178,7 +178,7 @@ class test_StoresManager(unittest.TestCase):
         # self.assertFalse(res) TODO: tests
 
     def test_remove_purchase_policy(self):
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8)
+        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
         # self.assertTrue(res)
 
         res = self.store_manager.remove_purchase_policy(1, "store_owner1", 1)
