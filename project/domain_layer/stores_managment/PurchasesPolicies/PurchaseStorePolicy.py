@@ -7,7 +7,7 @@ class PurchaseStorePolicy(PurchasePolicy):
         super().__init__(p_id, store_id)
         self.min_amount_products = min_amount_products
         self.max_amount_products = max_amount_products
-        self.id = id
+        self.id = p_id
         # self.products_int_policy = {}  # {product_name, bool}
         self.MAX_SIZE = 100000
         self.MIN_SIZE = 0

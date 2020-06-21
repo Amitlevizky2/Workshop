@@ -303,7 +303,8 @@ class StoresManager:
         logic_operator = get_logic_operator(logic_operator_str)
         if purchase_policies_id is None or logic_operator is None:
             return jsons.dumps({'error': True, 'error_msg': "The parameters are not valid"})
-
+        print("printing policy IDs ")
+        print(purchase_policies_id)
         store = self.get_store(store_id)
         policies = []
 
@@ -312,7 +313,8 @@ class StoresManager:
                 return jsons.dumps({'error': True, 'error_msg': "Wrong policy id was inserted \n"})
             policy: PurchasePolicy = store.purchase_policies[purch_policy_id]
             policies.append(policy)
-
+        print("printing policies ")
+        print(policies)
         return jsons.dumps(
             store.add_purchase_composite_policy(permitted_user, policies, logic_operator))
 

@@ -529,6 +529,7 @@ class Store:
         self.purchases_idx += 1
 
         for policy in policies:
+            print(policy.__dict__)
             del self.purchase_policies[policy.id]
 
         policy = PurchaseCompositePolicy(policies, logic_operator, self.purchases_idx, self.store_id)

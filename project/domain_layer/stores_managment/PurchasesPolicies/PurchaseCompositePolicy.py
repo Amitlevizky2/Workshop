@@ -16,7 +16,7 @@ class PurchaseCompositePolicy(PurchasePolicy):
             self.orm = CompositePolicyORM()
             self.orm.policy_id = self.id
             self.orm.store_id = self.store_id
-            self.orm.logic_operator = logic_operator
+            self.orm.logic_operator = str(self.logic_operator)
             self.orm.add_policies(purchase_policies)
             self.orm.add()
         else:

@@ -166,7 +166,7 @@ class StoresManagerInterface:
     def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
                                       purchase_policies_id=None,
                                       logic_operator: str = None):
-        return self.add_purchase_composite_policy(store_id, permitted_user, purchase_policies_id, logic_operator)
+        return self.stores_manager.add_purchase_composite_policy(store_id, permitted_user, purchase_policies_id, logic_operator)
 
     def add_policy_to_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
                                                 composite_id: int = None,

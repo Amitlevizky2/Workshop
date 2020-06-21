@@ -5,14 +5,12 @@ from datetime import datetime
 
 from project.data_access_layer.DiscountORM import DiscountORM
 from project.data_access_layer.PolicyORM import PolicyORM
+from project.data_access_layer.PoliciesInCompositeORM import PoliciesInCompositeORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 from project.data_access_layer import Base, session, engine
 
-policies_in_composite_association = Table('Policies_in_Composite', Base.metadata,
-                             Column('composite_policy_id', Integer, ForeignKey('CompositePolicies.discount_id')),
-                             Column('policy_id', Integer, ForeignKey('Policies.id'))
-                             )
+
 
 
 
@@ -21,7 +19,7 @@ class CompositePolicyORM(PolicyORM):
     policy_id = Column(Integer, ForeignKey('policies.policy_id'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     logic_operator = Column(Integer)
-    policies_in_here = relationship("PoliciesORM", secondary=policies_in_composite_association)
+    policies_to_apply = relationship("PoliciesInCompositeORM")
 
     def change_logic_operaor(self, lo):
         self.logic_operator = lo
@@ -32,14 +30,8 @@ class CompositePolicyORM(PolicyORM):
         session.add(self)
         session.commit()
 
-    def add_policies(self, policies):
-        for poli in policies:
-            self.add_policy(poli)
-
-    def add_policy(self, policy):
-        pass
-        #TODO: check how to add to association table
-
-    def remove_policy(self, policy):
-        pass
-    #TODO: check association tables
+    def add_policies(self, purchase_policies):
+        for policy in purchase_policies:
+            from project.data_access_layer.PoliciesInCompositeORM import PoliciesInCompositeORM
+            poliorm = PoliciesInCompositeORM(composite_discount_id = self.policy_id, policy_id = policy.id, store_id = self.store_id)
+            poliorm.add()

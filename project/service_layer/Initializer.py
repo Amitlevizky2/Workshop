@@ -140,3 +140,9 @@ class Initializer:
         self.stores_manager.add_composite_discount(store_id, username, start_date, end_date, logic_opr,
                                                    discounts_preds, discounts_to_apply)
         self.users_manager.logout(username)
+
+    def add_composite_policy(self, store_id, username, logic_opr, policies):
+        guest = self.users_manager.add_guest_user()
+        self.users_manager.login(guest, username, "pass")
+        self.stores_manager.add_purchase_composite_policy(store_id, username, policies, logic_opr)
+        self.users_manager.logout(username)
