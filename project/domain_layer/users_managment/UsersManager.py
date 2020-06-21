@@ -155,8 +155,21 @@ class UsersManager:
                 return False, user
         return False, {'error_msg': 'user ' + admin + ' is not an admin'}
 
+    def add_admin(self, admin, username_to_be_admin):
+        if self.find_reg_user(username_to_be_admin)[0]:
+            if self.is_admin(admin):
+                if not self.is_admin(username_to_be_admin):
+                    self.admins.append(username_to_be_admin)
+                else:
+                    return False, {'error_msg': 'user' + username_to_be_admin + 'is allready admin'}
+            else:
+                return False,{'error_msg': 'user ' + admin + ' is not an admin'}
+        else:
+            return False, {'error_msg': 'user ' + username_to_be_admin + ' is not an registered user'}
+
     def is_admin(self, username):
         return username in self.admins
+
 
     def add_managed_store(self, username, store_id):
         ans, user = self.find_reg_user(username)

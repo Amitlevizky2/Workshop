@@ -6,12 +6,13 @@ from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy impo
 
 
 class CompositeDiscount(Discount):                                    #[(Discount, [products_name])]
-    def __init__(self, start_date, end_date, logic_operator: LogicOperator, cond_prod_tup_list: list, discounts_to_apply: list):
-        super().__init__(start_date, end_date, 0)
+    def __init__(self, start_date, end_date, logic_operator: LogicOperator, cond_prod_tup_list: list, discounts_to_apply: list, store_id, orm=None):
+        super().__init__(start_date, end_date, 0, store_id)
         self.discounts_to_apply = discounts_to_apply
         self.logic_operator = logic_operator
         # self.products_in_discount = {}  # {product: bool}
         self.cond_prod_tup_list = cond_prod_tup_list
+        self.orm = orm
         self.discount_type = "Composite Discount"
 
     def commit_discount(self, product_price_dict: dict):
@@ -99,3 +100,19 @@ class CompositeDiscount(Discount):                                    #[(Discoun
 
     def get_updated_price(self, product: Product):
         return product.original_price
+
+    def createORM(self):
+        #TODO: add building of list of predicates and to_apply
+        if self.orm is None:
+            from project.data_access_layer.CompositeDiscountORM import CompositeDiscountORM
+            self.orm = CompositeDiscountORM()
+            self.orm.discount_id= self.id
+            self.orm.start_date = self.start
+            self.orm.end_date = self.end
+            self.orm.percent = self.discount
+            self.orm.logic_operator = self.logic_operator
+            for prod in self.products_in_discount.keys():
+                from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
+                pidorm = ProductsInDiscountsORM(discount_id=self.discount_id, product_name=prod, store_id=self.store_id)
+                pidorm.add()
+            self.orm.add()

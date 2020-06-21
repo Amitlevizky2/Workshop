@@ -44,6 +44,7 @@ class Inventory:
     def remove_product(self, product_name):
         if product_name in self.products.keys():
             self.products.pop(product_name)
+            self.products[product_name].orm.delete()
             return True
         return False
 

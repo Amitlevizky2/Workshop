@@ -7,7 +7,7 @@ class Driver:
     @staticmethod
     def make_bridge() -> Proxy:
         proxy = Proxy()
-        adapter = Adapter()
+        #adapter = Adapter()
         #proxy.set_real(adapter)
         return proxy
 

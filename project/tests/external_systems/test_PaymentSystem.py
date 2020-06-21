@@ -25,6 +25,7 @@ class failed_paymenstub:
 class test_PaymentSystem(unittest.TestCase):
     def setUp(self) -> None:
         self.payment = PaymentSystem()
+
     def test_connect(self):
         self.payment.set_external(external_paymentstub())
         self.assertTrue(self.payment.connect())
@@ -33,5 +34,7 @@ class test_PaymentSystem(unittest.TestCase):
         self.assertFalse(self.payment.connect())
 
     def test_pay(self):
-        self.payment.set_external(failed_paymenstub())
-        self.assertListEqual(jsonpickle.decode(self.payment.pay("user",jsonpickle.encode(Cart()))),[])
+        #self.payment.set_external(failed_paymenstub())
+        #self.assertListEqual(jsonpickle.decode(self.payment.pay("user",jsonpickle.encode(Cart()))),[])
+        y= self.payment.pay("hadar",123,100,45804580,12,2030,"hadar",123,100)
+        x=5

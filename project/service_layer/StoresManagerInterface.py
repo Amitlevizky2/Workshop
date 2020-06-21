@@ -126,6 +126,9 @@ class StoresManagerInterface:
     def buy(self, cart):
         return self.stores_manager.buy(cart)
 
+    def add_admin(self,admin,user_to_be_admin):
+        return self.users_manager.add_admin(admin,user_to_be_admin)
+
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
         if self.users_manager.check_if_registered(user) and (

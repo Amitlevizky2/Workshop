@@ -1,17 +1,27 @@
 import jsons
 
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 from project.domain_layer.users_managment.User import User
 
 
 class RegisteredUser(User):
 
-    def __init__(self, username):
+    def __init__(self, username, orm = None):
         super().__init__(username)
         self.username = username
         self.purchase_history = []
         self.loggedin = False
         self.managed_stores = []
         self.notifications = []
+        if orm is None:
+            self.orm = RegisteredUserORM()
+            self.orm.username = username
+            self.orm.add()
+        else:
+            self.orm = orm
+
+    def add_purchase(self, purchase):
+        self.purchase_history.append(purchase)
 
     def logout(self):
         self.loggedin = False
@@ -54,6 +64,7 @@ class RegisteredUser(User):
     def add_notification(self, message):
         print('user: ' + self.username + 'got notification: ' + message)
         self.notifications.append(message)
+        self.orm.add_notification(self.username, message)
 
     def have_notifications(self) -> bool:
         return self.notifications.__len__() > 0

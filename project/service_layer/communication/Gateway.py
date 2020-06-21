@@ -147,7 +147,7 @@ def add_purchase():
 @app.route('/buy', methods=['POST', 'GET'])
 def buy():
     message = request.get_json()
-    data = purchase_manager.buy(message['username'])
+    data = purchase_manager.buy(message['username'],message['store_id'],message['price'],message['number'],message['month'],message['year'],message['holder'],message['ccv'],message['id'])
     return jsonify(data)
 
 
