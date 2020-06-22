@@ -2,21 +2,19 @@ import datetime
 
 from project.domain_layer.communication_managment.Publisher import Publisher
 from project.domain_layer.external_managment.Purchase import Purchase
-from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import \
-    ConditionalProductDiscount
 from project.domain_layer.stores_managment.DiscountsPolicies.DiscountPolicy import Discount
 from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
 from project.domain_layer.stores_managment.Store import Store
 
-
 class StoreStub(Store):
+
     def __init__(self, store_id, name, store_owner):
         super().__init__(store_id, name, store_owner)
-        self.init_discount()
-        self.init_purchase_policy()
-        self.init_inventory()
+        # self.init_discount()
+        # self.init_purchase_policy()
+        # self.init_inventory()
 
     def appoint_owner(self, owner, to_appoint):
         if owner is 'store_owner11' and to_appoint is 'owner':
@@ -237,7 +235,7 @@ class StoreStub(Store):
     def init_discount(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import \
             VisibleProductDiscount
-        vis_discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5)
+        vis_discount = VisibleProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 1)
         # cond_discount = ConditionalProductDiscount(datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 5, 2, 2)
         self.discounts[1] = vis_discount
 
@@ -245,5 +243,5 @@ class StoreStub(Store):
         pass
 
     def init_purchase_policy(self):
-        policy = PurchaseProductPolicy(2, 6, 1)
+        policy = PurchaseProductPolicy(2, 6, 1, 1)
         self.purchase_policies[1] = policy

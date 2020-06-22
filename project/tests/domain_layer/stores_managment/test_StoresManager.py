@@ -3,7 +3,6 @@ import unittest
 
 import jsons
 
-from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
 from project.domain_layer.stores_managment.Store import Store
@@ -11,10 +10,25 @@ from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
 from project.tests.domain_layer.stores_managment.Stubs.StoreStub import StoreStub
+import project.data_access_layer
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 
 
 class test_StoresManager(unittest.TestCase):
     def setUp(self) -> None:
+
+        path = 'sqlite:////Users/avivlevitzky/PycharmProjects/Workshop/project/test.db'
+        Base = declarative_base()
+        session = sessionmaker()
+        engine = create_engine(path, echo=True)
+        session.configure(bind=engine)
+        session = Session()
+
+
+
+
         self.store_manager = StoresManager()
         # self.stores_getters = StoresGetters(self.store_manager)
         for i in range(5):
@@ -23,9 +37,9 @@ class test_StoresManager(unittest.TestCase):
                                                                          Store.update_product]
             self.store_manager.stores_idx = i
 
-        products = self.init_product()
-        self.insert_products_to_store(products.values(), self.store_manager.stores.values())
-        self.init_discounts()
+        # products = self.init_product()
+        # self.insert_products_to_store(products.values(), self.store_manager.stores.values())
+        # self.init_discounts()
         self.init_stores()
 
     def init_stores(self):
@@ -172,7 +186,7 @@ class test_StoresManager(unittest.TestCase):
                                                          datetime.datetime(2020, 12, 17),
                                                          "and", {1: ['Banana']}, [1])
         res1 = jsons.loads(res1)
-        self.assertFalse(res1['error'])
+        self.assertFalse(res1)
 
     # def test_add_composite_discount(self):
     #     res1 = self.store_manager.add_composite_discount(11,
