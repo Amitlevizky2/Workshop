@@ -193,4 +193,7 @@ class UsersManagerInterface:
     def init_data(self):
         self.user_manager.init_data()
 
+    def get_today_stats(self):
+        self.user_manager.get_today_stats()
+
 

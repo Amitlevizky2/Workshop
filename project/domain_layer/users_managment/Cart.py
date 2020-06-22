@@ -64,9 +64,10 @@ class Cart:
         """
         baskets_description = []
         for value in self.baskets.values():
-            baskets_description.append({
+            print(type(value))
+            baskets_description.append(
                 value.get_jsn_description()
-            })
+            )
         return {
             'baskets': baskets_description
         }
