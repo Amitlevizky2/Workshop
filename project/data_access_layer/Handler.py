@@ -1,7 +1,7 @@
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session,engine
+from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ProductORM import ProductORM
 from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
 from project.data_access_layer.PurchaseORM import PurchaseORM
@@ -16,40 +16,49 @@ class Handler:
         #open session
 
     def find_user(self, username):
-        user = session.query(RegisteredUserORM).filter_by(username=username).first()
+        user = proxy.get_handler_session().query(RegisteredUserORM).filter_by(username=username).first()
         return user.createObject()
 
 #CALL WHEN ADDED TO CART PRODUCT
     def find_store(self, store_id):
-        store = session.query(StoreORM).filter_by(id=store_id).first()
+        store = proxy.get_handler_session().query(StoreORM).filter_by(id=store_id).first()
         return store.createObject()
 
     def get_all_stores(self):
-        stores = session.query(StoreORM)
+        Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
+        stores = proxy.get_handler_session().query(StoreORM)
         real_stores = []
         for store in stores:
             real_stores.append(store.createObject())
+        return real_stores
 
     def get_all_regusers(self):
-        users = session.query(RegisteredUserORM)
+        Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['notifications']], checkfirst=True)
+        users = proxy.get_handler_session().query(RegisteredUserORM)
         real_users =[]
         for user in users:
             real_users.append(user.createObject())
+        return real_users
 
     def search(self, name):
         #maybe filter like
         #CHECK HOW TO QUERY CONTAINS
-        products = session.query(ProductORM).fiter_by(name="%name%")
+        products = proxy.get_handler_session().query(ProductORM).fiter_by(name="%name%")
         real_products =[]
         prod_discounts = {}
         result={}
         for product in products:
-            storeorm = session.query(StoreORM).filter_by(id=product.store_id)
+            storeorm = proxy.get_handler_session().query(StoreORM).filter_by(id=product.store_id)
             store_name = storeorm.name
             if store_name not in result.keys():
                 result[store_name] = {"products": [], "discounts": []}
             result[store_name]["products"].append(product.createObject())
-            pidOrm = session.query(ProductsInDiscountsORM).filter_by(product_name=name, store_id =product.store_id)
+            pidOrm = proxy.get_handler_session().query(ProductsInDiscountsORM).filter_by(product_name=name, store_id =product.store_id)
             for dis in pidOrm:
                 real_discount = dis.discount.createObject()
                 result[store_name]["discounts"].append(real_discount)
@@ -57,17 +66,23 @@ class Handler:
         #return list of  {store_name, {products:[Products], discounts:[Discounts] } }
 
     def find_user_purchases(self, username):
-        return session.query(PurchaseORM).filter_by(username=username)
+        orms = proxy.get_handler_session().query(PurchaseORM).filter_by(username=username)
+        purchases = []
+        for p in orms:
+            purchase = p.createObject()
+            purchases.append(purchase)
+        return purchases
 
     def find_store_purchases(self, store_id):
-        return session.query(PurchaseORM).filter_by(store_id=store_id)
+        orms = proxy.get_handler_session().query(PurchaseORM).filter_by(store_id=store_id)
+        purchases =[]
+        for p in orms:
+            purchase = p.createObject()
+            purchases.append(purchase)
+        return purchases
 
 
 #TODO:
     #def buy(self):
-
-
-    #def login(self,username):
-
 
     #def viewcart(self, username):

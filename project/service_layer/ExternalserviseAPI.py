@@ -2,8 +2,7 @@
 import requests
 
 class ExternalServiceAPI:
-    def __init__(self):
-       self.obj = ExternalServiceAPI()
+
 
     def connect(self):
         handsheke = {"action_type": "handshake"}

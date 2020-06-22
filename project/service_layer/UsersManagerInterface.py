@@ -11,13 +11,13 @@ from project.service_layer.Security import Security
 class UsersManagerInterface:
     security = Security()
 
-    def __init__(self):
-        self.user_manager = UsersManager()
+    def __init__(self, data_handler):
+        self.user_manager = UsersManager(data_handler)
         self.stores_manager = None
-        username = self.user_manager.add_guest_user()
-        print(username)
-        self.user_manager.register(username, "admin")
-        self.user_manager.admins.append("admin")
+        #username = self.user_manager.add_guest_user()
+        #print(username)
+        #self.user_manager.register(username, "admin")
+        #self.user_manager.admins.append("admin")
 
     def set_stores_manager(self, stores_manager: StoresManagerInterface):
         self.stores_manager = stores_manager
@@ -189,5 +189,8 @@ class UsersManagerInterface:
 
     def get_users_manager(self) -> UsersManager:
         return self.user_manager
+
+    def init_data(self):
+        self.user_manager.init_data()
 
 

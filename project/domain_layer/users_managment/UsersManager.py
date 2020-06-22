@@ -13,11 +13,11 @@ class UsersManager:
     # store_manager = StoresManager()
     incremental_id = 0
 
-    def __init__(self):
+    def __init__(self, data_handler):
         # self.publisher = None
         #  self.stores_manager = None
         self.reg_user_list = {}
-
+        self.data_handler = data_handler
         self.guest_user_list = {}
         # maybe dictionary {id, username}
         self.admins = []
@@ -243,3 +243,8 @@ class UsersManager:
     #     self.stores_manager = stores_manager
     def is_store_manager(self, username):
         pass
+
+    def init_data(self):
+        users = self.data_handler.get_all_regusers()
+        for user in users:
+            self.reg_user_list[user.username] = user

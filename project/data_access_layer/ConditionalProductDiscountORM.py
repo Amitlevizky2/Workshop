@@ -3,7 +3,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, update
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, engine, session
+from project.data_access_layer import Base, engine, session, proxy
 from project.data_access_layer.DiscountORM import DiscountORM
 
 
@@ -20,16 +20,16 @@ class ConditionalProductDiscountsORM(DiscountORM):
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['conditionalproductdiscounts']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def update_min_amount(self, min):
         self.min_amount = min
-        session.commit()
+        proxy.get_session().commit()
 
     def update_num_to_apply(self, num):
         self.num_products_to_apply = num
-        session.commit()
+        proxy.get_session().commit()
 
     def createObject(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import \

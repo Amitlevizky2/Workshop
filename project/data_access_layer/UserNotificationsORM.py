@@ -2,12 +2,11 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session,engine
-
+from project.data_access_layer import Base, session, engine, proxy
 
 
 def find_all_notifications(username):
-    return session.query(UserNotificationORM).filter_by(username=username)
+    return proxy.get_session().query(UserNotificationORM).filter_by(username=username)
 
 
 
@@ -21,5 +20,5 @@ class UserNotificationORM(Base):
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['notifications']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()

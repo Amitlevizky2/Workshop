@@ -1,21 +1,25 @@
+import time
+
+from project.data_access_layer.Handler import Handler
 from project.domain_layer.communication_managment.Publisher import Publisher
 from project.service_layer.PurchaseManager import PurchaseManager
 from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
 from os import path
+from project.data_access_layer import engine
 
 
 class Initializer:
     def __init__(self, sio):
-        self.users_manager = UsersManagerInterface()
-        self.stores_manager = StoresManagerInterface(self.users_manager)
+        self.data_handler = Handler()
+        self.users_manager = UsersManagerInterface(self.data_handler)
+        self.stores_manager = StoresManagerInterface(self.users_manager, self.data_handler)
         self.purchase_manager = PurchaseManager(self.users_manager, self.stores_manager)
         self.publisher = Publisher(sio)
         self.users_manager.set_stores_manager(self.stores_manager)
         self.stores_manager.bound_publisher(self.publisher)
         self.bound_managers()
-        print(path.exists("../../tradeSystem.db"))
-        if path.exists("init.txt"):
+        if path.exists("init.txt") and not engine.dialect.has_table(engine, "regusers"):
             file1 = open('init.txt', 'r')
             Lines = file1.readlines()
             sid = 0
@@ -26,20 +30,22 @@ class Initializer:
 
             # print(self.stores_manager.stores_manager.get_store(0).store_managers)
         else:
-            file1 = open('init.txt', 'w')
-            L = ""
-            for i in range(1, 7):
-                L += "self.register(\"u" + str(i) + "\")\n"
-
-            L += "self.open_store(\"u2\",\"s1\")\n"
-            L += "self.add_product(\"u2\",sid,\"diapers\",30,20)\n"
-            L += "self.appoint_owner(\"u2\",sid,\"u3\")\n"
-
-            L += "self.appoint_manager(\"u3\",sid,\"u5\")\n"
-            L += "self.add_permission(\"u3\",sid,\"u5\",\"add_product\")\n"
-            L += "self.appoint_manager(\"u3\",sid,\"u6\")\n"
-            file1.writelines(L)
-            file1.close()
+            self.users_manager.init_data()
+            self.stores_manager.init_data()
+            # file1 = open('init.txt', 'w')
+            # L = ""
+            # for i in range(1, 7):
+            #     L += "self.register(\"u" + str(i) + "\")\n"
+            #
+            # L += "self.open_store(\"u2\",\"s1\")\n"
+            # L += "self.add_product(\"u2\",sid,\"diapers\",30,20)\n"
+            # L += "self.appoint_owner(\"u2\",sid,\"u3\")\n"
+            #
+            # L += "self.appoint_manager(\"u3\",sid,\"u5\")\n"
+            # L += "self.add_permission(\"u3\",sid,\"u5\",\"add_product\")\n"
+            # L += "self.appoint_manager(\"u3\",sid,\"u6\")\n"
+            # file1.writelines(L)
+            # file1.close()
 
     def get_users_manager_interface(self) -> UsersManagerInterface:
         return self.users_manager
@@ -118,7 +124,6 @@ class Initializer:
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_purchase_product_policy(store_id, username, min_amount_products, max_amount_products, products)
-        print("GOT HERE MOTHERFUCKERRRRRRRRR1")
         self.users_manager.logout(username)
 
     def add_purchase_store_policy(self, username, store_id, min_amount_products, max_amount_products):

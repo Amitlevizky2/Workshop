@@ -46,6 +46,6 @@ class Product:
             return {'error': True,
                     'error_msg': 'There is not enough quantity in store'}
         self.amount -= to_reduce
-        self.orm.update_product_amount(self.name, self.orm.store_id, self.amount)
+        self.orm.update_product_amount(self.amount)
         return {'error': False,
                 'data': 'Product amount reduced'}

@@ -2,8 +2,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session,engine
-
+from project.data_access_layer import Base, session, engine, proxy
 
 
 class OwnerORM(Base):
@@ -16,9 +15,9 @@ class OwnerORM(Base):
 
     def add(self, owner):
         Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
-        session.add(owner)
-        session.commit()
+        proxy.get_session().add(owner)
+        proxy.get_session().commit()
 
     def remove(self):
-        session.delete(self)
-        session.commit()
+        proxy.get_session().delete(self)
+        proxy.get_session().commit()
