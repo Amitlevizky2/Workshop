@@ -9,15 +9,11 @@ from project.data_access_layer.PredicateORM import PredicateORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 
-from project.data_access_layer import Base, session, engine
-
-
-
-
+from project.data_access_layer import Base, session, engine, proxy
 
 
 def find_by_id(discount_id):
-    session.query(DiscountORM).filter_by(discount_id=discount_id).first()
+    proxy.get_session().query(DiscountORM).filter_by(discount_id=discount_id).first()
 
 
 class CompositeDiscountORM(DiscountORM):
@@ -32,14 +28,14 @@ class CompositeDiscountORM(DiscountORM):
 
     def change_logic_operaor(self, lo):
         self.logic_operator = lo
-        session.commit()
+        proxy.get_session().commit()
 
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['CompositeDiscounts']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def createObject(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import \

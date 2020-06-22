@@ -12,8 +12,8 @@ from project.domain_layer.stores_managment.StoresManager import StoresManager
 
 
 class StoresManagerInterface:
-    def __init__(self, users_manager):
-        self.stores_manager = StoresManager()
+    def __init__(self, users_manager, data_handler):
+        self.stores_manager = StoresManager(data_handler)
         self.stores_getters = StoresGetters(self.stores_manager)
         self.spell_checker = SpellChecker()
         self.users_manager = users_manager
@@ -136,7 +136,7 @@ class StoresManagerInterface:
             return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))
 
     def remove_product(self, store_id, product_name, username):
-        return self.stores_manager.remove_produce_from_store(store_id, product_name, username)
+        return self.stores_manager.remove_product_from_store(store_id, product_name, username)
 
     # def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
     #     return self.stores_manager.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
@@ -347,3 +347,6 @@ class StoresManagerInterface:
 
     def is_valid_amount(self, store_id, product_name, quantity):
         return self.stores_manager.is_valid_amount(store_id, product_name, quantity)
+
+    def init_data(self):
+        self.stores_manager.init_data()

@@ -2,8 +2,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import session,Base,engine
-
+from project.data_access_layer import session, Base, engine, proxy
 
 
 class ManagerORM(Base):
@@ -16,9 +15,9 @@ class ManagerORM(Base):
 
     def add(self, manager):
         Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
-        session.add(manager)
-        session.commit()
+        proxy.get_session().add(manager)
+        proxy.get_session().commit()
 
     def remove(self):
-        session.delete(self)
-        session.commit()
+        proxy.get_session().delete(self)
+        proxy.get_session().commit()

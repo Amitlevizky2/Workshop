@@ -2,16 +2,16 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, String, update, ForeignKey
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session, engine
+from project.data_access_layer import Base, session, engine, proxy
 from project.domain_layer.stores_managment.Product import Product
 
 
 def find_product(name, store_id):
-    return session.query(ProductORM).filter_by(name=name, store_id=store_id).first()
+    return proxy.get_session().query(ProductORM).filter_by(name=name, store_id=store_id).first()
 
 
 def find_product_store_id(name, store_id):
-    return session.query(ProductORM).filter_by(store_id=store_id).first()
+    return proxy.get_session().query(ProductORM).filter_by(store_id=store_id).first()
 
 class ProductORM(Base):
     __tablename__ = 'products'
@@ -25,15 +25,15 @@ class ProductORM(Base):
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def find_product(self, name, store_id):
-        return session.query(ProductORM).filter_by(name=name, store_id=store_id).first()
+        return proxy.get_session().query(ProductORM).filter_by(name=name, store_id=store_id).first()
 
-    def update_product_amount(self, name, store_id, amount):
+    def update_product_amount(self, amount):
         self.quantity = amount
-        session.commit()
+        proxy.get_session().commit()
 
     def update_product(self, attribute, updated):
         if attribute == self.categories:
@@ -42,10 +42,10 @@ class ProductORM(Base):
             self.key_words = updated
         if attribute == self.price:
             self.price = updated
-        session.commit()
+        proxy.get_session().commit()
 
     def delete(self):
-        session.query(ProductORM).delete.where(name=self.name, store_id=self.store_id)
+        proxy.get_session().query(ProductORM).delete.where(name=self.name, store_id=self.store_id)
 
     def createObject(self):
-        return Product(self.name, self.price, self.categorties, self.key_words, self.amount, self)
+        return Product(self.name, self.price, self.categories, self.key_words, self.quantity, self.store_id, self)
