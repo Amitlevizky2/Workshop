@@ -577,7 +577,7 @@ class Store:
 
     def get_discount_by_id(self, discount_id):
         if discount_id in self.discounts.keys():
-            return {'ans': False, 'discount': self.discounts[discount_id]}
+            return {'error': False, 'discount': self.discounts[discount_id]}
 
     def get_purchase_policies(self):
         return {'ans': True,

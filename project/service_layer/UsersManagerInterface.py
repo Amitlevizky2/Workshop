@@ -190,4 +190,7 @@ class UsersManagerInterface:
     def get_users_manager(self) -> UsersManager:
         return self.user_manager
 
+    def get_today_stats(self):
+        self.user_manager.get_today_stats()
+
 
