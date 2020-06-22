@@ -2,14 +2,15 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, exc
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session,engine
+from project.data_access_layer import Base, session, engine, proxy
+
 
 #from project.data_access_layer.OwnerORM import OwnerORM
 
 
 
 def find_by_username(username):
-    return session.query(RegisteredUserORM).filter_by(username=username).first()
+    return proxy.get_session().query(RegisteredUserORM).filter_by(username=username).first()
 
 
 
@@ -28,8 +29,8 @@ class RegisteredUserORM(Base):
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
         try:
-            session.add(self)
-            session.commit()
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
         except exc.SQLAlchemyError:
             pass
             #try catch what do i do with catch
@@ -38,8 +39,8 @@ class RegisteredUserORM(Base):
     def add_notification(self, username, message):
         from project.data_access_layer.UserNotificationsORM import UserNotificationORM
         notif = UserNotificationORM(username=username, notification=message)
-        session.add(notif)
-        session.commit()
+        proxy.get_session().add(notif)
+        proxy.get_session().commit()
 
     def createObject(self):
         from project.domain_layer.users_managment.RegisteredUser import RegisteredUser

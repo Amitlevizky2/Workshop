@@ -1,7 +1,9 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean, update
+from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session, engine
+from project.data_access_layer import Base, session, engine, proxy
+from project.data_access_layer.ProductORM import ProductORM
 
 
 class ProductsInBasketORM(Base):
@@ -11,12 +13,13 @@ class ProductsInBasketORM(Base):
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     product_name = Column(String, ForeignKey('products.name'), primary_key=True)
     quantity = Column(Integer)
+    product = relationship("ProductORM")
 
     def update_quantity(self, amount):
         self.quantity = amount
-        #session.commit()
+        #proxy.get_session().commit()
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['productsinbaskets']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()

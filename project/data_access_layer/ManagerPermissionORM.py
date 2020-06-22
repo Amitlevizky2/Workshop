@@ -15,8 +15,8 @@ class ManagerPermissionORM(Base):
 
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['managerpermissions']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def remove(self, username, store_id, permission):
-        session.query(ManagerPermissionORM).delete.where(username=username, store_id=store_id, permission=permission)
+        proxy.get_session().query(ManagerPermissionORM).delete.where(username=username, store_id=store_id, permission=permission)

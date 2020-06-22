@@ -9,6 +9,7 @@ class RegisteredUser(User):
     def __init__(self, username, orm = None):
         super().__init__(username)
         self.username = username
+       # self.is_admin =
         self.purchase_history = []
         self.loggedin = False
         self.managed_stores = []

@@ -2,7 +2,7 @@ from sqlalchemy import Table, Column, Integer, ForeignKey, String,update
 from sqlalchemy.orm import relationship
 from datetime import  datetime
 
-from project.data_access_layer import Base, session, engine
+from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.DiscountORM import DiscountORM
 from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
 
@@ -19,8 +19,8 @@ class VisibleProductDiscountORM(DiscountORM):
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscounts']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def createObject(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import \

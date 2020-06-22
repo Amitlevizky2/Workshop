@@ -31,8 +31,24 @@ class Security:
         #     return pwdhash == stored_password
         # else:
         #     return False
+
+        stored_password = SORM.find_pass(username).hashed_pass
+        salt = stored_password[:64]
+        stored_password = stored_password[64:]
+        pwdhash = hashlib.pbkdf2_hmac('sha512',
+                                      provided_password.encode('utf-8'),
+                                      salt.encode('ascii'),
+                                      100000)
+        pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+        return pwdhash == stored_password
+
+
         password = SORM.find_pass(username)
-        if self.hash_password(provided_password) == password:
+        print("recived before hash "+provided_password)
+        print("from DB:")
+        print(password.hashed_pass)
+        print("recieved" + self.hash_password(provided_password))
+        if self.hash_password(provided_password) == password.hashed_pass:
             return True
         else:
             return False

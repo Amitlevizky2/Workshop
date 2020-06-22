@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from project.data_access_layer.DiscountORM import DiscountORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
-from project.data_access_layer import Base, session, engine
+from project.data_access_layer import Base, session, engine, proxy
 
 
 class PolicyORM(Base):
@@ -14,10 +14,9 @@ class PolicyORM(Base):
     discriminator = Column('type', String(50))
     products = relationship("ProductsInPoliciesORM")
     __mapper_args__ = {
-        'polymorphic_identity': 'policy',
         'polymorphic_on': discriminator
     }
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()

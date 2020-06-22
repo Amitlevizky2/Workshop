@@ -4,6 +4,7 @@ from project.domain_layer.users_managment.Cart import Cart
 # from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.NullUser import NullUser
 from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
+from project.domain_layer.users_managment.Statistics import Statistics
 from project.domain_layer.users_managment.User import User
 from project import logger
 import jsonpickle
@@ -13,14 +14,15 @@ class UsersManager:
     # store_manager = StoresManager()
     incremental_id = 0
 
-    def __init__(self):
+    def __init__(self, data_handler):
         # self.publisher = None
         #  self.stores_manager = None
         self.reg_user_list = {}
-
+        self.data_handler = data_handler
         self.guest_user_list = {}
         # maybe dictionary {id, username}
         self.admins = []
+        self.stats = Statistics()
 
     def find_reg_user(self, username):
         if username in self.reg_user_list.keys():
@@ -71,10 +73,24 @@ class UsersManager:
             if res is True:
                 self.merge_carts(data, guest_user.cart)
                 self.guest_user_list.pop(username)
+                self.update_stats(username)
                 return True, {'data': data.get_jsn_description()}
             return res, guest_user
         else:
             return False, {'error_msg': 'incorrect user name. Please try again.'}
+
+    def update_stats(self, username: str):
+        self.stats.add_reg_users()
+        self.stats.remove_guests_stats()
+
+        if self.is_manager(username):
+            self.stats.add_managers()
+
+    def is_manager(self, username: str):
+        ans: RegisteredUser = self.find_reg_user(username)
+        if ans.is_store_manager():
+            return True
+        return False
 
     # make sure when  user exits system to remove the user from guest user list
     def add_guest_user(self):
@@ -82,6 +98,7 @@ class UsersManager:
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
         logger.log("guest user with username %s was added to system", user.username)
+        self.stats
         return user.username
 
     # look up via usr id change user list to map of ids and user
@@ -177,7 +194,7 @@ class UsersManager:
             added = user.add_managed_store(store_id)
             if added is True:
                 return True, {'data': 'appointed successfully'}
-            return False, {'error_msg': 'user ' + user + ' is already managing the store: ' + store_id + '.'}
+            return False, {'error_msg': 'user ' + username + ' is already managing the store: ' + str(store_id) + '.'}
         return ans, user
 
     def get_managed_stores(self, username, view_format=''):
@@ -243,3 +260,14 @@ class UsersManager:
     #     self.stores_manager = stores_manager
     def is_store_manager(self, username):
         pass
+
+    def init_data(self):
+        users = self.data_handler.get_all_regusers()
+        for user in users:
+            self.reg_user_list[user.username] = user
+
+    def get_today_stats(self):
+        return {
+            'error': False,
+            'stats': self.stats.get_today_statistics()
+        }

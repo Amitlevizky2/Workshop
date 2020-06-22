@@ -26,6 +26,7 @@ class Inventory:
                 self.products.get(product_name).visible_discount.append(updated)
             else:
                 setattr(self.products.get(product_name), attribute, updated)
+                self.products.get(product_name).orm.update_product(attribute, updated)
             return True
         return False
 

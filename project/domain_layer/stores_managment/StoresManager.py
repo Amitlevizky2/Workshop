@@ -36,11 +36,12 @@ def get_logic_operator(logic_operator_str: str):
 
 
 class StoresManager:
-    def __init__(self):
+    def __init__(self, data_handler):
         self.publisher = None
         self.users_manager = None
         self.stores = {}
         self.stores_idx = 0
+        self.data_handler = data_handler
 
     def update_product(self, store_id, user, product_name, new_price, new_amount):
         """
@@ -184,7 +185,7 @@ class StoresManager:
     def get_store_products(self, store_id):
         return jsons.dumps(self.get_store(store_id).get_store_products())
 
-    def remove_produce_from_store(self, store_id, product_name, username):
+    def remove_product_from_store(self, store_id, product_name, username):
         store = self.get_store(store_id)
         product = store.search(product_name)
         if product:
@@ -509,3 +510,12 @@ class StoresManager:
         return jsons.dumps(store.edit_store_manager_permissions(owner, manager, permissions))
 
 # {product_name, (Product, amount, updated_price, original_price)}
+
+    def init_data(self):
+        stores = self.data_handler.get_all_stores()
+        for store in stores:
+            self.stores[store.store_id] = store
+            attrs=vars(store)
+            print(', '.join("%s: %s" % item for item in attrs.items()))
+
+

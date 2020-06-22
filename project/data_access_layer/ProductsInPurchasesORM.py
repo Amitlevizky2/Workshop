@@ -2,8 +2,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import session, Base, engine
-
+from project.data_access_layer import session, Base, engine, proxy
 
 
 class ProductsInPurchasesORM(Base):
@@ -17,6 +16,6 @@ class ProductsInPurchasesORM(Base):
     # create products in purchaseORM and send to this function
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['productsinpurcases']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 

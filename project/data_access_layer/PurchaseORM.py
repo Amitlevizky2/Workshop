@@ -3,7 +3,7 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, DateTime, Text
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import Base, session, engine
+from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ProductsInPurchasesORM import ProductsInPurchasesORM
 from project.domain_layer.external_managment.Purchase import Purchase
 
@@ -20,8 +20,8 @@ class PurchaseORM(Base):
 #create purchaseORM and send to this function
     def add(self):
         Base.metadata.create_all(engine, [Base.metadata.tables['purchases']], checkfirst=True)
-        session.add(self)
-        session.commit()
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def createObject(self):
         return Purchase(jsons.loads(self.products), self.username, self.store_id, self.id, self)
