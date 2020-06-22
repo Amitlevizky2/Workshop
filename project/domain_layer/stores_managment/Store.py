@@ -15,7 +15,6 @@ from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy
 from project.domain_layer.users_managment import Basket
 
 
-
 class Store:
     def __init__(self, store_id, name, store_owner, orm=None):
         self.store_id = store_id
@@ -42,43 +41,51 @@ class Store:
             self.orm = orm
         self.publisher = None
 
-    def appoint_owner(self, owner, to_appoint):
+    def appoint_owner(self, owner, to_appoint, users_manager):
         """
 
         Args:
             owner:
             to_appoint:
-
+            users_manager:
         Returns:
 
         """
         if owner in self.store_owners and \
                 to_appoint not in self.store_owners:
+            ans = self.appoint_owner_helper(owner, to_appoint, users_manager)
+            if ans is False:
+                return {'error': True,
+                        'error_msg': 'User ' + to_appoint + ' does not exist.'}
             return {'error': False,
-                    'data': self.appoint_owner_helper(owner, to_appoint)}
+                    'data': 'appointed successfully.'}
         else:
             logger.error("%s is not a store owner or %s is already owner", owner, to_appoint)
             return {'error': True,
                     'error_msg': owner + "is not a store owner or " + to_appoint + " is already owner"}
 
-    def appoint_owner_helper(self, owner, to_appoint):
+    def appoint_owner_helper(self, owner, to_appoint, users_manager):
         self.store_owners.append(to_appoint)
+        ans, message = users_manager.add_managed_store(to_appoint, self.store_id)
+        if ans is False:
+            return False
         print("**********************************")
-        print("me:"+owner +" to_appoint "+to_appoint)
-        self.orm.appoint_owner(owner, to_appoint)
+        print("me:" + owner + " to_appoint " + to_appoint)
+        # self.orm.appoint_owner(owner, to_appoint)
         self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
             self.store_managers.pop(to_appoint)
         self.appointed_by[owner].append(to_appoint)
         return True
 
-    def remove_owner(self, owner, to_remove, publisher: Publisher):
+    def remove_owner(self, owner, to_remove, publisher: Publisher, users_manager):
 
         """
 
         Args:
             owner:
             to_remove:
+            :param users_manager:
             :param owner:
             :param to_remove:
             :param publisher:
@@ -92,30 +99,29 @@ class Store:
                 if owner in self.appointed_by.keys() and to_remove in self.appointed_by.get(owner):
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
-
-                        self.__remove_owner_all_appointed(to_remove, publisher)
-                        self.orm.remove_owner(to_remove)
-                    return {'ans': True,
-                            'desc': 'product has been removed'}
+                        self.__remove_owner_all_appointed(to_remove, publisher, users_manager)
+                    # self.orm.remove_owner(to_remove)
+                    return {'error': False,
+                            'data': 'owner has been removed'}
                 else:
                     logger.error("%s is not a store owner", owner)
-                    return {'ans': False,
-                            'desc': to_remove + ' is not a appointed by ' + owner}
+                    return {'error': True,
+                            'error_msg': to_remove + ' is not a appointed by ' + owner}
             else:
-                return {'ans': False,
-                        'desc': to_remove + ' is not owner of this store'}
+                return {'error': True,
+                        'error_msg': to_remove + ' is not owner of this store'}
         else:
-            return {'ans': False,
-                    'desc': to_remove + ' is not owner of this store'}
+            return {'error': True,
+                    'error_msg': to_remove + ' is not owner of this store'}
 
-    def remove_manager(self, owner, to_remove):
+    def remove_manager(self, owner, to_remove, users_manager):
 
         """
 
         Args:
             owner:
             to_remove:
-
+            users_manager:
         Returns:
 
         """
@@ -126,33 +132,39 @@ class Store:
 
                     self.appointed_by[owner].remove(to_remove)
                     self.store_managers.pop(to_remove)
+                    users_manager.remove_managed_store(to_remove, self.store_id)
 
-                    return {'ans': True,
-                            'desc': to_remove + ' is not a manager by ' + owner}
+                    return {'error': False,
+                            'data': to_remove + ' is not a manager by ' + owner}
 
                 else:
-                    return {'ans': False,
-                            'desc': to_remove + ' is not a appointed by ' + owner}
+                    return {'error': True,
+                            'error_msg': to_remove + ' is not a appointed by ' + owner}
             else:
-                return {'ans': False,
-                        'desc': to_remove + ' is not a manager of this store'}
+                return {'error': True,
+                        'error_msg': to_remove + ' is not a manager of this store'}
         else:
             logger.error("%s is not a store owner", owner)
-            return {'ans': False,
-                    'desc': owner + ' is not an owner of this store'}
+            return {'error': True,
+                    'error_msg': owner + ' is not an owner of this store'}
 
-    def __remove_owner_all_appointed(self, to_remove, publisher):
+    def __remove_owner_all_appointed(self, to_remove, publisher, users_manager):
 
+        if to_remove in self.appointed_by.keys():
+            for own_or_man in self.appointed_by[to_remove]:
+                self.__remove_owner_all_appointed(own_or_man, publisher, users_manager)
+                print(own_or_man)
+                print(to_remove)
+            self.appointed_by.pop(to_remove)
         if to_remove in self.store_owners:
             self.store_owners.remove(to_remove)
+            users_manager.remove_managed_store(to_remove, self.store_id)
             # send notification to user to_remove.
             publisher.store_ownership_update(self.store_id, self.name, [to_remove])
         if to_remove in self.store_managers.keys():
             self.store_managers.pop(to_remove)
-        if to_remove in self.appointed_by.keys():
-            for own_or_man in self.appointed_by[to_remove]:
-                self.__remove_owner_all_appointed(own_or_man, publisher)
-                self.appointed_by.pop(to_remove)
+            users_manager.remove_managed_store(to_remove, self.store_id)
+        # publisher.store_ownership_update(self.store_id, self.name, [to_remove])
 
     def add_permission_to_manager(self, owner, manager, permission):
         """
@@ -229,21 +241,25 @@ class Store:
             return {'error': True,
                     'error_msg': owner + 'is not an owner of this store'}
 
-    def appoint_manager(self, owner, to_appoint):
+    def appoint_manager(self, owner, to_appoint, users_manager):
         """
 
         Args:
             owner: user that in the owners list
             to_appoint: user that should be appoint to manager
-
+            users_manager:
         Returns:
 
         """
         if owner in self.store_owners:
             if to_appoint not in self.store_managers.keys():
-                self.store_managers[to_appoint] = [getattr(Store, "get_sales_history")]
+                self.store_managers[to_appoint] = ["view_purchase_history"]
                 self.appointed_by[owner].append(to_appoint)
-                self.orm.appoint_manager(owner, to_appoint)
+                answer = users_manager.add_managed_store(to_appoint, self.store_id)
+                if answer is False:
+                    return {'error': True,
+                            'error_msg': 'User ' + to_appoint + ' does not exist.'}
+                # self.orm.appoint_manager(owner, to_appoint)
                 return {'error': False,
                         'data': to_appoint + ' has become a manager'}
             else:
@@ -271,7 +287,8 @@ class Store:
         """
         if self.is_owner(user_name) or self.check_permission(user_name, 'update_products'):
             self.inventory.add_product(product_name,
-                                       Product(product_name, product_price, product_categories, key_words, amount, self.store_id))
+                                       Product(product_name, product_price, product_categories, key_words, amount,
+                                               self.store_id))
             return {'error': False,
                     'data': "Product has been added"}
         else:
@@ -316,7 +333,7 @@ class Store:
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, 'view_purchase_history') or is_admin:
             self.sales = self.orm.getPurchases()
-            #TODO: fix purchase maybe handler maybe add function to store
+            # TODO: fix purchase maybe handler maybe add function to store
             return {'error': False,
                     'data': self.sales}
         return {'error': True,
@@ -429,7 +446,8 @@ class Store:
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount = self.discounts[discount_id]
             return {
-                'error': not discount.edit_discount(discount_id, start_date, end_date, percent, min_amount, nums_to_apply, products),
+                'error': not discount.edit_discount(discount_id, start_date, end_date, percent, min_amount,
+                                                    nums_to_apply, products),
                 'data': 'done'}
         return {'error': True,
                 'error_msg': permitted_username + ' do not have this permission'}
@@ -494,10 +512,10 @@ class Store:
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
         print("GOT HERE MOTHERFUCKERRRRRRRRR")
-        print("id is: " +str(self.purchases_idx))
+        print("id is: " + str(self.purchases_idx))
         policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
         self.purchase_policies[self.purchases_idx] = policy
-        #policy.set_id(self.purchases_idx)
+        # policy.set_id(self.purchases_idx)
 
         return {'error': False, 'data': "Policy as been added"}
 
@@ -580,8 +598,7 @@ class Store:
             return {'ans': False, 'discount': self.discounts[discount_id]}
 
     def get_purchase_policies(self):
-        return {'ans': True,
-                'desc': self.purchase_policies}
+        return self.purchase_policies
 
     def get_purchase_policy_by_id(self, purchase_policy_id: int):
         if purchase_policy_id is None:
@@ -685,10 +702,18 @@ class Store:
         manager_permissions = self.get_user_permissions(manager)
         if manager_permissions['error'] is True:
             return manager_permissions
-        curr_permissions = set(manager_permissions['data'])
+        curr_permissions = set(manager_permissions['data']['permissions'])
         _new_permissions = set(new_permissions)
+        print('curr_permissions: ')
+        print(curr_permissions)
+        print('_new_permissions: ')
+        print(_new_permissions)
         add_permissions = set(_new_permissions - curr_permissions)
+        print('add_permissions: ')
+        print(add_permissions)
         remove_permissions = set(curr_permissions - _new_permissions)
+        print('remove_permissions: ')
+        print(remove_permissions)
         for new_permission in add_permissions:
             res = self.add_permission_to_manager(owner, manager, new_permission)
             if res['error'] is True:

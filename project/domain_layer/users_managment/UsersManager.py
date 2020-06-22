@@ -99,7 +99,7 @@ class UsersManager:
                 user.logout()
                 return {'error': False, 'data': self.add_guest_user()}
             return {'error': True, 'error_msg': 'User ' + username + ' is not logged in.'}
-        return {'error': True, 'error_msg': ans['error_msg']}
+        return {'error': True, 'error_msg': user['error_msg']}
 
     def view_purchases(self, username):
         ans, user = self.find_user(username)
@@ -160,16 +160,16 @@ class UsersManager:
             if self.is_admin(admin):
                 if not self.is_admin(username_to_be_admin):
                     self.admins.append(username_to_be_admin)
+
                 else:
                     return False, {'error_msg': 'user' + username_to_be_admin + 'is allready admin'}
             else:
-                return False,{'error_msg': 'user ' + admin + ' is not an admin'}
+                return False, {'error_msg': 'user ' + admin + ' is not an admin'}
         else:
             return False, {'error_msg': 'user ' + username_to_be_admin + ' is not an registered user'}
 
     def is_admin(self, username):
         return username in self.admins
-
 
     def add_managed_store(self, username, store_id):
         ans, user = self.find_reg_user(username)
@@ -177,7 +177,6 @@ class UsersManager:
             added = user.add_managed_store(store_id)
             if added is True:
                 return True, {'data': 'appointed successfully'}
-            return False, {'error_msg': 'user ' + username + ' is already managing the store: ' + str(store_id) + '.'}
         return ans, user
 
     def get_managed_stores(self, username, view_format=''):

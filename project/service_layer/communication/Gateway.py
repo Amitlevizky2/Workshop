@@ -147,7 +147,7 @@ def add_purchase():
 @app.route('/buy', methods=['POST', 'GET'])
 def buy():
     message = request.get_json()
-    data = purchase_manager.buy(message['username'],message['store_id'],message['price'],message['number'],message['month'],message['year'],message['holder'],message['ccv'],message['id'])
+    data = purchase_manager.buy(message['username'],message['number'],message['month'],message['year'],message['holder'],message['ccv'],message['id'],message['address'],message['city'],message['country'],message['zip'])
     return jsonify(data)
 
 
@@ -209,7 +209,9 @@ def open_store():
 @app.route('/appoint_store_owner', methods=['POST', 'GET'])
 def appoint_store_owner():
     message = request.get_json()
+    print(message)
     answer = stores_manager.appoint_owner_to_store(message['store_id'], message['owner'], message['to_appoint'])
+    print(answer)
     return jsonify(answer)
 
 
@@ -326,6 +328,7 @@ def edit_store_manager_permissions():
     message = request.get_json()
     answer = stores_manager.edit_store_manager_permissions(message['store_id'], message['owner'],
                                                            message['manager'], message['permissions'])
+    print(answer)
     return answer
 
 
@@ -363,7 +366,9 @@ def add_store_conditional_discount():
 @app.route('/get_purchases_policies', methods=['POST', 'GET'])
 def get_purchases_policies():
     message = request.get_json()
-    return stores_manager.get_purchases_policies(message['store_id'])
+    answer = stores_manager.get_purchases_policies(message['store_id'])
+    print(answer)
+    return answer
 
 
 @app.route('/get_purchase_policy_details', methods=['POST', 'GET'])

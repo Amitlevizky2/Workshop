@@ -1,6 +1,7 @@
-sqlalchemy
+sqlalchemy~=1.3.17
 jsonpickle==1.4.1
 pyspellchecker==0.5.4
 eventlet~=0.25.2
 Flask~=1.1.2
 jsons~=1.1.2
+requests~=2.24.0

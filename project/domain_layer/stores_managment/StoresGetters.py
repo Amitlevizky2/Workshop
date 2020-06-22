@@ -92,4 +92,4 @@ class StoresGetters:
 
     def get_store_owners(self, permitted_user: str, store_id: int):
         store_owners = self.stores_manager.get_store_owners(store_id)
-        return jsons.dumps(store_owners)
+        return store_owners

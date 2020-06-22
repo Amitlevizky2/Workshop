@@ -118,7 +118,7 @@ class StoresManager:
             to_appoint:
         """
         return jsons.dumps(
-            self.get_store(store_id).appoint_manager(owner, to_appoint))
+            self.get_store(store_id).appoint_manager(owner, to_appoint, self.users_manager))
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         """
@@ -129,7 +129,7 @@ class StoresManager:
             to_appoint:
         """
         return jsons.dumps(
-            self.get_store(store_id).appoint_owner(owner, to_appoint))
+            self.get_store(store_id).appoint_owner(owner, to_appoint, self.users_manager))
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         return jsons.dumps(
@@ -275,11 +275,11 @@ class StoresManager:
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
-        return jsons.dumps(store.remove_manager(owner, to_remove))
+        return jsons.dumps(store.remove_manager(owner, to_remove, self.users_manager))
 
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
-        return jsons.dumps(store.remove_owner(owner, to_remove, self.publisher))
+        return jsons.dumps(store.remove_owner(owner, to_remove, self.publisher, self.users_manager))
 
     def add_purchase_store_policy(self, store_id: int, permitted_user: str, min_amount_products: int,
                                   max_amount_products: int):
@@ -498,7 +498,9 @@ class StoresManager:
 
     def get_user_permissions(self, store_id, username):
         store = self.get_store(store_id)
-        return jsons.dumps(store.get_user_permissions(username))
+        answer = store.get_user_permissions(username)
+        print(answer)
+        return jsons.dumps(answer)
 
     def is_valid_amount(self, store_id, product_name, quantity):
         store = self.get_store(store_id)
@@ -506,6 +508,8 @@ class StoresManager:
 
     def edit_store_manager_permissions(self, store_id, owner, manager, permissions):
         store = self.get_store(store_id)
-        return jsons.dumps(store.edit_store_manager_permissions(owner, manager, permissions))
+        answer = store.edit_store_manager_permissions(owner, manager, permissions)
+        print(answer)
+        return jsons.dumps(answer)
 
 # {product_name, (Product, amount, updated_price, original_price)}

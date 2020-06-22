@@ -51,6 +51,7 @@ class Publisher:
     def store_ownership_update(self, store_id, store_name, users: [str]):
         """
         send "store owner appointment" event notification message
+        :param status: add permissions or removed permissions
         :param store_id:
         :param store_name:
         :param users: list of recipients (user names)
