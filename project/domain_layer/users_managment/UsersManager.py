@@ -177,7 +177,7 @@ class UsersManager:
             added = user.add_managed_store(store_id)
             if added is True:
                 return True, {'data': 'appointed successfully'}
-            return False, {'error_msg': 'user ' + user + ' is already managing the store: ' + store_id + '.'}
+            return False, {'error_msg': 'user ' + username + ' is already managing the store: ' + str(store_id) + '.'}
         return ans, user
 
     def get_managed_stores(self, username, view_format=''):

@@ -78,9 +78,11 @@ class Basket:
         """
         products_description = []
         for key, value in self.products.items():
+            print(value)
             products_description.append({
                 'product_name': key,
-                'amount': value[1]
+                # 'amount': value[1]
+                'amount':value
             })
         return {
             'store_id': self.store_id,
