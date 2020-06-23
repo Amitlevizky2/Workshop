@@ -1,5 +1,6 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine, proxy
@@ -15,6 +16,11 @@ class SecurityORM(Base):
     hashed_pass = Column(String)
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['passwords']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['passwords']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
+

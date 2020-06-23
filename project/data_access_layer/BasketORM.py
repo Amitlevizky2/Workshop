@@ -1,6 +1,7 @@
 
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, update, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine, proxy
@@ -21,11 +22,15 @@ class BasketORM(Base):
         return proxy.get_session().query(BasketORM).filter_by(username=username).first()
 
 
-
+#sqlalchemy.exc.IntegrityError
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['baskets']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['baskets']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
 
 
     #add commit
@@ -41,12 +46,16 @@ class BasketORM(Base):
 
 
     def remove_product_from_basket(self, product_name):
-        proxy.get_session().query(ProductsInBasketORM).delete.where(username= self.username, store_id=self.store_id, product_name=product_name)
+        res = proxy.get_session().query(ProductsInBasketORM).filter_by(username= self.username, store_id=self.store_id, product_name=product_name).first()
+        proxy.get_session().delete(res)
         proxy.get_session().commit()
 
     def remove_basket(self):
-        proxy.get_session().query(ProductsInBasketORM).delete.where(username= self.username, store_id=self.store_id)
-        proxy.get_session().query(BasketORM).delete.where(username= self.username, store_id=self.store_id)
+        res = proxy.get_session().query(ProductsInBasketORM).filter_by(username= self.username, store_id=self.store_id).first()
+        for piborm in res:
+            proxy.get_session().delete(piborm)
+            proxy.get_session().commit()
+        proxy.get_session().delete(self)
         proxy.get_session().commit()
 
     def createObject(self):

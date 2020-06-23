@@ -186,6 +186,7 @@ class UsersManager:
     def is_admin(self, username):
         return username in self.admins
 
+
     def add_managed_store(self, username, store_id):
         ans, user = self.find_reg_user(username)
         if ans is True:

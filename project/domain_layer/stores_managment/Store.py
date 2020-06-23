@@ -15,6 +15,7 @@ from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy
 from project.domain_layer.users_managment import Basket
 
 
+
 class Store:
     def __init__(self, store_id, name, store_owner, orm=None):
         self.store_id = store_id
@@ -33,9 +34,9 @@ class Store:
             self.orm = StoreORM()
             self.orm.id = store_id
             self.orm.name = name
-            self.orm.discount_index = 0
-            self.orm.appoint_owner(store_owner, "")
-            self.orm.purchase_index = 0
+            self.orm.discount_idx = 0
+            self.orm.appoint_owner("", store_owner)
+            self.orm.purchases_idx = 0
             self.orm.add()
         else:
             self.orm = orm
@@ -70,8 +71,8 @@ class Store:
         if ans is False:
             return False
         print("**********************************")
-        print("me:" + owner + " to_appoint " + to_appoint)
-        # self.orm.appoint_owner(owner, to_appoint)
+        print("me:"+owner +" to_appoint "+to_appoint)
+        self.orm.appoint_owner(owner, to_appoint)
         self.appointed_by[to_appoint] = []
         if to_appoint in self.store_managers:
             self.store_managers.pop(to_appoint)
@@ -100,7 +101,7 @@ class Store:
                     if to_remove in self.appointed_by.keys():
                         self.appointed_by[owner].remove(to_remove)
                         self.__remove_owner_all_appointed(to_remove, publisher, users_manager)
-                    # self.orm.remove_owner(to_remove)
+                        self.orm.remove_owner(to_remove)
                     return {'error': False,
                             'data': 'owner has been removed'}
                 else:
@@ -259,7 +260,8 @@ class Store:
                 if answer is False:
                     return {'error': True,
                             'error_msg': 'User ' + to_appoint + ' does not exist.'}
-                # self.orm.appoint_manager(owner, to_appoint)
+                self.orm.appoint_manager(owner, to_appoint)
+                self.orm.add_permission(to_appoint, "get_sales_history")
                 return {'error': False,
                         'data': to_appoint + ' has become a manager'}
             else:
@@ -287,8 +289,7 @@ class Store:
         """
         if self.is_owner(user_name) or self.check_permission(user_name, 'update_products'):
             self.inventory.add_product(product_name,
-                                       Product(product_name, product_price, product_categories, key_words, amount,
-                                               self.store_id))
+                                       Product(product_name, product_price, product_categories, key_words, amount, self.store_id))
             return {'error': False,
                     'data': "Product has been added"}
         else:
@@ -387,6 +388,7 @@ class Store:
     def add_visible_product_discount(self, permitted_username, discount: Discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
+            self.orm.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
@@ -398,6 +400,7 @@ class Store:
     def add_conditional_discount_to_product(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
+            self.orm.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
@@ -410,6 +413,7 @@ class Store:
     def add_conditional_discount_to_store(self, permitted_username, discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
+            self.orm.discount_idx += 1
             discount.id = self.discount_idx
             self.discounts[self.discount_idx] = discount
             discount.set_id(self.discount_idx)
@@ -422,6 +426,7 @@ class Store:
     def add_composite_discount(self, permitted_username: str, discount: Discount):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             self.discount_idx += 1
+            self.orm.discount_idx += 1
             discount.id = self.discount_idx
             print("I'M OVER HERE")
             self.discounts[self.discount_idx] = discount
@@ -514,11 +519,10 @@ class Store:
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
-        print("GOT HERE MOTHERFUCKERRRRRRRRR")
-        print("id is: " + str(self.purchases_idx))
+        self.orm.purchases_idx += 1
         policy = PurchaseStorePolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
         self.purchase_policies[self.purchases_idx] = policy
-        # policy.set_id(self.purchases_idx)
+        #policy.set_id(self.purchases_idx)
 
         return {'error': False, 'data': "Policy as been added"}
 
@@ -534,10 +538,8 @@ class Store:
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
         self.purchases_idx += 1
-        print("GOT HERE MOTHERFUCKERRRRRRRRR4")
+        self.orm.purchases_idx += 1
         policy = PurchaseProductPolicy(min_amount, max_amount, self.purchases_idx, self.store_id)
-        print("add_purchase_product_policy: policy")
-        print(policy)
         self.purchase_policies[self.purchases_idx] = policy
         policy.set_id(self.purchases_idx)
 
@@ -550,7 +552,7 @@ class Store:
             return {'error': True, 'error_msg': "User dont have permission\n"}
 
         self.purchases_idx += 1
-
+        self.orm.purchases_idx += 1
         for policy in policies:
             print(policy.__dict__)
             del self.purchase_policies[policy.id]

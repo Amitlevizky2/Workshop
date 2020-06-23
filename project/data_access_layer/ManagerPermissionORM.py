@@ -1,5 +1,6 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import session, Base, engine, proxy
@@ -16,9 +17,16 @@ class ManagerPermissionORM(Base):
 
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['managerpermissions']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['managerpermissions']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
+
 
     def remove(self, username, store_id, permission):
-        proxy.get_session().query(ManagerPermissionORM).delete.where(username=username, store_id=store_id, permission=permission)
+        res = proxy.get_session().query(ManagerPermissionORM).filter(username=username, store_id=store_id, permission=permission).first()
+        proxy.get_session().delete(res)
+        proxy.get_session().commit()

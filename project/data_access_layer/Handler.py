@@ -7,13 +7,30 @@ from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscounts
 from project.data_access_layer.PurchaseORM import PurchaseORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 from project.data_access_layer.StoreORM import StoreORM
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
+from project.data_access_layer.Proxy import Proxy
 
 class Handler:
-    def __init__(self):
-        session
-        #init db tables?
-        #open session
+
+    def init_db(self):
+        path = 'sqlite:///C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db'
+        global Base
+        Base = declarative_base()
+        # session = sessionmaker()
+        engine = create_engine(path, echo=True)
+        # session.configure(bind=engine)
+        Session = sessionmaker(bind=engine)
+        # Session is a class
+        session = Session()
+        proxy = Proxy(session)
+        # Base.metadata.bind = engine
+        # Base.metadata.create_all(engine)
+        meta = MetaData()
+        meta.create_all(engine)
+        session.commit()
 
     def find_user(self, username):
         user = proxy.get_handler_session().query(RegisteredUserORM).filter_by(username=username).first()
@@ -81,7 +98,9 @@ class Handler:
             purchases.append(purchase)
         return purchases
 
-
+    def is_admin(self, username):
+        userorm = proxy.get_handler_session().query(RegisteredUserORM).filter_by(username=username)
+        return userorm.admin is 1
 #TODO:
     #def buy(self):
 

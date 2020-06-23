@@ -519,7 +519,5 @@ class StoresManager:
         stores = self.data_handler.get_all_stores()
         for store in stores:
             self.stores[store.store_id] = store
-            attrs=vars(store) 
-            print(', '.join("%s: %s" % item for item in attrs.items()))
 
 
