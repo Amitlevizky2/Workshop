@@ -35,6 +35,7 @@ def get_logic_operator(logic_operator_str: str):
         return None
 
 
+
 class StoresManager:
     def __init__(self, data_handler):
         self.publisher = None

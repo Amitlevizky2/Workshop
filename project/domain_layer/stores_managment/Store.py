@@ -234,7 +234,7 @@ class Store:
                     return {'error': True,
                             'error_msg': manager + ' not appointed by ' + owner}
             else:
-                return {'error': False,
+                return {'error': True,
                         'error_msg': manager + ' is not a manager'}
 
         else:

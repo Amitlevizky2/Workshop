@@ -128,13 +128,25 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def edit_visible_discount(self, permitted_username, discount_id, start_date, end_date, percent):
-        return super().edit_visible_discount(permitted_username, discount_id, start_date, end_date, percent)
+    def edit_visible_discount(self, permitted_username, discount_id, start_date,
+                              end_date, percent, products=[]):
+        if permitted_username is 'store_owner11' and discount_id == 1 and 'Banana' in products:
+            return {'error': False,
+                    'error_msg': 'succesfully added'}
+
+        else:
+            return {'error': True,
+                    'error_msg': 'wrong'}
 
     def edit_conditional_discount_to_product(self, permitted_username: str, discount_id: int, start_date, end_date,
-                                             percent, min_amount: int, nums_to_apply: int):
-        return super().edit_conditional_discount_to_product(permitted_username, discount_id, start_date, end_date,
-                                                            percent, min_amount, nums_to_apply)
+                                             percent, min_amount: int, nums_to_apply: int, products=[]):
+        if permitted_username is 'store_owner11' and discount_id == 1 and 'Banana' in products:
+            return {'error': False,
+                    'error_msg': 'succesfully added'}
+
+        else:
+            return {'error': True,
+                    'error_msg': 'wrong'}
 
     def edit_conditional_discount_to_store(self, permitted_username: str, discount_id: int, start_date, end_date,
                                            percent: int, min_price: int):
