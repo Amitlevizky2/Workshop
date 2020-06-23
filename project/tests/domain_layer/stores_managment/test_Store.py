@@ -15,6 +15,9 @@ import jsons
 import os
 
 from project.domain_layer.users_managment.Basket import Basket
+from project.domain_layer.users_managment.UsersManager import UsersManager
+
+
 class PublisherStub(Publisher):
 
 
@@ -24,6 +27,11 @@ class PublisherStub(Publisher):
         pass
 
 class TestStore(unittest.TestCase):
+    user_manager = UsersManager(None)
+    # @classmethod
+    # def setUpClass(cls) -> None:
+    #     cls.user_manager = UsersManager(None)
+
     def setUp(self):
         self.store = Store(0, "test store", "test owner")
         self.store.store_managers = {"Moshe": [],
@@ -129,16 +137,16 @@ class TestStore(unittest.TestCase):
 
     def test_appoint_owner_one(self):
         # There is no such owner
-        res = self.store.appoint_owner("not test owner", "Moshe", None)
+        res = self.store.appoint_owner("not test owner", "Moshe", self.user_manager)
         self.assertTrue(res['error'])
         # Valid appointment
-        res = self.store.appoint_owner("test owner", "Moshe", None)
+        res = self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         self.assertFalse(res['error'])
         # Moshe is already a store owner, should not e appointed again
-        res = self.store.appoint_owner("test owner", "Moshe", None)
+        res = self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         self.assertTrue(res['error'])
         # circle appointment is not allowed
-        res = self.store.appoint_owner("moshe", "test owner", None)
+        res = self.store.appoint_owner("moshe", "test owner", self.user_manager)
         self.assertTrue(res['error'])
 
     def test_appoint_owner_two(self):
@@ -516,9 +524,9 @@ class TestStore(unittest.TestCase):
         if table_name in Base.metadata.tables:
             Base.metadata.drop_all(engine, [Base.metadata.tables[table_name]])
 
-    @classmethod
-    def tearDownClass(cls):
-        os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
+    # @classmethod
+    # def tearDownClass(cls):
+    #     os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
 
 
 if __name__ == '__main__':

@@ -42,6 +42,8 @@ class Product:
         return amount * self.original_price
 
     def reduce_amount(self, to_reduce):
+        print('PRODUCT')
+        print(to_reduce)
         if to_reduce > self.amount:
             return {'error': True,
                     'error_msg': 'There is not enough quantity in store'}

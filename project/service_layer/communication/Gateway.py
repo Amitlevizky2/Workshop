@@ -137,9 +137,11 @@ def view_user_purchases():
 @app.route('/buy', methods=['POST', 'GET'])
 def buy():
     message = request.get_json()
+    print(message)
     data = purchase_manager.buy(message['username'], message['number'], message['month'], message['year'],
                                 message['holder'], message['ccv'], message['id'], message['address'], message['city'],
                                 message['country'], message['zip'])
+    print(data)
     return jsonify(data)
 
 

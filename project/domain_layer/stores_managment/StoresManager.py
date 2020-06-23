@@ -82,7 +82,7 @@ class StoresManager:
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():
-
+            print('ytdityetdndidify')
             return self.stores.get(store_id)
         else:
             if store_id is None:
@@ -157,7 +157,11 @@ class StoresManager:
 
     def buy(self, cart: Cart):
         answer = jsons.loads(self.check_cart_validity(cart))
-        if not answer['error']:
+        print('STORE MANAGER')
+        print(answer)
+        if answer['error'] is True:
+            print('STORE MANAGER')
+            print('in if')
             return jsons.dumps({'error': True,
                                 'error_msg': answer['description']})
 
@@ -173,7 +177,10 @@ class StoresManager:
         for store_id in cart.baskets.keys():
             basket = cart.get_basket(store_id)
             for product in basket.products.keys():
-                if not self.get_store(store_id).buy_product(product, basket.products[product]):
+                print('store id is: {}'.format(str(store_id)))
+                store = self.get_store(int(store_id)).buy_product(product, basket.products[product])
+                if store['error'] is True:
+                    print('in if')
                     return False
 
             # store_obj.sales.append(description[store_obj.name])

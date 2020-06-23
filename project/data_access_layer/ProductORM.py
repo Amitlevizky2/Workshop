@@ -42,12 +42,14 @@ class ProductORM(Base):
         proxy.get_session().commit()
 
     def update_product(self, attribute, updated):
-        if attribute == self.categories:
+        if attribute == "categories":
             self.categories = updated
-        if attribute == self.key_words:
+        if attribute == "key_words":
             self.key_words = updated
-        if attribute == self.price:
+        if attribute == "original_price":
             self.price = updated
+        if attribute == "amount":
+            self.quantity = updated
         proxy.get_session().commit()
 
     def delete(self):

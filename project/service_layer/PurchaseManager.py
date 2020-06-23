@@ -57,10 +57,11 @@ class PurchaseManager:
                         self.payment_system.pay(user, store_id, store_basket['store_purchase_price'],CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid)
                         self.purchases_idx += 1
                         purchase = Purchase(store_basket['desc'], user, store_id, self.purchases_idx)
-                        print()
+                        print(jsons.dumps(purchase))
                         purchases[store_id] = purchase
                         self.store_manager.add_purchase_to_store(store_id, purchase)
 
+                    print('PURCHASE MANAGER')
                     self.store_manager.buy(cart)
                     self.user_manager.add_purchase(user, purchases)
                     self.user_manager.remove_cart(user)

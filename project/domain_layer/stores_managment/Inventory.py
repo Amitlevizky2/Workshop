@@ -31,6 +31,9 @@ class Inventory:
         return False
 
     def buy_product(self, product_name, amount):
+        print('INVENTORY')
+        print(product_name)
+        print(amount)
         if product_name not in self.products.keys():
             return {'error': True,
                     'error_msg': 'No such product: ' + product_name}

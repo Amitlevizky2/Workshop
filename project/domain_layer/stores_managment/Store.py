@@ -330,7 +330,10 @@ class Store:
                 product.original_price = discount.get_updated_price(product)
 
     def buy_product(self, product_name, amount):
+        print('%%%%%%%%%%%')
         res = self.inventory.buy_product(product_name, amount)
+        print('%%%%%%%%%%%')
+        print(res)
         return res
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:

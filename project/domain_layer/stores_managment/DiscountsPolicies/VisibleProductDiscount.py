@@ -80,7 +80,7 @@ class VisibleProductDiscount(Discount):
 
     def get_updated_price(self, product: Product):
         if product.name in self.products_in_discount.keys():
-            print('in get_updated_price. price is: {}'.format(str(product.original_price - float(product.original_price) * self.discount)))
+            # print('in get_updated_price. price is: {}'.format(str(product.original_price - float(product.original_price) * self.discount)))
             return (product.original_price - float(product.original_price) * self.discount)
         else:
             return product.original_price
