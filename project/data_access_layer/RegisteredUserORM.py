@@ -1,5 +1,6 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, exc
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine, proxy
@@ -20,6 +21,7 @@ class RegisteredUserORM(Base):
     from project.data_access_layer.StoreORM import StoreORM
     __tablename__ = 'regusers'
     username = Column(String, primary_key=True)
+    admin = Column(Integer)
     baskets = relationship('BasketORM', back_populates="user")
     notifications = relationship('UserNotificationORM')
     owns = relationship('OwnerORM', foreign_keys="OwnerORM.username")
@@ -27,14 +29,17 @@ class RegisteredUserORM(Base):
 
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
         try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
             proxy.get_session().add(self)
             proxy.get_session().commit()
-        except exc.SQLAlchemyError:
-            pass
-            #try catch what do i do with catch
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
 
+    def make_admin(self):
+        self.admin = 1
+        proxy.get_session().commit()
 
     def add_notification(self, username, message):
         from project.data_access_layer.UserNotificationsORM import UserNotificationORM

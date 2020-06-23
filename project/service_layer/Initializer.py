@@ -20,6 +20,7 @@ class Initializer:
         self.stores_manager.bound_publisher(self.publisher)
         self.bound_managers()
         if path.exists("init.txt") and not engine.dialect.has_table(engine, "regusers"):
+           # self.data_handler.init_db()
             file1 = open('init.txt', 'r')
             Lines = file1.readlines()
             sid = 0

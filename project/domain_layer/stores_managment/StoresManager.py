@@ -517,5 +517,5 @@ class StoresManager:
             self.stores[store.store_id] = store
             attrs=vars(store)
             print(', '.join("%s: %s" % item for item in attrs.items()))
-
+            print(jsons.dump(store))
 

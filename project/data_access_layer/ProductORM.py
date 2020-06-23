@@ -1,5 +1,6 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, String, update, ForeignKey
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine, proxy
@@ -24,9 +25,14 @@ class ProductORM(Base):
 
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
+
 
     def find_product(self, name, store_id):
         return proxy.get_session().query(ProductORM).filter_by(name=name, store_id=store_id).first()
@@ -45,7 +51,8 @@ class ProductORM(Base):
         proxy.get_session().commit()
 
     def delete(self):
-        proxy.get_session().query(ProductORM).delete.where(name=self.name, store_id=self.store_id)
+        proxy.get_session().delete(self)
+        proxy.get_session().commit()
 
     def createObject(self):
         return Product(self.name, self.price, self.categories, self.key_words, self.quantity, self.store_id, self)

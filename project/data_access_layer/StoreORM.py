@@ -1,6 +1,7 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship, with_polymorphic, polymorphic_union
 
 from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ManagerORM import ManagerORM
@@ -8,9 +9,12 @@ from project.data_access_layer.ManagerPermissionORM import ManagerPermissionORM
 from project.data_access_layer.OwnerORM import OwnerORM
 #from project.data_access_layer.RegisteredUserORM import association_owners, association_managers
 # from project.data_access_layer.RegisteredUserORM import association_owners, association_managers
-from project.data_access_layer.DiscountORM import DiscountORM
-from project.data_access_layer.PurchaseORM import PurchaseORM
 
+from project.data_access_layer.PurchaseORM import PurchaseORM
+from project.data_access_layer.ConditionalProductDiscountORM import ConditionalProductDiscountsORM
+from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountORM
+from project.data_access_layer.VisibleProductDiscountORM import VisibleProductDiscountORM
+from project.data_access_layer.CompositeDiscountORM import CompositeDiscountORM
 
 def find_store(store_id):
     return proxy.get_session().query(StoreORM).filter_by(store_id=store_id).first()
@@ -21,19 +25,28 @@ class StoreORM(Base):
     __tablename__ = 'stores'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    discount_index = Column(Integer)
-    purchase_index = Column(Integer)
+    discount_idx = Column(Integer)
+    purchases_idx = Column(Integer)
     owned_by = relationship("OwnerORM", back_populates="store")
     managed_by = relationship("ManagerORM")
-    discounts = relationship("DiscountORM")
+   # discounts = relationship("DiscountORM")
+    vis = relationship("VisibleProductDiscountORM")
+    condprod = relationship("ConditionalProductDiscountsORM")
+    condstore = relationship("ConditionalStoreDiscountORM")
+    comp= relationship("CompositeDiscountORM")
     policies = relationship("PolicyORM")
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
 
-    def appoint_owner(self,  appointed_by,owner):
+
+    def appoint_owner(self, appointed_by, owner):
         Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
@@ -44,8 +57,9 @@ class StoreORM(Base):
         proxy.get_session().commit()
 
     def remove_owner(self, to_remove):
-        self.remove_appoint_by(to_remove)
-        proxy.get_session().query(OwnerORM).delete.where(username=to_remove)
+        self.remove_appointed_by(to_remove)
+        res = proxy.get_session().query(OwnerORM).filter_by(username=to_remove).first()
+        proxy.get_session().delete(res)
         proxy.get_session().commit()
 
     def remove_appointed_by(self, to_remove):
@@ -59,7 +73,8 @@ class StoreORM(Base):
 
     def remove_manager(self, to_remove):
         self.remove_appoint_by(to_remove)
-        proxy.get_session().query(ManagerORM).delete.where(username=to_remove)
+        res = proxy.get_session().query(ManagerORM).filter_by(username=to_remove).first()
+        res.remove()
         proxy.get_session().commit()
 
     def add_permission(self, manager, permission):
@@ -67,7 +82,8 @@ class StoreORM(Base):
         perm.add()
 
     def remove_permission(self, manager, permission):
-        proxy.get_session().query(ManagerPermissionORM).delete.where(username=manager, store_id=self.id, permission=permission)
+        res = proxy.get_session().query(ManagerPermissionORM).filter_by(username=manager, store_id=self.id, permission=permission).first()
+        proxy.get_session().delete(res)
         proxy.get_session().commit()
 
     def appoint_manager(self, owner, to_appoint):
@@ -84,16 +100,23 @@ class StoreORM(Base):
     def createObject(self):
         from project.domain_layer.stores_managment.Store import Store
         store = Store(self.id, self.name, self.owned_by[0].username, self)
-        store.discount_idx = self.discount_index
-        store.purchases_idx = self.purchase_index
+        store.discount_idx = self.discount_idx
+        store.purchases_idx = self.purchases_idx
         owners = []
         appointed_by = {}
         for owner in self.owned_by:
             owners.append(owner.username)
+            print("owner IS OVER HEREEEEEEEEEEEEEE1")
+            print(owner.username)
+            print(owner.appointed_by)
             if owner.username not in appointed_by.keys():
                 appointed_by[owner.username] = []
+                print("owner IS OVER HEREEEEEEEEEEEEEE2")
+                print(owner.username)
+                print(owner.appointed_by)
             if owner.appointed_by not in appointed_by.keys():
-                appointed_by[owner.appointed_by]=[owner.username]
+                if owner.appointed_by is not '':
+                    appointed_by[owner.appointed_by]=[owner.username]
             else:
                 appointed_by[owner.appointed_by].append(owner.username)
         store.store_owners = owners
@@ -104,24 +127,19 @@ class StoreORM(Base):
             permissions = proxy.get_session().query(ManagerPermissionORM).filter_by(username=name)
             managers[name] = []
             for permission in permissions:
-                managers[name].append(permission)
+                managers[name].append(permission.permission)
         store.store_managers = managers
+        store.appointed_by =appointed_by
         discounts = {}
-        for discount in self.discounts:
-            dis = None
-            if discount.discriminator == 'Visible Discount':
-                from project.data_access_layer import VisibleProductDiscountORM
-                dis = proxy.get_session().query(VisibleProductDiscountORM).filter_by(discount_id=discount.discount_id)
-            elif discount.discriminator == 'Conditional Product':
-                from project.data_access_layer import ConditionalProductDiscountORM
-                dis = proxy.get_session().query(ConditionalProductDiscountORM).filter_by(discount_id=discount.discount_id)
-            elif discount.discriminator == 'Conditional Store':
-                from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountORM
-                dis = proxy.get_session().query(ConditionalStoreDiscountORM).filter_by(discount_id=discount.discount_id)
-            elif discount.discriminator == 'Composite Discount':
-                from project.data_access_layer.CompositeDiscountORM import CompositeDiscountORM
-                dis = proxy.get_session().query(CompositeDiscountORM).filter_by(discount_id=discount.discount_id)
-            discounts[discount.discount_id]=dis.createObject()
+        # print(dis)
+        for discount in self.vis:
+            discounts[discount.discount_id] = discount.createObject()
+        for discount in self.condprod:
+            discounts[discount.discount_id] = discount.createObject()
+        for discount in self.condstore:
+            discounts[discount.discount_id] = discount.createObject()
+        for discount in self.comp:
+            discounts[discount.discount_id] = discount.createObject()
         store.discounts = discounts
         ## inventory
         from project.data_access_layer.ProductORM import ProductORM
@@ -133,16 +151,6 @@ class StoreORM(Base):
         store.inventory.products = inventory
         policies = {}
         for policy in self.policies:
-            pol = None
-            if policy.discriminator == 'Product Policy':
-                from project.data_access_layer import ProductPolciesORM
-                pol = proxy.get_session().query(ProductPolciesORM).filter_by(policy_id=policy.policy_id)
-            elif policy.discriminator == 'Store Policy':
-                from project.data_access_layer.StorePolicyORM import StorePolicyORM
-                pol = proxy.get_session().query(StorePolicyORM).filter_by(policy_id=policy.policy_id)
-            elif policy.discriminator == 'Composite Policy':
-                from project.data_access_layer.CompositePolicyORM import CompositePolicyORM
-                pol = proxy.get_session().query(CompositePolicyORM).filter_by(policy_id=policy.policy_id)
-            policies[policy.policy_ic] = pol.createObject()
+            policies[policy.policy_id] = policy.createObject()
         store.purchase_policies = policies
         return store

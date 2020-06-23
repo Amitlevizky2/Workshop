@@ -14,6 +14,10 @@ class DiscountToApplyORM(Base):
     discount = relationship('DiscountORM', foreign_keys=[discount_id, store_id])
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['to_apply_composite']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['to_apply_composite']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error

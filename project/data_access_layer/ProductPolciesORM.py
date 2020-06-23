@@ -5,17 +5,14 @@ from sqlalchemy.orm import relationship
 from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.PolicyORM import PolicyORM
 from project.data_access_layer.ProductsInPoliciesORM import ProductsInPoliciesORM
+from project.data_access_layer import PolicyORM
 
-class ProductPoliciesORM(PolicyORM):
+class ProductPoliciesORM(Base):
     __tablename__ = 'productspolicies'
-    policy_id = Column(Integer, ForeignKey('policies.policy_id'), primary_key=True)
+    policy_id = Column(Integer, primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     min_amount = Column(Integer)
     max_amount = Column(Integer)
-    products = relationship("ProductsInPoliciesORM")
-    __mapper_args__ = {
-        'polymorphic_identity': 'Product Policy'
-    }
 
     def update_min_amount(self, min):
         self.min_amount = min
@@ -26,24 +23,37 @@ class ProductPoliciesORM(PolicyORM):
         proxy.get_session().commit()
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
-        Base.metadata.create_all(engine, [Base.metadata.tables['productspolicies']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
+            Base.metadata.create_all(engine, [Base.metadata.tables['productspolicies']], checkfirst=True)
+            PolicyORM.add(self.policy_id, self.store_id)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
+
 
     def add_product(self, product_name):
         piporm = ProductsInPoliciesORM(policy_id=self.policy_id, product_name=product_name, store_id=self.store_id)
         piporm.add()
 
     def remove_product(self, product_name):
-        proxy.get_session().query(ProductsInPoliciesORM).delete.where(policy_id=self.policy_id, product_name=product_name, store_id=self.store_id)
-        proxy.get_session().commit()
+        res = proxy.get_session().query(ProductsInPoliciesORM).filter_by(policy_id=self.policy_id, product_name=product_name, store_id=self.store_id)
+        for pip in res:
+            proxy.get_session().delete(pip)
+            proxy.get_session().commit()
+
 
     def createObject(self):
         from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
-        poli = PurchaseProductPolicy(self.min_amout, self.max_amount, self.policy_id, self.store_id, self)
+        poli = PurchaseProductPolicy(self.min_amount, self.max_amount, self.policy_id, self.store_id, self)
         prods = {}
-        for piporm in self.products:
+        from project.data_access_layer.ProductsInPoliciesORM import ProductsInPoliciesORM
+        res = proxy.get_session().query(ProductsInPoliciesORM).filter(
+            ProductsInPoliciesORM.policy_id == self.policy_id).filter(
+            ProductsInPoliciesORM.store_id == self.store_id)
+        for piporm in res:
             prods[piporm.product_name] = True
         poli.products_in_policy = prods
         return poli

@@ -146,6 +146,6 @@ class ConditionalProductDiscount(Discount):
             self.orm.num_prods_to_apply = self.num_prods_to_apply
             for prod in self.products_in_discount.keys():
                 from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
-                pidorm = ProductsInDiscountsORM(discount_id=self.discount_id, product_name=prod, store_id=self.store_id)
+                pidorm = ProductsInDiscountsORM(discount_id=self.id, product_name=prod, store_id=self.store_id)
                 pidorm.add()
             self.orm.add()

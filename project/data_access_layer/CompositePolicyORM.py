@@ -1,34 +1,39 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, update
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from project.data_access_layer.DiscountORM import DiscountORM
-from project.data_access_layer.PolicyORM import PolicyORM
+from project.data_access_layer import PolicyORM
 from project.data_access_layer.PoliciesInCompositeORM import PoliciesInCompositeORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 from project.data_access_layer import Base, session, engine, proxy
+from project.domain_layer.stores_managment.DiscountsPolicies.LogicOperator import LogicOperator
 
 
-class CompositePolicyORM(PolicyORM):
+class CompositePolicyORM(Base):
     __tablename__ = 'CompositePolicies'
     policy_id = Column(Integer, ForeignKey('policies.policy_id'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     logic_operator = Column(Integer)
     policies_to_apply = relationship("PoliciesInCompositeORM")
-    __mapper_args__ = {
-        'polymorphic_identity': 'Composite Policy'
-    }
 
     def change_logic_operaor(self, lo):
         self.logic_operator = lo
         proxy.get_session().commit()
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['CompositePolicies']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['CompositePolicies']], checkfirst=True)
+            PolicyORM.add(self.policy_id, self.store_id)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error
+
 
     def add_policies(self, purchase_policies):
         for policy in purchase_policies:
@@ -41,28 +46,28 @@ class CompositePolicyORM(PolicyORM):
         poliorm.add()
 
     def remove_policy(self, policy):
-        proxy.get_session().query(PoliciesInCompositeORM).delete.where(composite_discount_id=self.policy_id, policy_id=policy.id,
-                                         store_id=self.store_id)
+        proxy.get_session().query(PoliciesInCompositeORM).filter_by(composite_discount_id=self.policy_id, policy_id=policy.id,
+                                         store_id=self.store_id).first()
+
+    def get_logic_operator(self, logic_operator_str:str):
+        if logic_operator_str is None:
+            return None
+        if logic_operator_str.upper() == "LogicOperator.OR":
+            return LogicOperator.OR
+        elif logic_operator_str.upper() == "LogicOperator.AND":
+            return LogicOperator.AND
+        elif logic_operator_str.upper() == "LogicOperator.XOR":
+            return LogicOperator.XOR
+        else:
+            return None
 
     def createObject(self):
-        #CHANGEEEEEEE
-        from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import \
-            CompositeDiscount
+        from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseCompositePolicy import \
+            PurchaseCompositePolicy
         to_apply = []
-        for dis in self.discounts_to_apply:
-            real = dis.createObject()
-            to_apply.append(to_apply)
-        pred = []
-        pred_map_discount = {}
-        pred_map_prods = {}
-        for pre in self.products_in_predicates:
-            real_discount = pre.discount.createObject()
-            if real_discount.discount_id not in pred_map_discount.keys():
-                pred_map_discount[real_discount.discount_id] = real_discount
-            pred_map_prods[real_discount.discount_id].append(pre.product_name)
-        for dis_id in pred_map_discount.keys():
-            pred.append((pred_map_discount[dis_id], pred_map_prods[dis_id]))
-        compodis = CompositeDiscount(self.start_date, self.end_date, self.logic_operator, pred, to_apply, self.store_id,
-                                     self)
-        compodis.set_id(self.discount_id)
-        return compodis
+        res = proxy.get_session().query(PoliciesInCompositeORM).filter(PoliciesInCompositeORM.policy_id==self.policy_id).filter(PoliciesInCompositeORM.store_id==self.store_id)
+        for poli in res:
+            pol = poli.createObject()
+            to_apply.append(pol)
+        compopol = PurchaseCompositePolicy(to_apply, self.get_logic_operator(self.logic_operator), self.policy_id, self.store_id, self)
+        return compopol

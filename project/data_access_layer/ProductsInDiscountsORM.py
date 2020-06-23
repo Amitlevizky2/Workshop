@@ -1,9 +1,11 @@
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean, update
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ProductORM import ProductORM
+
 
 
 class ProductsInDiscountsORM(Base):
@@ -17,6 +19,10 @@ class ProductsInDiscountsORM(Base):
     discount = relationship('DiscountORM', back_populates='products')
 
     def add(self):
-        Base.metadata.create_all(engine, [Base.metadata.tables['Discount_products']], checkfirst=True)
-        proxy.get_session().add(self)
-        proxy.get_session().commit()
+        try:
+            Base.metadata.create_all(engine, [Base.metadata.tables['Discount_products']], checkfirst=True)
+            proxy.get_session().add(self)
+            proxy.get_session().commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            return error

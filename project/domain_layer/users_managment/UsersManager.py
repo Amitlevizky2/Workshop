@@ -248,3 +248,4 @@ class UsersManager:
         users = self.data_handler.get_all_regusers()
         for user in users:
             self.reg_user_list[user.username] = user
+            print(jsons.dump(user))
