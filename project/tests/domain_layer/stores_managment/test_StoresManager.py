@@ -3,44 +3,25 @@ import unittest
 
 import jsons
 
+from project.data_access_layer import Base, meta, StoreORM, engine
 from project.domain_layer.stores_managment.NullStore import NullStore
 from project.domain_layer.stores_managment.Product import Product
-from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
 from project.tests.domain_layer.stores_managment.Stubs.StoreStub import StoreStub
-import project.data_access_layer
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+import os
 
 
 class test_StoresManager(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.store_manager = StoresManager(None)
+        cls.init_stores(cls)
+
     def setUp(self) -> None:
-
-        path = 'sqlite:////Users/avivlevitzky/PycharmProjects/Workshop/project/test.db'
-        Base = declarative_base()
-        session = sessionmaker()
-        engine = create_engine(path, echo=True)
-        session.configure(bind=engine)
-        session = Session()
-
-
-
-
-        self.store_manager = StoresManager()
-        # self.stores_getters = StoresGetters(self.store_manager)
-        for i in range(5):
-            self.store_manager.stores[i] = Store(i, "test_store" + str(i), "test_owner" + str(i))
-            self.store_manager.stores[i].store_managers["test_owner"] = [Store.add_product, Store.add_visible_product_discount, Store.add_conditional_discount_to_product,
-                                                                         Store.update_product]
-            self.store_manager.stores_idx = i
-
-        # products = self.init_product()
-        # self.insert_products_to_store(products.values(), self.store_manager.stores.values())
-        # self.init_discounts()
-        self.init_stores()
+        pass
+        # StoreORM.__table__.drop(engine)
 
     def init_stores(self):
         # create stab stores
@@ -136,6 +117,7 @@ class test_StoresManager(unittest.TestCase):
         self.assertTrue(res3['error'])
 
     def test_get_discount_details(self):
+        self.init_discounts()
         res1 = self.store_manager.get_discount_details(11, 1)
         res1 = jsons.loads(res1)
         self.assertFalse(res1['error'])
@@ -207,10 +189,36 @@ class test_StoresManager(unittest.TestCase):
     #     self.assertFalse(res1['error'])
 
     def test_edit_visible_discount_to_product(self):
-        self.fail()
+        res1 = self.store_manager.edit_visible_discount_to_products(11, 'store_owner11', 1, datetime.datetime(2018, 6, 1), datetime.datetime(2020, 12, 17), 20, ['Banana'])
+        res2 = self.store_manager.edit_visible_discount_to_products(11, 'store_owner111', 1,
+                                                                    datetime.datetime(2018, 6, 1),
+                                                                    datetime.datetime(2020, 12, 17), 20, ['Banana'])
+        res3 = self.store_manager.edit_visible_discount_to_products(11, 'store_owner11', 1,
+                                                                    datetime.datetime(2018, 6, 1),
+                                                                    datetime.datetime(2020, 12, 17), 20, ['Apple'])
+        res1 = jsons.loads(res1)
+        res2 = jsons.loads(res2)
+        res3 = jsons.loads(res3)
+        self.assertFalse(res1['error'])
+        self.assertTrue(res2['error'])
+        self.assertTrue(res3['error'])
 
     def test_edit_conditional_discount_to_product(self):
-        self.fail()
+        res1 = self.store_manager.edit_visible_discount_to_products(11, 'store_owner11', 1,
+                                                                    datetime.datetime(2018, 6, 1),
+                                                                    datetime.datetime(2020, 12, 17), 20, ['Banana'])
+        res2 = self.store_manager.edit_visible_discount_to_products(11, 'store_owner111', 1,
+                                                                    datetime.datetime(2018, 6, 1),
+                                                                    datetime.datetime(2020, 12, 17), 20, ['Banana'])
+        res3 = self.store_manager.edit_visible_discount_to_products(11, 'store_owner11', 1,
+                                                                    datetime.datetime(2018, 6, 1),
+                                                                    datetime.datetime(2020, 12, 17), 20, ['Apple'])
+        res1 = jsons.loads(res1)
+        res2 = jsons.loads(res2)
+        res3 = jsons.loads(res3)
+        self.assertFalse(res1['error'])
+        self.assertTrue(res2['error'])
+        self.assertTrue(res3['error'])
 
     def test_get_user_permissions(self):
         res1 = self.store_manager.get_user_permissions(11, 'store_owner11')
@@ -573,6 +581,44 @@ class test_StoresManager(unittest.TestCase):
             self.store_manager.add_purchase_store_policy(store.store_id, "test_owner" + str_id, 5, 6)
             x=5
         return [p for p in self.store_manager.get_store(1).purchase_policies.keys()]
+
+    def tearDown(self) -> None:
+        self.drop_table('stores')
+        self.drop_table('baskets')
+        self.drop_table('CompositeDiscounts')
+        self.drop_table('CompositePolicies')
+        self.drop_table('conditionalproductdiscounts')
+        self.drop_table('conditionalstorediscounts')
+        self.drop_table('discounts')
+        self.drop_table('to_apply_composite')
+        self.drop_table('managers')
+        self.drop_table('managerpermissions')
+        self.drop_table('owners')
+        self.drop_table('Policy_in_composite')
+        self.drop_table('policies')
+        self.drop_table('predicates')
+        self.drop_table('products')
+        self.drop_table('productspolicies')
+        self.drop_table('productsinbaskets')
+        self.drop_table('Discount_products')
+        self.drop_table('Policy_products')
+        self.drop_table('productsinpurcases')
+        self.drop_table('purchases')
+        self.drop_table('regusers')
+        self.drop_table('stores')
+        self.drop_table('storepolicies')
+        self.drop_table('passwords')
+        self.drop_table('notifications')
+        self.drop_table('visibleProductDiscounts')
+        # self.drop_table('stores')
+
+    @classmethod
+    def tearDownClass(cls):
+        os.remove('/Users/avivlevitzky/PycharmProjects/Workshop/project/tests/test.db')
+
+    def drop_table(self, table_name: str):
+        if table_name in Base.metadata.tables:
+            Base.metadata.drop_all(engine, [Base.metadata.tables[table_name]])
 
 
 if __name__ == '__main__':

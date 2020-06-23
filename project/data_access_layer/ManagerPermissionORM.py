@@ -2,7 +2,9 @@ from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import session,Base, engine
+from project.data_access_layer import session, Base, engine, proxy
+
+
 # from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 
@@ -19,4 +21,6 @@ class ManagerPermissionORM(Base):
         proxy.get_session().commit()
 
     def remove(self, username, store_id, permission):
-        proxy.get_session().query(ManagerPermissionORM).delete.where(username=username, store_id=store_id, permission=permission)
+        res =proxy.get_session().query(ManagerPermissionORM).filter_by(username=username, store_id=store_id, permission=permission)
+        proxy.get_session().delete(res)
+        proxy.get_session().commit()
