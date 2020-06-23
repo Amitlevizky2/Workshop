@@ -14,6 +14,7 @@ class open_store(unittest.TestCase):
 
     def test_open_store_bad(self):
         self.service.logout()
+        res1 = 0
         if self.service.out:
             res1 = -1
         res2 = self.service.Open_store("Failed")

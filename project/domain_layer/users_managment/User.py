@@ -30,7 +30,9 @@ class User:
         for purchase in purchases:
             self.purchase_history.append(purchase)
 
-    def view_purchase_history(self):
+    def view_purchase_history(self, view_format=''):
+        if view_format == 'json':
+            return self.get_jsn_purchase_history()
         return self.purchase_history
 
     def get_jsn_description(self):
@@ -43,10 +45,16 @@ class User:
         })
 
     def get_jsn_purchase_history(self):
-        return []
+        purchases = []
+        for purchase in self.purchase_history:
+            purchases.append({
+                'store_id': purchase.store_id,
+                'products': jsons.dumps(purchase.products),
+                'buyer': purchase.buyer,
+                'purchase_id': purchase.purchase_id,
+                'date':purchase.date
+            })
+        return purchases
 
     def merge_carts(self, other: Cart):
         self.cart.merge_carts(other)
-
-
-

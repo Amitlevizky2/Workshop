@@ -7,12 +7,14 @@ from project.tests.external_systems.test_ShipmentSystemInterface import external
 
 class Adapter:
     def __init__(self):
-        self.users_manager_interface = UsersManagerInterface()
-        self.store_manager_interface = StoresManagerInterface(self.users_manager_interface)
+        self.users_manager_interface = UsersManagerInterface(None)
+        self.store_manager_interface = StoresManagerInterface(self.users_manager_interface,None)
+        self.users_manager_interface.set_stores_manager(self.store_manager_interface)
         self.purchase_manager = PurchaseManager(self.users_manager_interface, self.store_manager_interface)
         self.purchase_manager.set_external_payment(external_paymentstub())
         self.purchase_manager.set_external_shipment(external_shipmentstub())
         self.username = self.users_manager_interface.add_guest_user()
+        print(self.username)
 
     def register(self, username, password):
         return self.users_manager_interface.register(self.username, username, password)
@@ -42,20 +44,22 @@ class Adapter:
         return self.users_manager_interface.get_managed_stores(self.username)
 
     def logout(self):
-        self.username = self.users_manager_interface.logout(self.username)
+        res= self.users_manager_interface.logout(self.username)
+        if(not res['error']):
+            self.username = res['data']
         return self.username
 
     def get_purchase_history(self):
         return self.users_manager_interface.view_purchases(self.username)
 
-    def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
-        return self.store_manager_interface.add_discount_to_product(store_id, product_name, username, start_date, end_date, percent)
+    def add_discount_to_product(self, store_id,  username, start_date, end_date, percent,product_name):
+        return self.store_manager_interface.add_visible_discount_to_product(store_id,username,start_date,end_date,percent,product_name)
 
     def add_product(self, store_id, product, amount):
         return self.users_manager_interface.add_product(self.username, store_id, product, amount)
 
-    def buy(self):
-        return self.purchase_manager.buy(self.username)
+    def buy(self,CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid,address,city,country,zip):
+        return self.purchase_manager.buy(self.username,CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid,address,city,country,zip)
 
     def remove_product_from_store(self, store_id, product_name):
         return self.store_manager_interface.remove_product(store_id, product_name, self.username)

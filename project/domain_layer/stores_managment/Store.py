@@ -315,7 +315,8 @@ class Store:
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, 'view_purchase_history') or is_admin:
-            self.sales = self.orm.getPurchases()
+            #self.sales = self.orm.getPurchases()
+
             #TODO: fix purchase maybe handler maybe add function to store
             return {'error': False,
                     'data': self.sales}
@@ -346,7 +347,8 @@ class Store:
         if purchase is not None:
             self.sales.append(purchase)
             # send notification to owners.
-            publisher.purchase_update(self.store_id, self.name, self.store_owners)
+            if publisher is not None:
+                publisher.purchase_update(self.store_id, self.name, self.store_owners)
             return {'error': False,
                     'data': 'sale has been added'}
         return {'error': True,

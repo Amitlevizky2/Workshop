@@ -73,7 +73,7 @@ class UsersManager:
             if res is True:
                 self.merge_carts(data, guest_user.cart)
                 self.guest_user_list.pop(username)
-                self.update_stats(username)
+                self.update_stats(login_username)
                 return True, {'data': data.get_jsn_description()}
             return res, guest_user
         else:
@@ -87,8 +87,9 @@ class UsersManager:
             self.stats.add_managers()
 
     def is_manager(self, username: str):
-        ans: RegisteredUser = self.find_reg_user(username)
-        if ans.is_store_manager():
+        ans1: RegisteredUser = self.find_reg_user(username)[1]
+        x=5
+        if ans1.is_store_manager():
             return True
         return False
 
@@ -116,12 +117,12 @@ class UsersManager:
                 user.logout()
                 return {'error': False, 'data': self.add_guest_user()}
             return {'error': True, 'error_msg': 'User ' + username + ' is not logged in.'}
-        return {'error': True, 'error_msg': ans['error_msg']}
+        return {'error': True, 'error_msg': user['error_msg']}
 
     def view_purchases(self, username):
         ans, user = self.find_user(username)
         if ans is True:
-            return True, user.view_purchase_history(view_format='json')
+            return True, user.view_purchase_history()
         else:
             return False, user
         # if view purchases of username

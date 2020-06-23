@@ -20,15 +20,15 @@ class AddStorePermission(unittest.TestCase):
 
     def test_add_permission_sad(self):
 
-        self.assertFalse(self.service.add_permission(self.store_id, "not new manager", "add_product"))
+        self.assertTrue(self.service.add_permission(self.store_id, "not new manager", "add_product")['error'])
         self.service.logout()
         self.service.login("new manager", "new pass")
-        self.assertFalse(self.service.add_permission(self.store_id, "manager", "add_product"))
+        self.assertTrue(self.service.add_permission(self.store_id, "manager", "add_product")['error'])
 
     def test_add_permission_bad(self):
-        self.assertFalse(self.service.add_permission(self.store_id+40, "new manager", "add_product"))
+        self.assertFalse(not self.service.add_permission(self.store_id+40, "new manager", "add_product")['error'])
         self.service.logout()
-        self.assertFalse(self.service.add_permission(self.store_id, "new manager", "add_product"))
+        self.assertFalse(not self.service.add_permission(self.store_id, "new manager", "add_product")['error'])
 
 
 if __name__ == '__main__':

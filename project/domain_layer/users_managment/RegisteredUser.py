@@ -59,8 +59,8 @@ class RegisteredUser(User):
         """
         if store_id in self.managed_stores:
             self.managed_stores.remove(store_id)
-            return True, 'Store id: ' + store_id + ' is not managed by ' + self.username + ' anymore.'
-        return False, 'Store id: ' + store_id + ' is not associated with the user:  ' + self.username + '.'
+            return True, 'Store id: ' + str(store_id) + ' is not managed by ' + self.username + ' anymore.'
+        return False, 'Store id: ' + str(store_id) + ' is not associated with the user:  ' + self.username + '.'
 
     def add_notification(self, message):
         print('user: ' + self.username + 'got notification: ' + message)
@@ -79,7 +79,7 @@ class RegisteredUser(User):
         return messages
 
     def is_store_manager(self):
-        return self.managed_stores.__len__() > 0
+        return len(self.managed_stores) > 0
 
     def get_jsn_description(self):
         json_cart = self.cart.get_jsn_description()

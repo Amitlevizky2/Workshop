@@ -51,14 +51,14 @@ class PurchaseManager:
         if error:
             if not error_validity:
                 if valid_user:
-                    purchases = {}
+                    purchases = []
                     for store_basket in cart_desc.values():
                         store_id = store_basket['store_id']
                         self.payment_system.pay(user, store_id, store_basket['store_purchase_price'],CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid)
                         self.purchases_idx += 1
                         purchase = Purchase(store_basket['desc'], user, store_id, self.purchases_idx)
                         print()
-                        purchases[store_id] = purchase
+                        purchases.append(purchase)
                         self.store_manager.add_purchase_to_store(store_id, purchase)
 
                     self.store_manager.buy(cart)

@@ -221,6 +221,7 @@ class StoresManager:
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
+        x=6
         return store.add_product_to_discount(permitted_user, discount_id, product_name)
 
     def remove_product_from_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):

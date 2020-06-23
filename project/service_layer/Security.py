@@ -32,7 +32,11 @@ class Security:
         # else:
         #     return False
 
-        stored_password = SORM.find_pass(username).hashed_pass
+        stored_password = SORM.find_pass(username)
+        if stored_password is not None:
+            stored_password = stored_password.hashed_pass
+        else:
+            return False
         salt = stored_password[:64]
         stored_password = stored_password[64:]
         pwdhash = hashlib.pbkdf2_hmac('sha512',

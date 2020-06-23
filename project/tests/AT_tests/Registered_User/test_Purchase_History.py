@@ -1,7 +1,8 @@
 import unittest
-
+import os
+from project.data_access_layer import Base, meta, engine
 import jsonpickle
-
+import jsons
 from project.tests.AT_tests.test_env.Driver import Driver
 from project.tests.AT_tests import ATsetUP
 
@@ -13,25 +14,64 @@ class purchase_History(unittest.TestCase):
         self.service.register("user", "pass")
         self.service.login("user", "pass")
         res = self.service.searchProduct("Banana")
-        res_dec = jsonpickle.decode(res)
+        res_dec = jsons.loads(res)
         # product = res_dec
-        first_store_id = list(res_dec)[0]
-        encoded_product = jsonpickle.encode(res_dec.get(first_store_id)[0])
-        self.service.add_product(first_store_id, encoded_product, 2)#TODO
-        self.service.buy()
+        first_store_id = res_dec['avishop']["store_id"]
+        x=5
+        self.service.add_product(first_store_id, "Banana", 2)#TODO
+        self.service.buy(458053299887,12,2022,"amit levizky",448,2957474,"rager","beersheva","israel",283443)
+
+    @classmethod
+    def tearDownClass(cls):
+
+        os.remove("C:\\Users\\Owner\\Desktop\\Sadna_project\\Workshop\\daldal.db")
+
+    def tearDown(self) -> None:
+        self.drop_table('stores')
+        self.drop_table('baskets')
+        self.drop_table('CompositeDiscounts')
+        self.drop_table('CompositePolicies')
+        self.drop_table('conditionalproductdiscounts')
+        self.drop_table('conditionalstorediscounts')
+        self.drop_table('discounts')
+        self.drop_table('to_apply_composite')
+        self.drop_table('managers')
+        self.drop_table('managerpermissions')
+        self.drop_table('owners')
+        self.drop_table('Policy_in_composite')
+        self.drop_table('policies')
+        self.drop_table('predicates')
+        self.drop_table('products')
+        self.drop_table('productspolicies')
+        self.drop_table('productsinbaskets')
+        self.drop_table('Discount_products')
+        self.drop_table('Policy_products')
+        self.drop_table('productsinpurcases')
+        self.drop_table('purchases')
+        self.drop_table('passwords')
+        self.drop_table('regusers')
+        self.drop_table('stores')
+        self.drop_table('storepolicies')
+        self.drop_table('notifications')
+        self.drop_table('visibleProductDiscounts')
+
+    def drop_table(self, table_name: str):
+        if table_name in Base.metadata.tables:
+            Base.metadata.drop_all(engine, [Base.metadata.tables[table_name]])
 
     def test_purchase_happy(self):
-        result = jsonpickle.decode(self.service.get_purchase_history())
-        self.assertEqual(list(result[0].products)[0], "Banana")
+        result0,result1 = self.service.get_purchase_history()
+
+        self.assertEqual(list(result1[0][0].products)[0], "Banana")
 
     def test_purchase_bad(self):
         self.service.logout()
-        result = jsonpickle.decode(self.service.get_purchase_history())
-        self.assertTrue(len(result) == 0)
+        result0,result1 = self.service.get_purchase_history()
+        self.assertTrue(result0)
 
     def test_purchase_sad(self):
-        res1 = jsonpickle.decode(self.service.get_purchase_history())
-        self.assertNotEqual(list(res1[0].products)[0], "marshmelo")
+        result0,result1 = self.service.get_purchase_history()
+        self.assertNotEqual(list(result1[0][0].products)[0], "marshmelo")
 
 
 
