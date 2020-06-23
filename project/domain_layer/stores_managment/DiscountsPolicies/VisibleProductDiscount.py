@@ -65,6 +65,8 @@ class VisibleProductDiscount(Discount):
             for product in new_products:
                 prod_dict[product] = True
             self.products_in_discount = prod_dict
+            return True
+        return False
 
     def is_in_discount(self, product_name: str, product_price_dict: dict):
         return product_name in self.products_in_discount and \

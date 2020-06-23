@@ -10,16 +10,27 @@ class Statistics:
         self.owners = 0
 
     def get_today_statistics(self):
-            self.stat_by_day[datetime.date.today()] = {
-                'guests': self.guests,
-                'registered_users': self.reg_users,
-                'managers': self.managers,
-                'owners': self.owners,
-            }
+        """
+        :return: returns number of guest users, number of registered users, number of store managers and owners visited the store TODAY
+        """
+        self.stat_by_day[datetime.date.today()] = {
+            'guests': self.guests,
+            'registered_users': self.reg_users,
+            'managers': self.managers,
+            'owners': self.owners,
+        }
 
-            return self.stat_by_day
+        return self.stat_by_day
 
-    def get_range_statistics(self, start_date, end_date):
+    def get_range_statistics(self, _start_date, _end_date):
+        start_date = datetime.strptime(_start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(_end_date, '%Y-%m-%d')
+        """
+        :param start_date: starting date
+        :param end_date: end date
+        :return: returns number of guest users, number of registered users, number of store managers and owners
+                visited the store on those days.
+        """
         range_stats = {
             'guests': 0,
             'registered_users': 0,

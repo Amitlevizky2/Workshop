@@ -94,6 +94,8 @@ class ConditionalProductDiscount(Discount):
             for product in new_products:
                 prod_dict[product] = True
             self.products_in_discount = prod_dict
+            return True
+        return False
 
     def is_valid_condition(self, discount_conditions):
         return discount_conditions[0] > 0 and 0 <= discount_conditions <= 100

@@ -33,7 +33,6 @@ class UsersManager:
 
     def find_user(self, username):
         print(type(username))
-
         if username in self.reg_user_list.keys():
             user = self.reg_user_list[username]
             return True, user
@@ -43,7 +42,7 @@ class UsersManager:
                 return True, user
             else:
                 logger.error("user with username %s does not exist", username)
-                return False, {'error_msg ': 'user not found'}
+                return False, {'error_msg': 'user not found'}
 
     def register(self, username, new_username):
         ans, data = self.find_reg_user(new_username)
@@ -71,7 +70,7 @@ class UsersManager:
             data.loggedin = True
             res, guest_user = self.find_user(username)
             if res is True:
-                self.merge_carts(data, guest_user.cart)
+                # self.merge_carts(data, guest_user.cart)
                 self.guest_user_list.pop(username)
                 self.update_stats(username)
                 return True, {'data': data.get_jsn_description()}
@@ -87,10 +86,10 @@ class UsersManager:
             self.stats.add_managers()
 
     def is_manager(self, username: str):
-        ans: RegisteredUser = self.find_reg_user(username)
-        if ans.is_store_manager():
-            return True
-        return False
+        ans, data = self.find_reg_user(username)
+        if ans is False:
+            return False
+        return data.is_store_manager()
 
     # make sure when  user exits system to remove the user from guest user list
     def add_guest_user(self):
@@ -98,7 +97,7 @@ class UsersManager:
         self.incremental_id += 1
         self.guest_user_list[user.username] = user
         logger.log("guest user with username %s was added to system", user.username)
-        self.stats
+        self.stats.add_guests_stats()
         return user.username
 
     # look up via usr id change user list to map of ids and user
@@ -114,16 +113,16 @@ class UsersManager:
         if ans is True:
             if user.loggedin is True:
                 user.logout()
-                return {'error': False, 'data': self.add_guest_user()}
-            return {'error': True, 'error_msg': 'User ' + username + ' is not logged in.'}
-        return {'error': True, 'error_msg': ans['error_msg']}
+                return jsons.dumps({'error': False, 'data': self.add_guest_user()})
+            return jsons.dumps({'error': True, 'error_msg': 'User ' + username + ' is not logged in.'})
+        return jsons.dumps({'error': True, 'error_msg': user['error_msg']})
 
     def view_purchases(self, username):
         ans, user = self.find_user(username)
         if ans is True:
-            return True, user.view_purchase_history(view_format='json')
+            return jsons.dumps({'error': False, 'data': user.view_purchase_history()})
         else:
-            return False, user
+            return jsons.dumps({'error': True, 'error_msg': user['error_msg']})
         # if view purchases of username
 
     def add_product(self, username, store_id, product, quantity):
@@ -137,13 +136,11 @@ class UsersManager:
     def remove_product(self, username, store_id, product, quantity):
         answer, user = self.find_user(username)
         if answer is True:
-            ans = user.remove_product(store_id, product, quantity)
-            if ans is True:
-                data = {'data': 'product ' + product + ' quantity was updated'}
-                return ans, data
+            if user.remove_product(store_id, product, quantity) is True:
+                return jsons.dumps({'error': False, 'data': 'product ' + product + ' quantity was updated'})
             else:
-                data = {'error_msg': 'product ' + product + ' is not in cart'}
-                return ans, data
+                return jsons.dumps({'error': True, 'error_msg': 'product ' + product + ' is not in cart'})
+        return jsons.dumps({'error': True, 'error_msg': user['error_msg']})
 
     def get_cart(self, username):
         ans, user = self.find_user(username)
@@ -164,29 +161,30 @@ class UsersManager:
     #      return updated_baskets_list
 
     def view_purchases_admin(self, username, admin):
-        ans, user = self.find_reg_user(username)
+        ans, user = self.find_user(username)
         if admin in self.admins:
             if ans is True:
-                return jsonpickle.encode(user.view_purchase_history())
+                return jsons.dumps({'error': False, 'data': user.view_purchase_history()})
             else:
-                return False, user
-        return False, {'error_msg': 'user ' + admin + ' is not an admin'}
+                return jsons.dumps({'error': True, 'error_msg': user['error_msg']})
+        return jsons.dumps({'error': True, 'error_msg': 'user ' + admin + ' is not an admin'})
 
     def add_admin(self, admin, username_to_be_admin):
         if self.find_reg_user(username_to_be_admin)[0]:
             if self.is_admin(admin):
                 if not self.is_admin(username_to_be_admin):
                     self.admins.append(username_to_be_admin)
+                    return jsons.dumps({'error': False, 'data': 'User: {}, have admin privileges.'.format(username_to_be_admin)})
                 else:
-                    return False, {'error_msg': 'user' + username_to_be_admin + 'is allready admin'}
+                    return jsons.dumps({'error': True, 'error_msg': 'user' + username_to_be_admin + 'is already admin'})
             else:
-                return False,{'error_msg': 'user ' + admin + ' is not an admin'}
+                return jsons.dumps({'error': True, 'error_msg': 'user ' + admin + ' is not an admin'})
         else:
-            return False, {'error_msg': 'user ' + username_to_be_admin + ' is not an registered user'}
+            return jsons.dumps({'error': True, 'error_msg': 'user ' + username_to_be_admin + 'is not an registered '
+                                                                                             'user'})
 
     def is_admin(self, username):
         return username in self.admins
-
 
     def add_managed_store(self, username, store_id):
         ans, user = self.find_reg_user(username)
@@ -194,7 +192,6 @@ class UsersManager:
             added = user.add_managed_store(store_id)
             if added is True:
                 return True, {'data': 'appointed successfully'}
-            return False, {'error_msg': 'user ' + username + ' is already managing the store: ' + str(store_id) + '.'}
         return ans, user
 
     def get_managed_stores(self, username, view_format=''):
@@ -267,7 +264,24 @@ class UsersManager:
             self.reg_user_list[user.username] = user
 
     def get_today_stats(self):
-        return {
+        return jsons.dumps({
             'error': False,
             'stats': self.stats.get_today_statistics()
-        }
+        })
+
+    def get_range_statistics(self, start_date, end_date):
+        return jsons.dumps({
+            'error': False,
+            'stats': self.stats.get_range_statistics(start_date,end_date)
+        })
+
+    def add_first_admin(self):
+        admin_user = RegisteredUser(username='admin', is_admin=True)
+        self.reg_user_list['admin'] = admin_user
+        self.admins.append('admin')
+
+    def get_all_users(self, admin):
+        if self.is_admin(admin) is True:
+            return jsons.dumps({'error': False, 'data': list(self.reg_user_list.keys())})
+        return jsons.dumps({'error': True, 'error_msg': 'User {} is not admin!'.format(admin)})
+

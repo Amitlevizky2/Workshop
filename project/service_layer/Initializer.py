@@ -19,6 +19,7 @@ class Initializer:
         self.users_manager.set_stores_manager(self.stores_manager)
         self.stores_manager.bound_publisher(self.publisher)
         self.bound_managers()
+
         if path.exists("init.txt") and not engine.dialect.has_table(engine, "regusers"):
             file1 = open('init.txt', 'r')
             Lines = file1.readlines()
@@ -46,6 +47,7 @@ class Initializer:
             # L += "self.appoint_manager(\"u3\",sid,\"u6\")\n"
             # file1.writelines(L)
             # file1.close()
+        self.users_manager.add_first_admin()
 
     def get_users_manager_interface(self) -> UsersManagerInterface:
         return self.users_manager

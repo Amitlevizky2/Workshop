@@ -6,12 +6,16 @@ from project.domain_layer.users_managment.User import User
 
 class RegisteredUser(User):
 
-    def __init__(self, username, orm = None):
+    def __init__(self, username, orm = None, is_admin=None):
         super().__init__(username)
         self.username = username
        # self.is_admin =
         self.purchase_history = []
         self.loggedin = False
+        if is_admin is None:
+            self.is_admin = False
+        else:
+            self.is_admin = is_admin
         self.managed_stores = []
         self.notifications = []
         if orm is None:
@@ -49,8 +53,7 @@ class RegisteredUser(User):
         """
         if store_id not in self.managed_stores:
             self.managed_stores.append(store_id)
-            return True
-        return False
+        return True
 
     def remove_managed_store(self, store_id):
         """
@@ -59,13 +62,13 @@ class RegisteredUser(User):
         """
         if store_id in self.managed_stores:
             self.managed_stores.remove(store_id)
-            return True, 'Store id: ' + store_id + ' is not managed by ' + self.username + ' anymore.'
-        return False, 'Store id: ' + store_id + ' is not associated with the user:  ' + self.username + '.'
+            return True, 'Store id: ' + str(store_id) + ' is not managed by ' + self.username + ' anymore.'
+        return False, 'Store id: ' + str(store_id) + ' is not associated with the user:  ' + self.username + '.'
 
     def add_notification(self, message):
         print('user: ' + self.username + 'got notification: ' + message)
         self.notifications.append(message)
-        self.orm.add_notification(self.username, message)
+       # self.orm.add_notification(self.username, message)
 
     def have_notifications(self) -> bool:
         return self.notifications.__len__() > 0
@@ -91,7 +94,8 @@ class RegisteredUser(User):
             'cart': json_cart,
             'purchase_history': json_purchase_history,
             'managed_stores': json_managed_stores,
-            'notifications': json_notifications
+            'notifications': json_notifications,
+            'is_admin': self.is_admin
         })
 
     def get_jsn_purchase_history(self):

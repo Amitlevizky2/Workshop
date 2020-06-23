@@ -31,27 +31,28 @@ class Security:
         #     return pwdhash == stored_password
         # else:
         #     return False
+        _pass = SORM.find_pass(username)
+        if _pass is not None:
+            stored_password = _pass.hashed_pass
+            salt = stored_password[:64]
+            stored_password = stored_password[64:]
+            pwdhash = hashlib.pbkdf2_hmac('sha512',
+                                          provided_password.encode('utf-8'),
+                                          salt.encode('ascii'),
+                                          100000)
+            pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+            return pwdhash == stored_password
 
-        stored_password = SORM.find_pass(username).hashed_pass
-        salt = stored_password[:64]
-        stored_password = stored_password[64:]
-        pwdhash = hashlib.pbkdf2_hmac('sha512',
-                                      provided_password.encode('utf-8'),
-                                      salt.encode('ascii'),
-                                      100000)
-        pwdhash = binascii.hexlify(pwdhash).decode('ascii')
-        return pwdhash == stored_password
-
-
-        password = SORM.find_pass(username)
-        print("recived before hash "+provided_password)
-        print("from DB:")
-        print(password.hashed_pass)
-        print("recieved" + self.hash_password(provided_password))
-        if self.hash_password(provided_password) == password.hashed_pass:
-            return True
-        else:
-            return False
+            password = SORM.find_pass(username)
+            print("recived before hash " + provided_password)
+            print("from DB:")
+            print(password.hashed_pass)
+            print("recieved" + self.hash_password(provided_password))
+            if self.hash_password(provided_password) == password.hashed_pass:
+                return True
+            else:
+                return False
+        return False
 
     def add_user(self, username, password):
         self.passwords[username] = self.hash_password(password)

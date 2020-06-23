@@ -12,7 +12,6 @@ class User:
     def view_cart(self):
         self.cart.view()
 
-    # TODO: change argument product to product_name
     def remove_product(self, store_id, product, quantity) -> bool:
         return self.cart.remove_product(store_id, product, quantity)
 

@@ -14,10 +14,10 @@ class UsersManagerInterface:
     def __init__(self, data_handler):
         self.user_manager = UsersManager(data_handler)
         self.stores_manager = None
-        #username = self.user_manager.add_guest_user()
-        #print(username)
-        #self.user_manager.register(username, "admin")
-        #self.user_manager.admins.append("admin")
+
+    def add_first_admin(self):
+        self.security.add_user('admin', '1234')
+        self.user_manager.add_first_admin()
 
     def set_stores_manager(self, stores_manager: StoresManagerInterface):
         self.stores_manager = stores_manager
@@ -27,10 +27,14 @@ class UsersManagerInterface:
         ans, data = self.user_manager.register(username, new_username)
         if ans is True:
             self.security.add_user(new_username, password)
+            return jsons.dumps({
+                'error': False,
+                'data': data['data']
+            })
         print(data)
-        return ans, data
+        return jsons.dumps({'error': True, 'error_msg': data['error_msg']})
 
-# TODO: remove the return type hint. does not necessarily returns bool
+    # TODO: remove the return type hint. does not necessarily returns bool
     # EVERYTIME SOMEONE OPENS THE SYSTEM A NEW USER IS CREATEDDDDDDDD
     def login(self, username: str, login_username: str, password):
         print("here!")
@@ -62,7 +66,7 @@ class UsersManagerInterface:
     def add_guest_user(self):
         return self.user_manager.add_guest_user()
 
-# TODO: view_cart returns json object, not Cart.
+    # TODO: view_cart returns json object, not Cart.
     # look up via usr id change user list to map of ids and user
     def view_cart(self, username):
         logger.log("user %s called view_cart", username)
@@ -86,9 +90,10 @@ class UsersManagerInterface:
         logger.log("user %s called view_purchases", username)
         return self.user_manager.view_purchases(username)
 
-# TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
+    # TODO: change product to product_name and get the actual product from the method i added in StoresManagerInterface
     def add_product(self, username, store_id, product_name, quantity):
-        logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id, product_name, quantity)
+        logger.log("user %s called add product with store_id:%d, product_name:%s, quantity:%d", username, store_id,
+                   product_name, quantity)
         valid = self.stores_manager.is_valid_amount(store_id, product_name, quantity)
         if valid['error'] is False:
             return {
@@ -134,6 +139,9 @@ class UsersManagerInterface:
             'data': answer
         }
 
+    def add_admin(self, admin, user_to_be_admin):
+        return self.user_manager.add_admin(admin, user_to_be_admin)
+
     def add_managed_store(self, username, store_id):
         """
         :param username:
@@ -158,7 +166,7 @@ class UsersManagerInterface:
                 'data': stores_des
             })
         else:
-            return({
+            return ({
                 'error': True,
                 'error_msg': ans['error_msg']
             })
@@ -194,6 +202,10 @@ class UsersManagerInterface:
         self.user_manager.init_data()
 
     def get_today_stats(self):
-        self.user_manager.get_today_stats()
+        return self.user_manager.get_today_stats()
 
+    def get_range_statistics(self, start_date, end_date):
+        return self.user_manager.get_range_statistics(start_date, end_date)
 
+    def get_all_users(self, admin):
+        return self.user_manager.get_all_users(admin)

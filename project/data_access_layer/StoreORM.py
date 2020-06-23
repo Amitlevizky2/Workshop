@@ -44,7 +44,7 @@ class StoreORM(Base):
         proxy.get_session().commit()
 
     def remove_owner(self, to_remove):
-        self.remove_appoint_by(to_remove)
+        self.remove_appointed_by(to_remove)
         proxy.get_session().query(OwnerORM).delete.where(username=to_remove)
         proxy.get_session().commit()
 
@@ -58,7 +58,7 @@ class StoreORM(Base):
         proxy.get_session().commit()
 
     def remove_manager(self, to_remove):
-        self.remove_appoint_by(to_remove)
+        self.remove_appointed_by(to_remove)
         proxy.get_session().query(ManagerORM).delete.where(username=to_remove)
         proxy.get_session().commit()
 
