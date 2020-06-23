@@ -7,7 +7,7 @@ from datetime import  datetime
 
 from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
-from project.data_access_layer import Handler
+
 
 
 

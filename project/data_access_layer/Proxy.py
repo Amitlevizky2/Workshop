@@ -1,3 +1,4 @@
+from sqlalchemy.exc import SQLAlchemyError
 
 
 class Proxy:
@@ -9,7 +10,9 @@ class Proxy:
             # Try to get the underlying session connection, If you can get it, its up
             connection = self.session.connection()
             return self.session
-        except:
+        except SQLAlchemyError as e:
+            error = str(e.__dict__)
+            print(error)
             return False
 
     def get_handler_session(self):

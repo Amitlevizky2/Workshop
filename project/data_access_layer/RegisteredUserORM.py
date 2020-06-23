@@ -34,7 +34,8 @@ class RegisteredUserORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(e.__dict__)
+            print(error)
             return error
 
     def make_admin(self):

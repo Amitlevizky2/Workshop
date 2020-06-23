@@ -67,17 +67,19 @@ class Store:
 
     def appoint_owner_helper(self, owner, to_appoint, users_manager):
         self.store_owners.append(to_appoint)
-        ans, message = users_manager.add_managed_store(to_appoint, self.store_id)
-        if ans is False:
-            return False
-        print("**********************************")
-        print("me:"+owner +" to_appoint "+to_appoint)
-        self.orm.appoint_owner(owner, to_appoint)
-        self.appointed_by[to_appoint] = []
-        if to_appoint in self.store_managers:
-            self.store_managers.pop(to_appoint)
-        self.appointed_by[owner].append(to_appoint)
-        return True
+        if users_manager is not None:
+            ans, message = users_manager.add_managed_store(to_appoint, self.store_id)
+            if ans is False:
+                return False
+            print("**********************************")
+            print("me:"+owner +" to_appoint "+to_appoint)
+            self.orm.appoint_owner(owner, to_appoint)
+            self.appointed_by[to_appoint] = []
+            if to_appoint in self.store_managers:
+                self.store_managers.pop(to_appoint)
+            self.appointed_by[owner].append(to_appoint)
+            return True
+        return False
 
     def remove_owner(self, owner, to_remove, publisher: Publisher, users_manager):
 

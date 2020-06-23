@@ -29,11 +29,12 @@ class Initializer:
                 ret = eval(line)
                 if ret is not None:
                     sid = ret
-
+            self.users_manager.add_first_admin()
             # print(self.stores_manager.stores_manager.get_store(0).store_managers)
         else:
             self.users_manager.init_data()
             self.stores_manager.init_data()
+            self.users_manager.get_admin()
             # file1 = open('init.txt', 'w')
             # L = ""
             # for i in range(1, 7):
@@ -48,7 +49,7 @@ class Initializer:
             # L += "self.appoint_manager(\"u3\",sid,\"u6\")\n"
             # file1.writelines(L)
             # file1.close()
-        self.users_manager.add_first_admin()
+
 
     def get_users_manager_interface(self) -> UsersManagerInterface:
         return self.users_manager

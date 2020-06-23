@@ -277,7 +277,9 @@ class UsersManager:
         })
 
     def add_first_admin(self):
-        admin_user = RegisteredUser(username='admin', is_admin=True)
+        admin_user = RegisteredUser(username='admin')
+        admin_user.is_admin = True
+        admin_user.orm.make_admin()
         self.reg_user_list['admin'] = admin_user
         self.admins.append('admin')
 
@@ -286,3 +288,5 @@ class UsersManager:
             return jsons.dumps({'error': False, 'data': list(self.reg_user_list.keys())})
         return jsons.dumps({'error': True, 'error_msg': 'User {} is not admin!'.format(admin)})
 
+    def get_admin(self):
+        return self.data_handler.get_admin()

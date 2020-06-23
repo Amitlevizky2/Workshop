@@ -105,3 +105,10 @@ class Handler:
     #def buy(self):
 
     #def viewcart(self, username):
+
+    def get_admin(self):
+        admin = proxy.get_handler_session().query(RegisteredUserORM).filter_by(admin=1)
+        admins =[]
+        for ad in admin:
+            admins.append(ad.createObject())
+        return admins
