@@ -56,15 +56,14 @@ def login():
 def logout():
     message = request.get_json()
     answer = users_manager.logout(message['username'])
-    return jsonify(answer)
+    return answer
 
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     message = request.get_json()
-    answer, data = users_manager.register(message['username'], message['new_username'], message['password'])
-    data['error'] = not answer
-    return jsonify(data)
+    data = users_manager.register(message['username'], message['new_username'], message['password'])
+    return data
 
 
 @app.route('/is_manager', methods=['POST', 'GET'])
@@ -95,10 +94,9 @@ def remove_product():
     :return:
     """
     message = request.get_json()
-    answer, data = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
+    data = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
                                                 message['quantity'])
-    data['error'] = not answer
-    return jsonify(data)
+    return data
 
 
 @app.route('/get_cart', methods=['POST', 'GET'])
@@ -109,13 +107,6 @@ def get_cart():
     return jsonify(data)
 
 
-# TODO: implement
-@app.route('/remove_cart', methods=['POST', 'GET'])
-def remove_cart():
-    pass
-
-
-# TODO: implement
 @app.route('/view_cart', methods=['POST', 'GET'])
 def view_cart():
     message = request.get_json()
@@ -133,21 +124,22 @@ def get_managed_stores():
 @app.route('/view_user_purchases', methods=['POST', 'GET'])
 def view_user_purchases():
     message = request.get_json()
-    answer, data = users_manager.view_purchases(message['username'])
-    data['error'] = not answer
-    return jsonify(data)
-
-
-# TODO: implement
-@app.route('/add_purchase', methods=['POST', 'GET'])
-def add_purchase():
-    pass
+    print(message)
+    if message['is_admin'] is True:
+        answer = users_manager.view_purchases_admin(message['username'], message['admin'])
+        print(answer)
+        return answer
+    data = users_manager.view_purchases(message['username'])
+    print(data)
+    return data
 
 
 @app.route('/buy', methods=['POST', 'GET'])
 def buy():
     message = request.get_json()
-    data = purchase_manager.buy(message['username'],message['number'],message['month'],message['year'],message['holder'],message['ccv'],message['id'],message['address'],message['city'],message['country'],message['zip'])
+    data = purchase_manager.buy(message['username'], message['number'], message['month'], message['year'],
+                                message['holder'], message['ccv'], message['id'], message['address'], message['city'],
+                                message['country'], message['zip'])
     return jsonify(data)
 
 
@@ -264,9 +256,12 @@ def get_stores():
 
 @app.route('/get_store_sales_history', methods=['POST', 'GET'])
 def get_store_sales_history():
+    """
+    :return: store purchase history. username can be admin's username as well.
+    """
     message = request.get_json()
     answer = stores_manager.get_sales_history(message['store_id'], message['username'])
-    return jsonify({answer})
+    return jsonify(answer)
 
 
 @app.route('/add_visible_discount', methods=['POST', 'GET'])
@@ -492,12 +487,34 @@ def is_admin():
     return jsonify(data)
 
 
-# TODO: implement
 @app.route('/view_purchases_admin', methods=['POST', 'GET'])
 def view_purchases_admin():
     message = request.get_json()
     data = users_manager.view_purchases_admin(message['username'], message['admin'])
-    return jsonify(data)
+    return data
+
+
+@app.route('/add_admin', methods=['POST', 'GET'])
+def add_admin():
+    message = request.get_json()
+    data = users_manager.add_admin(message['admin'], message['future_admin'])
+    return data
+
+
+@app.route('/get_all_users', methods=['POST', 'GET'])
+def get_all_users():
+    message = request.get_json()
+    data = users_manager.get_all_users(message['admin'])
+    print(data)
+    return data
+
+
+@app.route('/get_range_statistics', methods=['POST', 'GET'])
+def get_range_statistics():
+    message = request.get_json()
+    data = users_manager.get_range_statistics(message['start_date'], message['end_date'])
+    print(data)
+    return data
 
 
 """---------------------------------------------------------------------"""
@@ -526,7 +543,16 @@ def disconnect():
         username = clients[sid]
         guest_username = users_manager.logout(username)
         clients.pop(sid)
+        leave_room(room=username)
         print('user {} is logged out!'.format(username))
+    leave_room(room=sid)
+
+
+@sio.on('get_today_stats', namespace='/statistics')
+def get_today_stats():
+    today_stats = users_manager.get_today_stats()
+    # sio.emit('today_stats', )
+    # print('received json: ' + str(json))
 
 
 def send_notification(username, message):

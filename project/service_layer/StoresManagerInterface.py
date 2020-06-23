@@ -126,14 +126,12 @@ class StoresManagerInterface:
     def buy(self, cart):
         return self.stores_manager.buy(cart)
 
-    def add_admin(self,admin,user_to_be_admin):
-        return self.users_manager.add_admin(admin,user_to_be_admin)
-
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
         if self.users_manager.check_if_registered(user) and (
-                store_id in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)):
-            return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user))
+                store_id in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)['data']):
+            return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user)['data'])
+        return []
 
     def remove_product(self, store_id, product_name, username):
         return self.stores_manager.remove_product_from_store(store_id, product_name, username)
@@ -270,7 +268,7 @@ class StoresManagerInterface:
     def add_composite_discount(self, store_id: int = None, username: str = None, start_date=None,
                                end_date=None, logic_operator: str = None,
                                discounts_products_dict: dict = None,
-                               discounts_to_apply_id: list = None, ):  # discounts_products_dict = {discount_id, [products_names]}
+                               discounts_to_apply_id: list = None):  # discounts_products_dict = {discount_id, [products_names]}
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
         return self.stores_manager.add_composite_discount(store_id, username, _start_date, _end_date, logic_operator,

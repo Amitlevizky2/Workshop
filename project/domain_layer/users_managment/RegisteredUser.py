@@ -94,7 +94,8 @@ class RegisteredUser(User):
             'cart': json_cart,
             'purchase_history': json_purchase_history,
             'managed_stores': json_managed_stores,
-            'notifications': json_notifications
+            'notifications': json_notifications,
+            'is_admin': self.is_admin
         })
 
     def get_jsn_purchase_history(self):

@@ -332,7 +332,7 @@ class Store:
 
     def get_sales_history(self, user, is_admin) -> [Purchase]:
         if self.check_permission(user, 'view_purchase_history') or is_admin:
-            self.sales = self.orm.getPurchases()
+            # self.sales = self.orm.getPurchases()
             # TODO: fix purchase maybe handler maybe add function to store
             return {'error': False,
                     'data': self.sales}
@@ -436,8 +436,11 @@ class Store:
                               end_date, percent, products=[]):
         if self.is_owner(permitted_username) or self.check_permission(permitted_username, 'update_discounts'):
             discount = self.discounts[discount_id]
-            return {'error': not discount.edit_discount(start_date, end_date, percent, products),
-                    'data': 'done'}
+            res = discount.edit_discount(start_date, end_date, percent, products)
+            if res is True:
+                return {'error': False,
+                        'data': 'done'}
+            return {'error': True, 'error_msg': 'Wrong edit information were given.'}
         return {'error': True,
                 'error_msg': permitted_username + ' do not have this permission'}
 

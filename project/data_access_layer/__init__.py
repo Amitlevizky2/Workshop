@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 from project.data_access_layer.Proxy import Proxy
 
-path = 'sqlite:///C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db'
+path = 'sqlite:///C:\\Users\\Owner\\Documents\\GitHub\\Workshop\\project\\tradeSystem.db'
 Base = declarative_base()
 # session = sessionmaker()
 engine = create_engine(path, echo = True)
