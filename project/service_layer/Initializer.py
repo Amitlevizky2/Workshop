@@ -21,7 +21,7 @@ class Initializer:
         self.bound_managers()
 
         if path.exists("init.txt") and not engine.dialect.has_table(engine, "regusers"):
-           # self.data_handler.init_db()
+            # self.data_handler.init_db()
             file1 = open('init.txt', 'r')
             Lines = file1.readlines()
             sid = 0
@@ -49,7 +49,6 @@ class Initializer:
             # L += "self.appoint_manager(\"u3\",sid,\"u6\")\n"
             # file1.writelines(L)
             # file1.close()
-
 
     def get_users_manager_interface(self) -> UsersManagerInterface:
         return self.users_manager
@@ -109,7 +108,7 @@ class Initializer:
         print(discount)
         self.users_manager.logout(username)
 
-#checkkkkkk
+    # checkkkkkk
     def add_conditional_discount_to_store(self, username, store_id, start_date, end_date, percent, min_price):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
@@ -118,16 +117,18 @@ class Initializer:
         print(discount)
         self.users_manager.logout(username)
 
-    def add_product_to_basket(self, username, store_id, product_name, quantity ):
+    def add_product_to_basket(self, username, store_id, product_name, quantity):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.users_manager.add_product(username, store_id, product_name, quantity)
         self.users_manager.logout(username)
 
-    def add_purchase_product_policy_to_store(self, username, store_id, min_amount_products, max_amount_products, products):
+    def add_purchase_product_policy_to_store(self, username, store_id, min_amount_products, max_amount_products,
+                                             products):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
-        self.stores_manager.add_purchase_product_policy(store_id, username, min_amount_products, max_amount_products, products)
+        self.stores_manager.add_purchase_product_policy(store_id, username, min_amount_products, max_amount_products,
+                                                        products)
         self.users_manager.logout(username)
 
     def add_purchase_store_policy(self, username, store_id, min_amount_products, max_amount_products):
@@ -137,13 +138,16 @@ class Initializer:
         self.stores_manager.add_purchase_store_policy(store_id, username, min_amount_products, max_amount_products)
         self.users_manager.logout(username)
 
-    def add_conditional_product_discount(self, username, store_id, start_date, end_date, percent, min_amount, num_prods_to_apply, products):
+    def add_conditional_product_discount(self, username, store_id, start_date, end_date, percent, min_amount,
+                                         num_prods_to_apply, products):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
-        self.stores_manager.add_conditional_discount_to_product(store_id, username, start_date, end_date, percent, min_amount, num_prods_to_apply, products)
+        self.stores_manager.add_conditional_discount_to_product(store_id, username, start_date, end_date, percent,
+                                                                min_amount, num_prods_to_apply, products)
         self.users_manager.logout(username)
 
-    def add_composite_discount(self, store_id, username, start_date, end_date, logic_opr, discounts_preds, discounts_to_apply):
+    def add_composite_discount(self, store_id, username, start_date, end_date, logic_opr, discounts_preds,
+                               discounts_to_apply):
         guest = self.users_manager.add_guest_user()
         self.users_manager.login(guest, username, "pass")
         self.stores_manager.add_composite_discount(store_id, username, start_date, end_date, logic_opr,

@@ -4,7 +4,7 @@ import jsonpickle
 import jsons
 from eventlet import wsgi
 from flask import Flask, jsonify, request, current_app
-from flask_socketio import SocketIO, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask_cors import CORS
 
 from project.service_layer.Initializer import Initializer
@@ -55,7 +55,9 @@ def login():
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     message = request.get_json()
+    print(message)
     answer = users_manager.logout(message['username'])
+    print(answer)
     return answer
 
 
@@ -262,8 +264,10 @@ def get_store_sales_history():
     :return: store purchase history. username can be admin's username as well.
     """
     message = request.get_json()
+    print(message)
     answer = stores_manager.get_sales_history(message['store_id'], message['username'])
-    return jsonify(answer)
+    print(answer)
+    return answer
 
 
 @app.route('/add_visible_discount', methods=['POST', 'GET'])
@@ -511,10 +515,10 @@ def get_all_users():
     return data
 
 
-@app.route('/get_range_statistics', methods=['POST', 'GET'])
+@app.route('/get_statistics', methods=['POST', 'GET'])
 def get_range_statistics():
     message = request.get_json()
-    data = users_manager.get_range_statistics(message['start_date'], message['end_date'])
+    data = users_manager.get_statistics(message['username'])
     print(data)
     return data
 
@@ -527,15 +531,19 @@ def get_range_statistics():
 @sio.on('join')
 def join(data):
     sid = request.sid
-    clients[sid] = data['room']
-    join_room(room=data['room'])
+    clients[sid] = data['username']
+    if data['room'] == 'admins':
+        join_room(room=data['room'])
+    join_room(room=data['username'])
 
 
 @sio.on('leave')
 def leave(data):
     sid = request.sid
     clients.pop(sid)
-    leave_room(room=data['room'])
+    if data['room'] == 'admins':
+        leave_room(room=data['room'])
+    leave_room(room=data['username'])
 
 
 @sio.on('disconnect')
@@ -550,11 +558,11 @@ def disconnect():
     leave_room(room=sid)
 
 
-@sio.on('get_today_stats', namespace='/statistics')
-def get_today_stats():
-    today_stats = users_manager.get_today_stats()
-    # sio.emit('today_stats', )
-    # print('received json: ' + str(json))
+# @sio.on('statistics_update')
+# def get_today_stats():
+#     today_stats = users_manager.get_today_stats()
+#     # sio.emit('today_stats', )
+#     # print('received json: ' + str(json))
 
 
 def send_notification(username, message):

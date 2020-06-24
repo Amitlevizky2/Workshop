@@ -52,16 +52,22 @@ class RegisteredUserORM(Base):
         from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
         user = RegisteredUser(self.username, self)
         managed_stores = []
+        Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
         for owner in self.owns:
             managed_stores.append(owner.store_id)
+        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
         for manager in self.manages:
             managed_stores.append(manager.store_id)
         user.managed_stores = managed_stores
+        if self.admin is 1:
+            user.is_admin = True
         notifies =[]
+        Base.metadata.create_all(engine, [Base.metadata.tables['notifications']], checkfirst=True)
         for noti in self.notifications:
             notifies.append(noti.notification)
         user.notifications = notifies
         basks = {}
+        Base.metadata.create_all(engine, [Base.metadata.tables['baskets']], checkfirst=True)
         for basket in self.baskets:
             basks[basket.store_id] = basket.createObject()
         user.cart.baskets = basks

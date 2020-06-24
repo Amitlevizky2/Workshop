@@ -128,10 +128,13 @@ class StoresManagerInterface:
 
     def get_sales_history(self, store_id, user) -> [Purchase]:
         logger.log("user %s get sales history of store no.%d", user, store_id)
+        managed_stores = self.users_manager.get_managed_stores(user)
+        print(managed_stores)
+        print(store_id)
         if self.users_manager.check_if_registered(user) and (
-                store_id in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)['data']):
+                store_id in managed_stores or self.users_manager.is_admin(user)['data']):
             return self.stores_manager.get_sales_history(store_id, user, self.users_manager.is_admin(user)['data'])
-        return []
+        return jsons.dumps({'error': True, 'error_msg': 'error'})
 
     def remove_product(self, store_id, product_name, username):
         return self.stores_manager.remove_product_from_store(store_id, product_name, username)

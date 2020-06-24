@@ -1,6 +1,8 @@
 from socket import SocketIO
 
+import jsons
 from flask import jsonify
+from flask_socketio import emit
 from jsonpickle import json
 
 from project.domain_layer.users_managment.UsersManager import UsersManager
@@ -13,18 +15,24 @@ class Publisher:
 
     def set_users_manager(self, users_manager: UsersManager):
         self.users_manager = users_manager
+        self.bound_publisher_and_stats()
 
     def notify(self, message, user):
         print('publisher message: ' + message)
         if self.users_manager.check_if_loggedin(user):
-            self.send_notification(user, message)
+            msg = {
+                'messages': [message]
+            }
+            self.send_notification(user, msg, 'send')
         else:
             self.users_manager.add_notification(user, message)
 
-    def send_notification(self, username, message):
-        self.sio.send({
-            'messages': [message]
-        }, room=username)
+    def send_notification(self, username, message, event):
+        if event == 'send':
+            self.sio.send(data=message, room=username)
+        if event == 'statistics_update':
+            print(message)
+            self.sio.emit('statistics', message, room=username)
 
     def store_status_update(self, store_id, store_name, users: [str], status=''):
         """
@@ -78,3 +86,9 @@ class Publisher:
         for owner in users:
             notification = message.format(owner, store_name)
             self.notify(notification, owner)
+
+    def notify_admins(self, statistics):
+        self.send_notification('admins', statistics, 'statistics_update')
+
+    def bound_publisher_and_stats(self):
+        self.users_manager.bound_publisher_and_stats(self)

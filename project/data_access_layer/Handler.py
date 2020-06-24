@@ -106,9 +106,9 @@ class Handler:
 
     #def viewcart(self, username):
 
-    def get_admin(self):
+    def get_admins(self):
         admin = proxy.get_handler_session().query(RegisteredUserORM).filter_by(admin=1)
         admins =[]
         for ad in admin:
-            admins.append(ad.createObject())
+            admins.append(ad.username)
         return admins
