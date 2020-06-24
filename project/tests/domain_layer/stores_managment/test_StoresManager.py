@@ -124,8 +124,6 @@ class test_StoresManager(unittest.TestCase):
 
     def test_add_visible_product_discount(self):
         res1 = self.store_manager.add_visible_product_discount(11, 'store_owner11',
-                                                               datetime.datetime(2018, 6, 1),
-                                                               datetime.datetime(2020, 12, 17),
                                                                5, [])
         res1 = jsons.loads(res1)
         self.assertFalse(res1['error'])
