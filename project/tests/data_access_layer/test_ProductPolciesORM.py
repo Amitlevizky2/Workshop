@@ -1,60 +1,70 @@
-import datetime
-from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String, update
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import relationship
-from project.data_access_layer import Base, session, engine, proxy
-from project.data_access_layer.PolicyORM import PolicyORM
+import os
+from unittest import TestCase
+
+from project.data_access_layer import *
+from project.data_access_layer.ProductORM import ProductORM
+from project.data_access_layer.ProductPolciesORM import ProductPoliciesORM
 from project.data_access_layer.ProductsInPoliciesORM import ProductsInPoliciesORM
-from project.data_access_layer import PolicyORM
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
-class ProductPoliciesORM(Base):
-    __tablename__ = 'productspolicies'
-    policy_id = Column(Integer, primary_key=True)
-    store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
-    min_amount = Column(Integer)
-    max_amount = Column(Integer)
+from project.data_access_layer.BasketORM import BasketORM
+from project.data_access_layer.OwnerORM import OwnerORM
+from project.data_access_layer.ManagerORM import ManagerORM
+from project.data_access_layer.StoreORM import StoreORM
+from project.data_access_layer.PolicyORM import PolicyORM
+from project.data_access_layer.VisibleProductDiscountORM import VisibleProductDiscountORM
 
-    def update_min_amount(self, min):
-        self.min_amount = min
+
+class TestVisibleORM(TestCase):
+
+    @classmethod
+    def setUpClass(self) -> None:
+        os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
+
+    def setUp(self) -> None:
+        self.store = StoreORM(id = 3456, name = "test_me", discount_idx = 0, purchases_idx = 0)
+        self.store.add()
+        self.product = ProductORM(name= "stuff", store_id= 3456, categories = "", key_words = "", price = 10, quantity = 5)
+        self.orm = ProductPoliciesORM(policy_id = 1, store_id = 3456, min_amount = 5, max_amount = 13)
+        Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['productspolicies']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['Policy_products']], checkfirst=True)
+
+    def test_add_success(self):
+        num = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        self.orm.add()
+        res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).delete()
+        proxy.get_session().commit()
+        self.assertEqual(num+1, res)
+
+    def test_add_fail(self):
+        self.orm.add()
+        num = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        store = ProductPoliciesORM(policy_id = 1, store_id = 3456, min_amount = 5, max_amount = 13)
+        res = store.add()
+        self.assertEqual('<class \'sqlalchemy.orm.exc.FlushError\'>', res)
+        proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).delete()
         proxy.get_session().commit()
 
-    def update_max_amount(self, id, max):
-        self.max_amount =max
+    def test_update_success(self):
+        self.orm.add()
+        self.orm.max_amount=60
+        res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).first()
+        self.assertTrue(res.max_amount is 60)
+
+    def test_remove_success(self):
+        proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).delete()
         proxy.get_session().commit()
+        res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        self.assertTrue(res == 0)
 
-    def add(self):
-        try:
-            Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
-            Base.metadata.create_all(engine, [Base.metadata.tables['productspolicies']], checkfirst=True)
-            PolicyORM.add(self.policy_id, self.store_id)
-            proxy.get_session().add(self)
-            proxy.get_session().commit()
-        except SQLAlchemyError as e:
-            error = str(type(e))
-            return error
+    def test_add_products_success(self):
+        num = proxy.get_session().query(ProductsInPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        self.orm.add_product("stuff")
+        res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        self.assertEqual(num + 1, res)
 
 
-    def add_product(self, product_name):
-        piporm = ProductsInPoliciesORM(policy_id=self.policy_id, product_name=product_name, store_id=self.store_id)
-        piporm.add()
-
-    def remove_product(self, product_name):
-        res = proxy.get_session().query(ProductsInPoliciesORM).filter_by(policy_id=self.policy_id, product_name=product_name, store_id=self.store_id)
-        for pip in res:
-            proxy.get_session().delete(pip)
-            proxy.get_session().commit()
-
-
-    def createObject(self):
-        from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
-        poli = PurchaseProductPolicy(self.min_amount, self.max_amount, self.policy_id, self.store_id, self)
-        prods = {}
-        from project.data_access_layer.ProductsInPoliciesORM import ProductsInPoliciesORM
-        res = proxy.get_session().query(ProductsInPoliciesORM).filter(
-            ProductsInPoliciesORM.policy_id == self.policy_id).filter(
-            ProductsInPoliciesORM.store_id == self.store_id)
-        for piporm in res:
-            prods[piporm.product_name] = True
-        poli.products_in_policy = prods
-        return poli
