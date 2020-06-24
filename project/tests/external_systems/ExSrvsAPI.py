@@ -17,7 +17,6 @@ class test_API(unittest.TestCase):
     def test_pay(self):
         try:
             res = self.api.pay(4234234234,12,2019,"hadar",455,132321)
-            x=5
             if 10000 <= res <= 100000:
 
                 transaction.commit()
