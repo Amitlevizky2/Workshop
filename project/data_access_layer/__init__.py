@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
 from project.data_access_layer.Proxy import Proxy
 
 amit_path = 'sqlite:////Users/avivlevitzky/PycharmProjects/Workshop/project/tests/test.db'

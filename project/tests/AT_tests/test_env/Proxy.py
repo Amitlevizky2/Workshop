@@ -128,9 +128,9 @@ class Proxy:
             else:
                 return None
 
-    def add_discount_to_product(self, storedID, product_name, username, start_date, end_date, percent):
+    def add_discount_to_product(self, storedID, username, start_date, end_date, percent,product_name):
         if self.real != None:
-            return self.real.add_discount_to_product(int(storedID), product_name, username, start_date, end_date, percent)
+            return self.real.add_discount_to_product(int(storedID),  username, start_date, end_date, percent,product_name)
         else:
             return True
 
@@ -140,9 +140,9 @@ class Proxy:
         else:
             return True
 
-    def buy(self):
+    def buy(self,CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid,address,city,country,zip):
         if self.real != None:
-            return self.real.buy()
+            return self.real.buy(CCnumber,CCmonth,CCyear,CCholder,CCccv,CCid,address,city,country,zip)
         else:
             return True
 
@@ -223,7 +223,7 @@ class Proxy:
 
     def remove_store_manager(self, store_id, user):
         if self.real != None:
-            return self.real.remove_store_manager(int(store_id), user)
+            return self.real.remove_store_manager(store_id, user)
 
         else:
 

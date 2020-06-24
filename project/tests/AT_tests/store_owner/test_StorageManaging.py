@@ -1,5 +1,7 @@
 import unittest
 
+import jsons
+
 from project.tests.AT_tests.test_env.Driver import Driver
 
 
@@ -15,16 +17,20 @@ class StorageManaging(unittest.TestCase):
 
         # check if was added
         res = self.service.searchProduct("Banana")
-        self.assertIn(self.store_id, res.keys())
-        self.assertTrue(res.get(self.store_id)[0].name == "Banana")
-        self.assertTrue(res.get(self.store_id)[0].price == 20)
+        res = jsons.loads(res)
+        x=5
+        self.assertEqual(self.store_id, res['my store']['store_id'])
+        self.assertTrue(res['my store']['search_res'][0]['name'] == "Banana")
+        self.assertTrue(res['my store']['search_res'][0]['original_price'] == 20)
 
     def test_add_product_to_store_sad(self):
         self.service.logout()
-        self.assertFalse(self.service.add_product_to_Store(self.store_id, "Banana", 20, "Food", "Fruits", 10))
+        res = self.service.add_product_to_Store(self.store_id, "Banana", 20, "Food", "Fruits", 10)
+        x=5
+        self.assertTrue(res['error'])
 
     def test_add_product_to_store_bad(self):
-        self.assertFalse(self.service.add_product_to_Store(self.store_id + 40, "Banana", 20, "Food", "Fruits", 10))
+        self.assertTrue(self.service.add_product_to_Store(self.store_id + 40, "Banana", 20, "Food", "Fruits", 10)['error'])
 
     def test_remove_product_from_store_success(self):
         self.test_add_product_to_store_success()

@@ -1,4 +1,7 @@
 import unittest
+
+import jsons
+
 from project.tests.AT_tests.test_env.Driver import Driver
 from project.tests.AT_tests import ATsetUP
 
@@ -16,26 +19,30 @@ class admin_view_purchase_history(unittest.TestCase):
         self.service.register("user", "pass")
         if self.service.login("user", "pass"):
             res = self.service.searchProduct("Banana")
-            first_store_id = list(res)[0]
-            self.service.add_product(first_store_id, res.get(first_store_id)[0], 2)
-            self.service.buy()
+            res_dec = jsons.loads(res)
+            first_store_id = res_dec['avishop']["store_id"]
+            self.service.add_product(first_store_id, "Banana", 2)
+            self.service.buy(458053299887,12,2022,"amit levizky",448,2957474,"rager","beersheva","israel",283443)
             result = self.service.get_purchase_history()
             self.service.logout()
             self.service.login("admin", "1234")
             history = self.service.view_store_history(self.store_id)
-            self.assertIn( "Banana", result[0].products.keys())
+            x=5
+            self.assertIn( "Banana", result[1][0][0].products.keys())
             self.assertIsNotNone(history)
-            self.assertIn("Banana", history[0].products.keys())
+            self.assertIn("Banana", result[1][0][0].products.keys())
 
     def test_admin_view_sad(self):
         res = self.service.searchProduct("Apple")
-        first_store_id = list(res)[0]
-        self.service.add_product(first_store_id, res.get(first_store_id)[0], 2)
-        self.service.buy()
+        res_dec = jsons.loads(res)
+        first_store_id = res_dec['avishop']["store_id"]
+        self.service.add_product(first_store_id, "Apple", 2)
+        self.service.buy(458053299887,12,2022,"amit levizky",448,2957474,"rager","beersheva","israel",283443)
         result = self.service.get_purchase_history()
         self.service.logout()
         self.service.login("admin", "1234")
-        self.assertNotIn("apple", result[0].products.keys())
+        x=5
+        self.assertNotIn("apple", result[1][0].products.keys())
 
     def test_admin_view_bad(self):
         history = None

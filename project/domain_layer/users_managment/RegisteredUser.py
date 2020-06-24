@@ -83,7 +83,7 @@ class RegisteredUser(User):
         return messages
 
     def is_store_manager(self):
-        return self.managed_stores.__len__() > 0
+        return len(self.managed_stores) > 0
 
     def get_jsn_description(self):
         json_cart = self.cart.get_jsn_description()

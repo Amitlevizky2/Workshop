@@ -18,11 +18,11 @@ class addStoreOwner(unittest.TestCase):
         self.assertIn(self.store_id, self.service.get_managed_stores())
 
     def test_add_new_owner_sad(self):
-        self.assertFalse(self.service.add_new_store_owner("not new owner", self.store_id))
+        self.assertTrue(self.service.add_new_store_owner("not new owner", self.store_id)['error'])
         self.test_add_new_owner_success()
         self.service.logout()
         self.service.login("owner", "pass")
-        self.assertFalse(self.service.add_new_store_owner("new owner", self.store_id))
+        self.assertTrue(self.service.add_new_store_owner("new owner", self.store_id)['error'])
 
     def test_add_new_owner_bad(self):
         self.assertFalse(self.service.add_new_store_owner("not new owner", self.store_id+40))

@@ -3,9 +3,7 @@ from sqlalchemy import Table, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
-from project.data_access_layer import session, Base, engine, proxy
-
-
+from project.data_access_layer import session,Base, engine,proxy
 # from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 
