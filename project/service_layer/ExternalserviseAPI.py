@@ -1,5 +1,9 @@
 
 import requests
+import unittest
+
+import transaction
+
 
 class ExternalServiceAPI:
 
@@ -13,7 +17,7 @@ class ExternalServiceAPI:
         paydtls ={'action_type': 'pay', "card_number": number
             ,"month": month, 'year':year, 'holder': holder
             ,'ccv': ccv, 'id': id}
-        rpay = requests.post("https://cs-bgu-wsep.herokuapp.com/",data = paydtls)
+        rpay = requests.post("https://cs-bgu-wsep.herokuapp.com/",data = paydtls,timeout=5)
         if rpay == -1:
             return "The transaction was declined"
         return rpay
@@ -41,4 +45,6 @@ class ExternalServiceAPI:
         if rcanclesupply == -1:
             return "The shipment was declined"
         return rcanclesupply
+
+
 
