@@ -1,3 +1,4 @@
+import eventlet
 import os
 import json
 import jsonpickle
@@ -9,10 +10,7 @@ from flask_cors import CORS
 
 from project.service_layer.Initializer import Initializer
 
-import eventlet
-
 eventlet.monkey_patch()
-
 app = Flask(__name__)
 CORS(app)
 app.secret_key = os.environ.get('SECRET')
@@ -143,6 +141,7 @@ def buy():
     data = purchase_manager.buy(message['username'], message['number'], message['month'], message['year'],
                                 message['holder'], message['ccv'], message['id'], message['address'], message['city'],
                                 message['country'], message['zip'])
+    print('buy result: ')
     print(data)
     return jsonify(data)
 

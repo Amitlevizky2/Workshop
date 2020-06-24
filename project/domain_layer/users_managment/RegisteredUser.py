@@ -116,3 +116,7 @@ class RegisteredUser(User):
             notifications.append(message)
 
         return notifications
+
+    def make_admin(self):
+        self.is_admin = True
+        self.orm.make_admin()

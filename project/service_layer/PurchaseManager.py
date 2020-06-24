@@ -12,12 +12,11 @@ from project.domain_layer.external_managment.ShipmentSystemInterface import Ship
 
 
 class PurchaseManager:
-    def __init__(self, user_manager: UsersManagerInterface, store_manager: StoresManagerInterface,
-                 external_service: ExternalServiceAPI):
+    def __init__(self, user_manager: UsersManagerInterface, store_manager: StoresManagerInterface):
         self.purchases_idx = 0
         self.user_manager = user_manager
         self.store_manager = store_manager
-        self.external_service = external_service
+        self.external_service = ExternalServiceAPI()
         self.payment_system = PaymentSystem()
         self.shipment_system = ShipmentSystemInterface()
 
@@ -33,13 +32,13 @@ class PurchaseManager:
     def connect_payment(self):
         return self.payment_system.connect()
 
-# user = username
+    # user = username
     def buy(self, user, cc_number, cc_month, cc_year, cc_holder, cc_ccv, cc_id, address, city, country, zip):
         try:
             answer, data = self.user_manager.get_cart(user)
             if answer is False:
                 return {'error': not answer,
-                        'error_msg': data.error_msg}
+                        'error_msg': data['error_msg']}
             cart = data
             cart_description = jsons.loads(self.store_manager.get_cart_description(cart))
 
@@ -65,11 +64,16 @@ class PurchaseManager:
                             print(jsons.dumps(purchase))
                             purchases[store_id] = purchase
                             # self.store_manager.add_purchase_to_store(store_id, purchase)
-
-                        payment_reciept = self.external_service.pay(cc_number, cc_month, cc_year, cc_holder, cc_ccv, cc_id)
+                        print('BEFORE PAYYYYYYYYYYY')
+                        payment_reciept = self.external_service.pay(cc_number, cc_month, cc_year, cc_holder, cc_ccv,
+                                                                    cc_id)
+                        print('payment_reciept')
+                        print(payment_reciept)
                         if payment_reciept > 0:
-                            if len(purchases) > 0:
+                            if len(purchases.keys()) > 0:
                                 supply_reciept = self.external_service.supply(cc_holder, address, city, country, zip)
+                                print('supply_reciept')
+                                print(supply_reciept)
                                 if supply_reciept > 0:
                                     self.store_manager.buy(cart)
                                     self.update_purchase_number(purchases, payment_reciept, supply_reciept)
@@ -79,12 +83,14 @@ class PurchaseManager:
 
                                     return {'error': False,
                                             'data': 'Purchase Confirmed!'}
-
                                 else:
-                                    self.external_service.cancelpay(payment_reciept)
+                                    # self.external_service.cancelpay(payment_reciept)
                                     return {'error': True,
                                             'data': 'Purchase Canceled'}
-
+                            else:
+                                self.external_service.cancelpay(payment_reciept)
+                                return {'error': True,
+                                        'data': 'Purchase Canceled'}
                     else:
                         return {'error': True,
                                 'error_msg': 'User does not have enough credit!'}
@@ -97,25 +103,25 @@ class PurchaseManager:
                 return {'error': True,
                         'error_msg': 'Undefined - get_cart_description'}
             transaction.commit()
-
         except:
+            print('AFTER PAYYYYYYYYYYY')
             transaction.abort()
 
-        def connect(self):
-            return True
+    def connect(self):
+        return True
 
-        def cancel_pay(self, receipt: int):
-            cancel = self.external_service.cancelpay(receipt)
-            if cancel == 1:
-                return {
-                    'error': False,
-                    'error_msg': 'Money returned'
-                }
-            else:
-                return {
-                    'error': True,
-                    'error_msg': 'Invalid receipt'
-                }
+    def cancel_pay(self, receipt: int):
+        cancel = self.external_service.cancelpay(receipt)
+        if cancel == 1:
+            return {
+                'error': False,
+                'error_msg': 'Money returned'
+            }
+        else:
+            return {
+                'error': True,
+                'error_msg': 'Invalid receipt'
+            }
 
     def cancel_supply(self, receipt: int):
         cancel = self.external_service.cancelsupply(receipt)
@@ -138,4 +144,3 @@ class PurchaseManager:
         for purchase in purchases:
             purchase.set_order_number(order_number)
             purchase.set_supply_number(supply_number)
-

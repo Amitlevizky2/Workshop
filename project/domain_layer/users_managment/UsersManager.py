@@ -173,10 +173,12 @@ class UsersManager:
         return jsons.dumps({'error': True, 'error_msg': 'user ' + admin + ' is not an admin'})
 
     def add_admin(self, admin, username_to_be_admin):
-        if self.find_reg_user(username_to_be_admin)[0]:
+        x1, x2 = self.find_reg_user(username_to_be_admin)
+        if x1 is True:
             if self.is_admin(admin):
                 if not self.is_admin(username_to_be_admin):
                     self.admins.append(username_to_be_admin)
+                    x2.make_admin()
                     return jsons.dumps(
                         {'error': False, 'data': 'User: {}, have admin privileges.'.format(username_to_be_admin)})
                 else:
