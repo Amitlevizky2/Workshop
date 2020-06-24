@@ -16,6 +16,7 @@ import os
 
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.UsersManager import UsersManager
+from project.tests.domain_layer.stores_managment.Stubs.UsersManagerStub import UsersManagerStub
 
 
 class PublisherStub(Publisher):
@@ -27,12 +28,8 @@ class PublisherStub(Publisher):
         pass
 
 class TestStore(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.users_manger = UsersManager(None)
-
     def setUp(self):
+        self.user_manager = UsersManagerStub()
         self.store = Store(0, "test store", "test owner")
         self.store.store_managers = {"Moshe": [],
                                      "Amit": ['add_product', 'update_products'],
@@ -137,22 +134,22 @@ class TestStore(unittest.TestCase):
 
     def test_appoint_owner_one(self):
         # There is no such owner
-        res = self.store.appoint_owner("not test owner", "Moshe")
+        res = self.store.appoint_owner("not test owner", "Moshe", self.user_manager)
         self.assertTrue(res['error'])
         # Valid appointment
-        res = self.store.appoint_owner("test owner", "Moshe")
+        res = self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         self.assertFalse(res['error'])
         # Moshe is already a store owner, should not e appointed again
-        res = self.store.appoint_owner("test owner", "Moshe")
+        res = self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         self.assertTrue(res['error'])
         # circle appointment is not allowed
-        res = self.store.appoint_owner("moshe", "test owner")
+        res = self.store.appoint_owner("moshe", "test owner", self.user_manager)
         self.assertTrue(res['error'])
 
     def test_appoint_owner_two(self):
-        self.store.appoint_owner("test owner", "Moshe")
+        self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         # to_appoint is already owner of the store
-        res = self.store.appoint_owner("test owner", "test owner")
+        res = self.store.appoint_owner("test owner", "test owner", self.user_manager)
         self.assertTrue(res['error'])
         # If Moshe was a manager, pull him out from that list
         self.assertNotIn("Moshe", self.store.store_managers)
@@ -163,22 +160,22 @@ class TestStore(unittest.TestCase):
 
     def test_remove_owner_one(self):
         users = [*self.store.store_managers]
-        self.store.appoint_owner("test owner", "Moshe")
+        self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         self.appoint_managers_to_owners(users)
 
         #owner is not really a store owner
-        res = self.store.remove_owner("Sebastian", "Amit",PublisherStub(None))
-        self.assertFalse(res['ans'])
+        res = self.store.remove_owner("Sebastian", "Amit",PublisherStub(None), self.user_manager)
+        self.assertTrue(res['error'])
         #to_remove is not a store owner
-        res = self.store.remove_owner("Amit", "Sebastian",PublisherStub(None))
-        self.assertFalse(res['ans'])
+        res = self.store.remove_owner("Amit", "Sebastian",PublisherStub(None), self.user_manager)
+        self.assertTrue(res['error'])
         #to_remove was not appointed by owner
-        res = self.store.remove_owner("Amit", "Lielle",PublisherStub(None))
-        self.assertFalse(res['ans'])
+        res = self.store.remove_owner("Amit", "Lielle",PublisherStub(None), self.user_manager)
+        self.assertTrue(res['error'])
 
     def test_remove_owner_two(self):
         users = [*self.store.store_managers]
-        self.store.appoint_owner("test owner", "Moshe")
+        self.store.appoint_owner("test owner", "Moshe", self.user_manager)
         self.appoint_managers_to_owners(users)
 
         # Check that all of the owner that was appoint by Moshe will are in the owners list
@@ -189,25 +186,25 @@ class TestStore(unittest.TestCase):
         for i in range(0, len(users) - 1):
             self.assertIn(users[i + 1], self.store.appointed_by[users[i]])
 
-        self.store.remove_owner("test owner", "Moshe",PublisherStub(None))
+        self.store.remove_owner("test owner", "Moshe",PublisherStub(None), self.user_manager)
         # self.store.store_owners.remove('Moshe')
         # Check that all of the owner that was appoint by Moshe will be deleted
         for i in range(0, len(users)):
             self.assertNotIn(users[i], self.store.store_owners)
 
     def test_remove_manager_one(self):
-        self.store.appoint_owner("test owner", "Moshe")
-        self.store.appoint_manager("Moshe", "Hadar")
+        self.store.appoint_owner("test owner", "Moshe", self.user_manager)
+        self.store.appoint_manager("Moshe", "Hadar", self.user_manager)
 
         # Amit is not owner
-        res = self.store.remove_manager("Amit", "Lielle")
-        self.assertFalse(res['ans'])
+        res = self.store.remove_manager("Amit", "Lielle", self.user_manager)
+        self.assertTrue(res['error'])
         # Ron is not in store managers dictionary
-        res = self.store.remove_manager("test owner", "Ron")
-        self.assertFalse(res['ans'])
+        res = self.store.remove_manager("test owner", "Ron", self.user_manager)
+        self.assertTrue(res['error'])
         # Hadar was not appointed by test owner
-        res = self.store.remove_manager("test owner", "Hadar")
-        self.assertFalse(res['ans'])
+        res = self.store.remove_manager("test owner", "Hadar", self.user_manager)
+        self.assertTrue(res['error'])
 
     def test_remove_manager_two(self):
         self.appoint_users_to_managers()
@@ -218,8 +215,8 @@ class TestStore(unittest.TestCase):
         # Avishay should be in the appointed by test owner list
         self.assertIn("Avishay", self.store.appointed_by["test owner"])
         # test owner and Avishay are valid parameters to the method
-        res = self.store.remove_manager("test owner", "Avishay")
-        self.assertTrue(res['ans'])
+        res = self.store.remove_manager("test owner", "Avishay", self.user_manager)
+        self.assertFalse(res['error'])
         # Avishay should not be in store's mangers list.
         self.assertNotIn("Avishay", self.store.store_managers)
         # Avishay should not be in the appointed by test owner list
@@ -227,8 +224,8 @@ class TestStore(unittest.TestCase):
 
     def test_add_permission_to_manager_one(self):
         # Sebastian is not in store managers dictionary
-        res = self.store.remove_manager("test store", "Sebastian")
-        self.assertFalse(res['ans'])
+        res = self.store.remove_manager("test store", "Sebastian", self.user_manager)
+        self.assertTrue(res['error'])
 
         self.appoint_users_to_managers()
         # Check that 3 managers was added to managers dictionary
@@ -311,16 +308,16 @@ class TestStore(unittest.TestCase):
 
     def test_appoint_manager_one(self):
         # Well, Moshe  you are not an owner yet, so...
-        res = self.store.appoint_manager("Moshe", "Alex")
+        res = self.store.appoint_manager("Moshe", "Alex", self.user_manager)
         self.assertTrue(res['error'])
 
         # Evgeny, you need to come back to earth and now!, you are already a manager man
-        res = self.store.appoint_manager("test owner", "Evgeny")
+        res = self.store.appoint_manager("test owner", "Evgeny", self.user_manager)
         self.assertTrue(res['error'])
 
     def test_appoint_manager_two(self):
         # Welcome Ron, a whole new world is waiting for
-        res = self.store.appoint_manager("test owner", "Ron")
+        res = self.store.appoint_manager("test owner", "Ron", self.user_manager)
         self.assertFalse(res['error'])
 
         # Yeah well i"ll check for you if you were added to the managers list, chill out man
@@ -330,7 +327,7 @@ class TestStore(unittest.TestCase):
         self.assertIn("Ron", self.store.appointed_by["test owner"])
 
         # Now that you become a manager, let see if you can see the store sales history
-        self.assertIn(Store.get_sales_history, self.store.store_managers["Ron"])
+        self.assertIn('view_purchase_history', self.store.store_managers["Ron"])
 
     def test_add_product_one(self):
         # Lielle you silly, you don't have the add product permission, moreover,
@@ -475,11 +472,11 @@ class TestStore(unittest.TestCase):
 
     def appoint_managers_to_owners(self, users):
         for i in range(0, len(users) - 1):
-            self.store.appoint_owner(users[i], users[i + 1])
+            self.store.appoint_owner(users[i], users[i + 1], self.user_manager)
 
     def appoint_users_to_managers(self):
         for i in range(0, len(self.standard_users)):
-            self.store.appoint_manager("test owner", self.standard_users[i])
+            self.store.appoint_manager("test owner", self.standard_users[i], self.user_manager)
 
     # def test_remove_product_from_discount(self):
     #     self.discount2.id = 0
@@ -526,7 +523,7 @@ class TestStore(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.remove('/Users/avivlevitzky/PycharmProjects/Workshop/project/tests/test.db')
+        os.remove('/Users/avivlevitzky/PycharmProjects/Workshop/project/tests/domain_layer/stores_managment/tradeSystem.db')
 
 
 if __name__ == '__main__':

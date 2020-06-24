@@ -121,7 +121,6 @@ class test_StoresManager(unittest.TestCase):
         res1 = self.store_manager.get_discount_details(11, 1)
         res1 = jsons.loads(res1)
         self.assertFalse(res1['error'])
-        self.assertIsNotNone(res1['discount'])
 
     def test_add_visible_product_discount(self):
         res1 = self.store_manager.add_visible_product_discount(11, 'store_owner11',
@@ -130,7 +129,6 @@ class test_StoresManager(unittest.TestCase):
                                                                5, [])
         res1 = jsons.loads(res1)
         self.assertFalse(res1['error'])
-        self.assertEqual(1, res1['data']['discount_id'])
 
     def test_add_conditional_discount_to_product(self):
         res1 = self.store_manager.add_conditional_discount_to_product(11, 'store_owner11',
@@ -139,7 +137,6 @@ class test_StoresManager(unittest.TestCase):
                                                                5, 5, 5, [])
         res1 = jsons.loads(res1)
         self.assertFalse(res1['error'])
-        self.assertEqual(1, res1['data']['discount_id'])
 
     def test_add_product_to_discount(self):
         res1 = self.store_manager.add_product_to_discount(11, 'store_owner11', 1, 'Banana')
@@ -236,273 +233,273 @@ class test_StoresManager(unittest.TestCase):
         self.assertTrue(res2['error'])
         self.assertTrue(res3['error'])
 
-    def test_update_product(self):
-        for store_id in self.store_manager.stores.keys():
-            res = self.store_manager.update_product(store_id, "test_owner" + str(store_id), "not real product", "price",
-                                                  20)
-            res = jsons.loads(res)
-            self.assertTrue(res['error'])
-
-            res = self.store_manager.update_product(store_id, "test_owner" + str(store_id), "Apple", "price",
-                                                  20)
-            res = jsons.loads(res)
-            self.assertTrue(res)
-
-    def test_search(self):
-        res = self.store_manager.search("Banana")
-        res = jsons.loads(res)
-        self.assertEqual(len(res.keys()), 5)
-        res = self.store_manager.search(key_words=["Fruits"])
-        res = jsons.loads(res)
-        self.assertEqual(len(res), 5)
-
-    def test_get_store(self):
-        self.assertTrue(isinstance(self.store_manager.get_store(7), NullStore))
-        self.test_open_store()
-        self.assertTrue(2 == self.store_manager.get_store(2).store_id)
-
-    def test_add_product_to_store(self):
-        res = self.store_manager.add_product_to_store(7, "not real store", "what a product", 1222, ["imaginary products"],
-                                                    ["no"], 20)
-        res = jsons.loads(res)
-        self.assertFalse(res['error'])
-        res = self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
-                                                ["no"], 20)
-        res = jsons.loads(res)
-        self.assertTrue(res['error'])
-        res = self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
-                                                    ["no"], 20)
-        res = jsons.loads(res)
-        self.assertFalse(res['error'])
-
-    def test_open_store(self):
-        index = self.store_manager.stores_idx
-        self.store_manager.open_store("t_ownet", "test")
-        self.assertEqual(index + 1, self.store_manager.stores_idx)
-
-    def test_get_sales_history(self):
-        cart = self.init_cart()
-        is_apply = self.store_manager.buy(cart)
-
-        sales = self.store_manager.get_sales_history(1, 'test_owner1', True)
-
-        # self.assertFalse(self.store_manager.get_sales_history(78, "the king", True))
-        # self.assertFalse(self.store_manager.get_sales_history(0, "some owner", False))
-        # self.assertEqual(self.store_manager.get_sales_history(0, "some owner", True)[0], "hi,i'm a admin view purchase")
-
-    def test_add_purchase_store_policy(self):
-        res = self.store_manager.add_purchase_store_policy(1, "test_owner1", 3, 8)
-        res = jsons.loads(res)
-        self.assertFalse(res['error'])
-        res = self.store_manager.add_purchase_store_policy(1, "test_owner1", None, None)
-        res = jsons.loads(res)
-        self.assertFalse(res['ans'])
-        res = self.store_manager.add_purchase_store_policy(1, "test_owner1", 1, None)
-        res = jsons.loads(res)
-        self.assertFalse(res['error'])
-        res = self.store_manager.add_purchase_store_policy(1, "test_owner2", 1, 2)
-        res = jsons.loads(res)
-        self.assertFalse(res['ans'])
-
-    def test_add_purchase_product_policy(self):
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-        # self.assertTrue(res)
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", None, None, ['Banana'])
-        # self.assertFalse(res)
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 1, None, ['Banana'])
-        # self.assertTrue(res)
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner2", 1, 2, ['Banana'])
-        # self.assertFalse(res)
-
-    def test_add_purchase_composite_policy(self):
-        policies_id = self.init_purchases_policies()
-
-        res = self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
-        # self.assertTrue(res)
-        res = self.store_manager.add_purchase_composite_policy(1, "test_owner1", [9], "and")
-        # self.assertFalse(res)
-        res = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, "xor")
-        # self.assertTrue(res)
-        res = self.store_manager.add_purchase_composite_policy(3, "test_owner3", policies_id, "or")
-        # self.assertTrue(res)
-        res = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, None)
-        # self.assertFalse(res)
-        res = self.store_manager.add_purchase_composite_policy(2, "test_owner5", None, "or")
-        # self.assertFalse(res) TODO: add tests
-
-    def test_add_policy_to_purchase_composite_policy(self):
-        policies_id = self.init_purchases_policies()
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-        self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
-
-        res = self.store_manager.add_policy_to_purchase_composite_policy(
-            1, "test_owner1", 5, 4)
-        # self.assertTrue(res)
-
-        res = self.store_manager.add_policy_to_purchase_composite_policy(
-            1, "test_owner1", 5, 10)
-        # self.assertFalse(res['error'])
-
-        res = self.store_manager.add_policy_to_purchase_composite_policy(
-            1, "test_owner1", 10, 4)
-        # self.assertFalse(res)
-
-    def test_add_product_to_purchase_product_policy(self):
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-
-        res = self.store_manager.add_product_to_purchase_product_policy(
-            1, 1, "test_owner1", "Apple")
-
-        # self.assertTrue(res)
-
-        res = self.store_manager.add_product_to_purchase_product_policy(
-            1, 1, "test_owner2", "Orange")
-
-        # self.assertFalse(res)
-
-        res = self.store_manager.add_product_to_purchase_product_policy(
-            2, 2, "test_owner2", "Orange")
-
-        # self.assertFalse(res) TODO: tests
-
-    def test_remove_purchase_policy(self):
-        res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-        # self.assertTrue(res)
-
-        res = self.store_manager.remove_purchase_policy(1, "store_owner1", 1)
-        # self.assertTrue(res)
-
-        res = self.store_manager.remove_purchase_policy(1, "store_owner1", 1)
-        # self.assertFalse(res)
-
-    def test_remove_product_from_purchase_product_policy(self):
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-
-        res = self.store_manager.add_product_to_purchase_product_policy(
-            1, 1, "test_owner1", "Apple")
-
-        self.assertTrue(res)
-
-        res = self.store_manager.remove_product_from_purchase_product_policy(
-            1, 1, "test_owner1", "Apple")
-
-        # self.assertTrue(res) TODO: test
-
-    def test_get_discounts(self):
-        discounts = self.store_manager.get_discounts(1)
-        # self.assertEqual(len(discounts), 7) TODO: tests
-
-    def test_get_purchases_policies(self):
-        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
-        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 89)
-        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
-
-        self.store_manager.add_purchase_composite_policy(1, "test_owner1", [1, 2], "xor")
-
-        purchases = jsons.load(self.store_manager.get_purchases_policies(1))
-        self.assertTrue(purchases['ans'])
-        purchases = purchases['policies']
-        self.assertEqual(2, len(purchases))
-
-    def test_get_purchase_by_id(self):
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-        description = self.store_manager.get_purchase_policy_by_id(1, 1)
-        description = jsons.loads(description)
-        self.assertTrue(description['ans'])
-        description = description['desc']
-        min = description['min_amount_products']
-        max = description['max_amount_products']
-        self.assertEqual(min, 3)
-        self.assertEqual(max, 8)
-
-    def test_check_cart_validity_and(self):
-        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
-        self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
-        self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
-
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1, 2], "and")
-
-        cart = self.init_cart()
-        res = self.store_manager.check_cart_validity(cart)
-        res = jsons.loads(res)
-        self.assertTrue(res['error'])
-
-    def test_check_cart_validity_or(self):
-        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
-        self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
-        self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
-
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "or")
-
-        cart = self.init_cart()
-        res = self.store_manager.check_cart_validity(cart)
-        x=5
-
-    def test_check_cart_validity_xor(self):
-        self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
-        self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
-        self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
-
-        self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "xor")
-
-        cart = self.init_cart()
-        res = self.store_manager.check_cart_validity(cart)
-        x=5
-
-    def test_get_cart_description(self):
-        cart = self.init_cart()
-        cart = jsons.loads(self.store_manager.get_cart_description(cart))
-        self.assertTrue(cart['ans'])
-        self.assertEqual(cart['cart_price'], 2060.0)
-        cart = cart['cart_description']
-        store = cart['test_store1']
-        desc = store['desc']
-        product = desc['Apple']
-        apple_price = product['price_after_disc']
-        self.assertEqual(apple_price, 196.0)
-
-    def test_get_total_basket_tup_price(self):
-        cart = self.init_cart()
-        updated = self.store_manager.get_updated_basket(cart.baskets[1])
-        price = self.store_manager.get_total_basket_price(updated)
-        x = 5
-
-    def test_stores_details(self):
-        self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
-        stores_description = jsons.loads(self.store_manager.get_stores_description())
-        self.assertFalse(stores_description['error'])
-        stores_description = stores_description['data']
-        self.assertEqual(len(stores_description.keys()), 5)
-
-    def test_buy(self):
-        cart = self.init_cart()
-        is_apply = self.store_manager.buy(cart)
-        x=5
-
-    def test_get_product_from_store(self):
-        product = jsons.loads(self.store_manager.get_product_from_store(1, "Apple"))
-        self.assertTrue(product['ans'])
-        product = product['product']
-        self.assertEqual(product['amount'], 30)
-
-    def test_get_inventory_description(self):
-        inventory = jsons.loads(self.store_manager.get_inventory_description(1))
-        products = inventory['inventory']['products']
-        self.assertTrue(len(products.keys()) == 9)
-
-    def test_get_store_managers(self):
-        managers = jsons.loads(self.store_manager.get_store_managers(1))
-        self.assertFalse(managers['error'])
-        managers = managers['data']
-        self.assertTrue(len(managers) == 1)
-        # self.assertTrue(len(managers['test_owner']) == 4)
-
-    def test_get_store_owners(self):
-        owners = self.store_manager.get_store_owners(1)
-        owners = jsons.loads(owners)
-        self.assertFalse(owners['error'])
-        owners = owners['data']
-        self.assertIn('test_owner1', owners)
+    # def test_update_product(self):
+    #     for store_id in self.store_manager.stores.keys():
+    #         res = self.store_manager.update_product(store_id, "test_owner" + str(store_id), "not real product", "price",
+    #                                               20)
+    #         res = jsons.loads(res)
+    #         self.assertTrue(res['error'])
+    #
+    #         res = self.store_manager.update_product(store_id, "test_owner" + str(store_id), "Apple", "price",
+    #                                               20)
+    #         res = jsons.loads(res)
+    #         self.assertTrue(res)
+    #
+    # def test_search(self):
+    #     res = self.store_manager.search("Banana")
+    #     res = jsons.loads(res)
+    #     self.assertEqual(len(res.keys()), 5)
+    #     res = self.store_manager.search(key_words=["Fruits"])
+    #     res = jsons.loads(res)
+    #     self.assertEqual(len(res), 5)
+    #
+    # def test_get_store(self):
+    #     self.assertTrue(isinstance(self.store_manager.get_store(7), NullStore))
+    #     self.test_open_store()
+    #     self.assertTrue(2 == self.store_manager.get_store(2).store_id)
+    #
+    # def test_add_product_to_store(self):
+    #     res = self.store_manager.add_product_to_store(7, "not real store", "what a product", 1222, ["imaginary products"],
+    #                                                 ["no"], 20)
+    #     res = jsons.loads(res)
+    #     self.assertFalse(res['error'])
+    #     res = self.store_manager.add_product_to_store(2, "test_owner", "what a product", 1222, ["imaginary products"],
+    #                                             ["no"], 20)
+    #     res = jsons.loads(res)
+    #     self.assertTrue(res['error'])
+    #     res = self.store_manager.add_product_to_store(2, "test_owner2", "what a product", 1222, ["imaginary products"],
+    #                                                 ["no"], 20)
+    #     res = jsons.loads(res)
+    #     self.assertFalse(res['error'])
+    #
+    # def test_open_store(self):
+    #     index = self.store_manager.stores_idx
+    #     self.store_manager.open_store("t_ownet", "test")
+    #     self.assertEqual(index + 1, self.store_manager.stores_idx)
+    #
+    # def test_get_sales_history(self):
+    #     cart = self.init_cart()
+    #     is_apply = self.store_manager.buy(cart)
+    #
+    #     sales = self.store_manager.get_sales_history(1, 'test_owner1', True)
+    #
+    #     # self.assertFalse(self.store_manager.get_sales_history(78, "the king", True))
+    #     # self.assertFalse(self.store_manager.get_sales_history(0, "some owner", False))
+    #     # self.assertEqual(self.store_manager.get_sales_history(0, "some owner", True)[0], "hi,i'm a admin view purchase")
+    #
+    # def test_add_purchase_store_policy(self):
+    #     res = self.store_manager.add_purchase_store_policy(1, "test_owner1", 3, 8)
+    #     res = jsons.loads(res)
+    #     self.assertFalse(res['error'])
+    #     res = self.store_manager.add_purchase_store_policy(1, "test_owner1", None, None)
+    #     res = jsons.loads(res)
+    #     self.assertFalse(res['ans'])
+    #     res = self.store_manager.add_purchase_store_policy(1, "test_owner1", 1, None)
+    #     res = jsons.loads(res)
+    #     self.assertFalse(res['error'])
+    #     res = self.store_manager.add_purchase_store_policy(1, "test_owner2", 1, 2)
+    #     res = jsons.loads(res)
+    #     self.assertFalse(res['ans'])
+    #
+    # def test_add_purchase_product_policy(self):
+    #     res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #     # self.assertTrue(res)
+    #     res = self.store_manager.add_purchase_product_policy(1, "test_owner1", None, None, ['Banana'])
+    #     # self.assertFalse(res)
+    #     res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 1, None, ['Banana'])
+    #     # self.assertTrue(res)
+    #     res = self.store_manager.add_purchase_product_policy(1, "test_owner2", 1, 2, ['Banana'])
+    #     # self.assertFalse(res)
+    #
+    # def test_add_purchase_composite_policy(self):
+    #     policies_id = self.init_purchases_policies()
+    #
+    #     res = self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
+    #     # self.assertTrue(res)
+    #     res = self.store_manager.add_purchase_composite_policy(1, "test_owner1", [9], "and")
+    #     # self.assertFalse(res)
+    #     res = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, "xor")
+    #     # self.assertTrue(res)
+    #     res = self.store_manager.add_purchase_composite_policy(3, "test_owner3", policies_id, "or")
+    #     # self.assertTrue(res)
+    #     res = self.store_manager.add_purchase_composite_policy(2, "test_owner2", policies_id, None)
+    #     # self.assertFalse(res)
+    #     res = self.store_manager.add_purchase_composite_policy(2, "test_owner5", None, "or")
+    #     # self.assertFalse(res) TODO: add tests
+    #
+    # def test_add_policy_to_purchase_composite_policy(self):
+    #     policies_id = self.init_purchases_policies()
+    #     self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #     self.store_manager.add_purchase_composite_policy(1, "test_owner1", policies_id, "and")
+    #
+    #     res = self.store_manager.add_policy_to_purchase_composite_policy(
+    #         1, "test_owner1", 5, 4)
+    #     # self.assertTrue(res)
+    #
+    #     res = self.store_manager.add_policy_to_purchase_composite_policy(
+    #         1, "test_owner1", 5, 10)
+    #     # self.assertFalse(res['error'])
+    #
+    #     res = self.store_manager.add_policy_to_purchase_composite_policy(
+    #         1, "test_owner1", 10, 4)
+    #     # self.assertFalse(res)
+    #
+    # def test_add_product_to_purchase_product_policy(self):
+    #     self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #
+    #     res = self.store_manager.add_product_to_purchase_product_policy(
+    #         1, 1, "test_owner1", "Apple")
+    #
+    #     # self.assertTrue(res)
+    #
+    #     res = self.store_manager.add_product_to_purchase_product_policy(
+    #         1, 1, "test_owner2", "Orange")
+    #
+    #     # self.assertFalse(res)
+    #
+    #     res = self.store_manager.add_product_to_purchase_product_policy(
+    #         2, 2, "test_owner2", "Orange")
+    #
+    #     # self.assertFalse(res) TODO: tests
+    #
+    # def test_remove_purchase_policy(self):
+    #     res = self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #     # self.assertTrue(res)
+    #
+    #     res = self.store_manager.remove_purchase_policy(1, "store_owner1", 1)
+    #     # self.assertTrue(res)
+    #
+    #     res = self.store_manager.remove_purchase_policy(1, "store_owner1", 1)
+    #     # self.assertFalse(res)
+    #
+    # def test_remove_product_from_purchase_product_policy(self):
+    #     self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #
+    #     res = self.store_manager.add_product_to_purchase_product_policy(
+    #         1, 1, "test_owner1", "Apple")
+    #
+    #     self.assertTrue(res)
+    #
+    #     res = self.store_manager.remove_product_from_purchase_product_policy(
+    #         1, 1, "test_owner1", "Apple")
+    #
+    #     # self.assertTrue(res) TODO: test
+    #
+    # def test_get_discounts(self):
+    #     discounts = self.store_manager.get_discounts(1)
+    #     # self.assertEqual(len(discounts), 7) TODO: tests
+    #
+    # def test_get_purchases_policies(self):
+    #     self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+    #     self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 89)
+    #     self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+    #
+    #     self.store_manager.add_purchase_composite_policy(1, "test_owner1", [1, 2], "xor")
+    #
+    #     purchases = jsons.load(self.store_manager.get_purchases_policies(1))
+    #     self.assertTrue(purchases['ans'])
+    #     purchases = purchases['policies']
+    #     self.assertEqual(2, len(purchases))
+    #
+    # def test_get_purchase_by_id(self):
+    #     self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #     description = self.store_manager.get_purchase_policy_by_id(1, 1)
+    #     description = jsons.loads(description)
+    #     self.assertTrue(description['ans'])
+    #     description = description['desc']
+    #     min = description['min_amount_products']
+    #     max = description['max_amount_products']
+    #     self.assertEqual(min, 3)
+    #     self.assertEqual(max, 8)
+    #
+    # def test_check_cart_validity_and(self):
+    #     self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+    #     self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
+    #     self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
+    #
+    #     self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1, 2], "and")
+    #
+    #     cart = self.init_cart()
+    #     res = self.store_manager.check_cart_validity(cart)
+    #     res = jsons.loads(res)
+    #     self.assertTrue(res['error'])
+    #
+    # def test_check_cart_validity_or(self):
+    #     self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+    #     self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
+    #     self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
+    #
+    #     self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "or")
+    #
+    #     cart = self.init_cart()
+    #     res = self.store_manager.check_cart_validity(cart)
+    #     x=5
+    #
+    # def test_check_cart_validity_xor(self):
+    #     self.store_manager.add_purchase_store_policy(1, "test_owner1", None, 90)
+    #     self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 89)
+    #     self.store_manager.add_purchase_store_policy(2, "test_owner2", None, 90)
+    #
+    #     self.store_manager.add_purchase_composite_policy(2, "test_owner2", [1,2], "xor")
+    #
+    #     cart = self.init_cart()
+    #     res = self.store_manager.check_cart_validity(cart)
+    #     x=5
+    #
+    # def test_get_cart_description(self):
+    #     cart = self.init_cart()
+    #     cart = jsons.loads(self.store_manager.get_cart_description(cart))
+    #     self.assertTrue(cart['ans'])
+    #     self.assertEqual(cart['cart_price'], 2060.0)
+    #     cart = cart['cart_description']
+    #     store = cart['test_store1']
+    #     desc = store['desc']
+    #     product = desc['Apple']
+    #     apple_price = product['price_after_disc']
+    #     self.assertEqual(apple_price, 196.0)
+    #
+    # def test_get_total_basket_tup_price(self):
+    #     cart = self.init_cart()
+    #     updated = self.store_manager.get_updated_basket(cart.baskets[1])
+    #     price = self.store_manager.get_total_basket_price(updated)
+    #     x = 5
+    #
+    # def test_stores_details(self):
+    #     self.store_manager.add_purchase_product_policy(1, "test_owner1", 3, 8, ['Banana'])
+    #     stores_description = jsons.loads(self.store_manager.get_stores_description())
+    #     self.assertFalse(stores_description['error'])
+    #     stores_description = stores_description['data']
+    #     self.assertEqual(len(stores_description.keys()), 5)
+    #
+    # def test_buy(self):
+    #     cart = self.init_cart()
+    #     is_apply = self.store_manager.buy(cart)
+    #     x=5
+    #
+    # def test_get_product_from_store(self):
+    #     product = jsons.loads(self.store_manager.get_product_from_store(1, "Apple"))
+    #     self.assertTrue(product['ans'])
+    #     product = product['product']
+    #     self.assertEqual(product['amount'], 30)
+    #
+    # def test_get_inventory_description(self):
+    #     inventory = jsons.loads(self.store_manager.get_inventory_description(1))
+    #     products = inventory['inventory']['products']
+    #     self.assertTrue(len(products.keys()) == 9)
+    #
+    # def test_get_store_managers(self):
+    #     managers = jsons.loads(self.store_manager.get_store_managers(1))
+    #     self.assertFalse(managers['error'])
+    #     managers = managers['data']
+    #     self.assertTrue(len(managers) == 1)
+    #     # self.assertTrue(len(managers['test_owner']) == 4)
+    #
+    # def test_get_store_owners(self):
+    #     owners = self.store_manager.get_store_owners(1)
+    #     owners = jsons.loads(owners)
+    #     self.assertFalse(owners['error'])
+    #     owners = owners['data']
+    #     self.assertIn('test_owner1', owners)
 
 
     # def test_get_basket_description(self):
@@ -614,7 +611,7 @@ class test_StoresManager(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.remove('/Users/avivlevitzky/PycharmProjects/Workshop/project/tests/test.db')
+        os.remove('/Users/avivlevitzky/PycharmProjects/Workshop/project/tests/domain_layer/stores_managment/tradeSystem.db')
 
     def drop_table(self, table_name: str):
         if table_name in Base.metadata.tables:

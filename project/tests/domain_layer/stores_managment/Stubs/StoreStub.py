@@ -16,7 +16,7 @@ class StoreStub(Store):
         # self.init_purchase_policy()
         # self.init_inventory()
 
-    def appoint_owner(self, owner, to_appoint):
+    def appoint_owner(self, owner, to_appoint, user_manager):
         if owner is 'store_owner11' and to_appoint is 'owner':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -28,7 +28,7 @@ class StoreStub(Store):
     def appoint_owner_helper(self, owner, to_appoint):
         return super().appoint_owner_helper(owner, to_appoint)
 
-    def remove_owner(self, owner, to_remove, publisher: Publisher):
+    def remove_owner(self, owner, to_remove, publisher: Publisher, user_manager):
         if owner is 'store_owner11' and to_remove is 'to_remove':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -37,7 +37,7 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def remove_manager(self, owner, to_remove):
+    def remove_manager(self, owner, to_remove, users_manager):
         if owner is 'store_owner11' and to_remove is 'manager':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -64,7 +64,7 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def appoint_manager(self, owner, to_appoint):
+    def appoint_manager(self, owner, to_appoint, user_manager):
         if owner is 'store_owner11' and to_appoint is 'manager':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -111,10 +111,12 @@ class StoreStub(Store):
                     'error_msg': 'wrong'}
 
     def add_visible_product_discount(self, permitted_username, discount: Discount):
-        return super().add_visible_product_discount(permitted_username, discount)
+        return {'error': False,
+                'error_msg': 'succesfully added'}
 
     def add_conditional_discount_to_product(self, permitted_username, discount):
-        return super().add_conditional_discount_to_product(permitted_username, discount)
+        return {'error': False,
+                'error_msg': 'succesfully added'}
 
     def add_conditional_discount_to_store(self, permitted_username, discount):
         return super().add_conditional_discount_to_store(permitted_username, discount)
@@ -197,7 +199,8 @@ class StoreStub(Store):
         return super().get_discounts()
 
     def get_discount_by_id(self, discount_id):
-        return super().get_discount_by_id(discount_id)
+        return {'error': False,
+                'error_msg': 'succesfully added'}
 
     def get_purchase_policies(self):
         return super().get_purchase_policies()
