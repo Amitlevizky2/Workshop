@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from project.data_access_layer import *
 from project.data_access_layer.ProductORM import ProductORM
+from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
 from project.data_access_layer.BasketORM import BasketORM
@@ -29,6 +30,7 @@ class TestVisibleORM(TestCase):
         Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscounts']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['Discount_products']], checkfirst=True)
 
     def test_add_success(self):
         num = proxy.get_session().query(VisibleProductDiscountORM).filter_by(discount_id = 1).filter_by(store_id=3456).count()
@@ -59,3 +61,9 @@ class TestVisibleORM(TestCase):
         res = proxy.get_session().query(VisibleProductDiscountORM).filter_by(discount_id = 1).filter_by(store_id=3456).count()
         self.assertTrue(res == 0)
 
+    def test_add_products_success(self):
+        self.orm.add()
+        num = proxy.get_session().query(ProductsInDiscountsORM).filter_by(discount_id = 1).filter_by(store_id=3456).count()
+        self.orm.add_product("stuff")
+        res = proxy.get_session().query(ProductsInDiscountsORM).filter_by(discount_id = 1).filter_by(store_id=3456).count()
+        self.assertEqual(num + 1, res)
