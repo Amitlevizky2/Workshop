@@ -15,6 +15,9 @@ import jsons
 import os
 
 from project.domain_layer.users_managment.Basket import Basket
+from project.domain_layer.users_managment.UsersManager import UsersManager
+
+
 class PublisherStub(Publisher):
 
 
@@ -24,6 +27,11 @@ class PublisherStub(Publisher):
         pass
 
 class TestStore(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.users_manger = UsersManager(None)
+
     def setUp(self):
         self.store = Store(0, "test store", "test owner")
         self.store.store_managers = {"Moshe": [],
