@@ -204,11 +204,13 @@ class UsersManagerInterface:
     def get_today_stats(self):
         return self.user_manager.get_today_stats()
 
-    def get_range_statistics(self, start_date, end_date):
-        return self.user_manager.get_range_statistics(start_date, end_date)
+    def get_statistics(self, username):
+        if self.is_admin(username)['data'] is True:
+            return self.user_manager.get_statistics()
+        return jsons.dumps({'error': True, 'error_msg': 'Not admin!'})
 
     def get_all_users(self, admin):
         return self.user_manager.get_all_users(admin)
 
     def get_admin(self):
-        self.user_manager.get_admin()
+        self.user_manager.get_admins()

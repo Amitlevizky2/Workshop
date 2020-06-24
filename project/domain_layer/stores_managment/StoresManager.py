@@ -213,18 +213,20 @@ class StoresManager:
         store = self.get_store(store_id)
         answer = store.add_conditional_discount_to_product(username, ConditionalProductDiscount(start_date, end_date,
                                                                                                 percent, min_amount,
-                                                                                                num_prods_to_apply, store_id))
+                                                                                                num_prods_to_apply,
+                                                                                                store_id))
         if answer['error'] is False:
             for product_name in products:
                 self.add_product_to_discount(store_id, username, answer['data']['discount_id'], product_name)
-        return  jsons.dumps(answer)
+        return jsons.dumps(answer)
 
     def add_conditional_discount_to_store(self, store_id: int, username: str, start_date, end_date, percent: int,
                                           min_price: int):
         store = self.get_store(store_id)
         return jsons.dumps(store.add_conditional_discount_to_store(username,
                                                                    ConditionalStoreDiscount(start_date, end_date,
-                                                                                            percent, min_price, store_id)))
+                                                                                            percent, min_price,
+                                                                                            store_id)))
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
@@ -261,7 +263,7 @@ class StoresManager:
                                                                           tup_list, discounts_to_apply_list, store_id)))
 
     def edit_visible_discount_to_products(self, store_id: int, username: str, discount_id: int, start_date, end_date,
-                                         percent: int, products=[]):
+                                          percent: int, products=[]):
         store = self.get_store(store_id)
         return jsons.dumps(
             store.edit_visible_discount(username, discount_id, start_date, end_date, percent, products))
@@ -526,6 +528,3 @@ class StoresManager:
         stores = self.data_handler.get_all_stores()
         for store in stores:
             self.stores[store.store_id] = store
-
-
-

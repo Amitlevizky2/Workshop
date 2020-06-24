@@ -62,6 +62,7 @@ class UsersManager:
             return False, {
                 'error_msg': 'User name: ' + new_username + ' is already in use. Please choose another user name.'}
 
+    # TODO: add publisher
     def login(self, username: str, login_username: str):
         ans, data = self.find_reg_user(login_username)
         if ans is True:
@@ -72,18 +73,21 @@ class UsersManager:
             if res is True:
                 # self.merge_carts(data, guest_user.cart)
                 self.guest_user_list.pop(username)
-                self.update_stats(username)
+                self.update_stats(login_username)
                 return True, {'data': data.get_jsn_description()}
             return res, guest_user
         else:
             return False, {'error_msg': 'incorrect user name. Please try again.'}
 
     def update_stats(self, username: str):
-        self.stats.add_reg_users()
         self.stats.remove_guests_stats()
+        self.stats.add_reg_users()
 
-        if self.is_manager(username):
+        if self.is_manager(username) is True:
+            print('is manager {} is '.format(username))
+            print(self.is_manager(username))
             self.stats.add_managers()
+            self.stats.add_owners()
 
     def is_manager(self, username: str):
         ans, data = self.find_reg_user(username)
@@ -92,6 +96,7 @@ class UsersManager:
         return data.is_store_manager()
 
     # make sure when  user exits system to remove the user from guest user list
+    # TODO: add publisher
     def add_guest_user(self):
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1
@@ -174,7 +179,8 @@ class UsersManager:
             if self.is_admin(admin):
                 if not self.is_admin(username_to_be_admin):
                     self.admins.append(username_to_be_admin)
-                    return jsons.dumps({'error': False, 'data': 'User: {}, have admin privileges.'.format(username_to_be_admin)})
+                    return jsons.dumps(
+                        {'error': False, 'data': 'User: {}, have admin privileges.'.format(username_to_be_admin)})
                 else:
                     return jsons.dumps({'error': True, 'error_msg': 'user' + username_to_be_admin + 'is already admin'})
             else:
@@ -185,7 +191,6 @@ class UsersManager:
 
     def is_admin(self, username):
         return username in self.admins
-
 
     def add_managed_store(self, username, store_id):
         ans, user = self.find_reg_user(username)
@@ -263,6 +268,7 @@ class UsersManager:
         users = self.data_handler.get_all_regusers()
         for user in users:
             self.reg_user_list[user.username] = user
+        self.admins = self.get_admins()
 
     def get_today_stats(self):
         return jsons.dumps({
@@ -270,10 +276,10 @@ class UsersManager:
             'stats': self.stats.get_today_statistics()
         })
 
-    def get_range_statistics(self, start_date, end_date):
+    def get_statistics(self):
         return jsons.dumps({
             'error': False,
-            'stats': self.stats.get_range_statistics(start_date,end_date)
+            'data': self.stats.get_all_data()
         })
 
     def add_first_admin(self):
@@ -288,5 +294,8 @@ class UsersManager:
             return jsons.dumps({'error': False, 'data': list(self.reg_user_list.keys())})
         return jsons.dumps({'error': True, 'error_msg': 'User {} is not admin!'.format(admin)})
 
-    def get_admin(self):
-        return self.data_handler.get_admin()
+    def get_admins(self):
+        return self.data_handler.get_admins()
+
+    def bound_publisher_and_stats(self, publisher):
+        self.stats.set_publisher(publisher)
