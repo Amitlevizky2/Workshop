@@ -29,7 +29,6 @@ class BasketORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            session.rollback()
             error = str(type(e))
             return error
 
@@ -62,7 +61,6 @@ class BasketORM(Base):
     def createObject(self):
         from project.domain_layer.users_managment.Basket import Basket
         basket = Basket(self.username, self.store_id, self)
-        Base.metadata.create_all(engine, [Base.metadata.tables['productsinbaskets']], checkfirst=True)
         products = proxy.get_session().query(ProductsInBasketORM).filter_by(username= self.username, store_id=self.store_id)
         prods ={}
         for product in products:

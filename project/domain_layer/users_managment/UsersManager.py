@@ -62,7 +62,6 @@ class UsersManager:
             return False, {
                 'error_msg': 'User name: ' + new_username + ' is already in use. Please choose another user name.'}
 
-    # TODO: add publisher
     def login(self, username: str, login_username: str):
         ans, data = self.find_reg_user(login_username)
         if ans is True:
@@ -96,7 +95,6 @@ class UsersManager:
         return data.is_store_manager()
 
     # make sure when  user exits system to remove the user from guest user list
-    # TODO: add publisher
     def add_guest_user(self):
         user = User("guestUser" + str(self.incremental_id))
         self.incremental_id += 1

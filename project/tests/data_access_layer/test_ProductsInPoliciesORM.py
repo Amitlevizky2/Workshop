@@ -7,23 +7,21 @@ from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ProductORM import ProductORM
 
 
+class ProductsInPoliciesORM(Base):
+    __tablename__ = 'Policy_products'
 
-class ProductsInDiscountsORM(Base):
-    __tablename__ = 'Discount_products'
-    #id = Column(Integer, primary_key=True)
-    discount_id = Column(Integer, ForeignKey('discounts.discount_id'), primary_key=True)
+    policy_id = Column(Integer, ForeignKey('policies.policy_id'), primary_key=True)
     product_name = Column(String, ForeignKey('products.name'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     ##not sure this works.
     product = relationship('ProductORM', foreign_keys=[product_name, store_id])
-    discount = relationship('DiscountORM', back_populates='products')
+    policy = relationship('PolicyORM')
 
     def add(self):
         try:
-            Base.metadata.create_all(engine, [Base.metadata.tables['Discount_products']], checkfirst=True)
+            Base.metadata.create_all(engine, [Base.metadata.tables['Policy_products']], checkfirst=True)
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            session.rollback()
             error = str(type(e))
             return error

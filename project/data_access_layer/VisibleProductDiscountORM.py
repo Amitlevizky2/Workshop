@@ -33,6 +33,7 @@ class VisibleProductDiscountORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
+            session.rollback()
             error = str(type(e))
             return error
 
@@ -43,6 +44,7 @@ class VisibleProductDiscountORM(Base):
         visdis = VisibleProductDiscount(self.start_date, self.end_date, (self.percent*100), self.store_id, self)
         visdis.set_id(self.discount_id)
         prods = {}
+        Base.metadata.create_all(engine, [Base.metadata.tables['Discount_products']], checkfirst=True)
         res = proxy.get_session().query(ProductsInDiscountsORM).filter(ProductsInDiscountsORM.discount_id==self.discount_id).filter(ProductsInDiscountsORM.store_id==self.store_id)
         for pidorm in res:
             prods[pidorm.product_name] = True

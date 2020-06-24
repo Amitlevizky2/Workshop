@@ -69,7 +69,7 @@ class RegisteredUser(User):
     def add_notification(self, message):
         print('user: ' + self.username + 'got notification: ' + message)
         self.notifications.append(message)
-       # self.orm.add_notification(self.username, message)
+        self.orm.add_notification(self.username, message)
 
     def have_notifications(self) -> bool:
         return self.notifications.__len__() > 0

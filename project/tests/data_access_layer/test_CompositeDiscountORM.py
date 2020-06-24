@@ -48,7 +48,6 @@ class CompositeDiscountORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            session.rollback()
             error = str(type(e))
             return error
 
@@ -68,18 +67,15 @@ class CompositeDiscountORM(Base):
         from project.domain_layer.stores_managment.DiscountsPolicies.CompositeDiscount import \
             CompositeDiscount
         to_apply =[]
-        Base.metadata.create_all(engine, [Base.metadata.tables['to_apply_composite']], checkfirst=True)
         for dis in self.discounts_to_apply:
             real = dis.discount.createObject()
             to_apply.append(to_apply)
         pred = []
         pred_map_discount={}
         pred_map_prods={}
-        Base.metadata.create_all(engine, [Base.metadata.tables['predicates']], checkfirst=True)
         res = proxy.get_session().query(PredicateORM).filter(PredicateORM.composite_discount_id==self.discount_id).filter(PredicateORM.store_id==self.store_id)
         for pre in res:
             from project.data_access_layer.DiscountORM import DiscountORM
-            Base.metadata.create_all(engine, [Base.metadata.tables['discounts']], checkfirst=True)
             discount = proxy.get_session().query(DiscountORM).filter(DiscountORM.discount_id==pre.discount_id).filter(DiscountORM.store_id==pre.store_id).first()
             real_discount = discount.createObject()
             if real_discount.id not in pred_map_discount.keys():
@@ -88,6 +84,7 @@ class CompositeDiscountORM(Base):
             pred_map_prods[real_discount.id].append(pre.product_name)
         for dis_id in pred_map_discount.keys():
             pred.append((pred_map_discount[dis_id], pred_map_prods[dis_id]))
+
         compodis = CompositeDiscount(self.start_date, self.end_date, self.get_logic_operator(self.logic_operator), pred, to_apply, self.store_id, self)
         compodis.set_id(self.discount_id)
         return compodis

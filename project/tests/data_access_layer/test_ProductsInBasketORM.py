@@ -7,22 +7,25 @@ from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.ProductORM import ProductORM
 
 
-class ProductsInPoliciesORM(Base):
-    __tablename__ = 'Policy_products'
-
-    policy_id = Column(Integer, ForeignKey('policies.policy_id'), primary_key=True)
-    product_name = Column(String, ForeignKey('products.name'), primary_key=True)
+class ProductsInBasketORM(Base):
+    __tablename__ = 'productsinbaskets'
+    #basket_id = Column(Integer, ForeignKey('baskets.id'), primary_key=True)
+    username = Column(String, ForeignKey('regusers.username'), primary_key=True)
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
-    ##not sure this works.
-    product = relationship('ProductORM', foreign_keys=[product_name, store_id])
-    policy = relationship('PolicyORM')
+    product_name = Column(String, ForeignKey('products.name'), primary_key=True)
+    quantity = Column(Integer)
+    product = relationship("ProductORM")
+
+    def update_quantity(self, amount):
+        self.quantity = amount
+        #proxy.get_session().commit()
 
     def add(self):
         try:
-            Base.metadata.create_all(engine, [Base.metadata.tables['Policy_products']], checkfirst=True)
+            Base.metadata.create_all(engine, [Base.metadata.tables['productsinbaskets']], checkfirst=True)
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            session.rollback()
             error = str(type(e))
             return error
+

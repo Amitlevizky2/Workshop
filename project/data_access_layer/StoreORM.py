@@ -42,8 +42,11 @@ class StoreORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
+            session.rollback()
             error = str(type(e))
+            # print(error)
             return error
+
 
 
     def appoint_owner(self, appointed_by, owner):
@@ -115,11 +118,13 @@ class StoreORM(Base):
             else:
                 appointed_by[owner.appointed_by].append(owner.username)
         store.store_owners = owners
+        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
         managers = {}
         Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
         for manager in self.managed_by:
             name = manager.username
             appointed_by[manager.appointed_by].append(name)
+            Base.metadata.create_all(engine, [Base.metadata.tables['managerpermissions']], checkfirst=True)
             permissions = proxy.get_session().query(ManagerPermissionORM).filter_by(username=name)
             managers[name] = []
             Base.metadata.create_all(engine, [Base.metadata.tables['managerpermissions']], checkfirst=True)
@@ -129,12 +134,16 @@ class StoreORM(Base):
         store.appointed_by =appointed_by
         discounts = {}
         # print(dis)
+        Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscounts']], checkfirst=True)
         for discount in self.vis:
             discounts[discount.discount_id] = discount.createObject()
+        Base.metadata.create_all(engine, [Base.metadata.tables['conditionalproductdiscounts']], checkfirst=True)
         for discount in self.condprod:
             discounts[discount.discount_id] = discount.createObject()
+        Base.metadata.create_all(engine, [Base.metadata.tables['conditionalstorediscounts']], checkfirst=True)
         for discount in self.condstore:
             discounts[discount.discount_id] = discount.createObject()
+        Base.metadata.create_all(engine, [Base.metadata.tables['CompositeDiscounts']], checkfirst=True)
         for discount in self.comp:
             discounts[discount.discount_id] = discount.createObject()
         store.discounts = discounts
@@ -148,6 +157,7 @@ class StoreORM(Base):
             inventory[product.name] = prod
         store.inventory.products = inventory
         policies = {}
+        Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
         for policy in self.policies:
             policies[policy.policy_id] = policy.createObject()
         store.purchase_policies = policies

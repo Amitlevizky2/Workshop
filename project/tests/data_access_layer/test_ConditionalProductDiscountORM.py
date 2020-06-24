@@ -39,7 +39,6 @@ class ConditionalProductDiscountsORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            session.rollback()
             error = str(type(e))
             return error
 
@@ -58,7 +57,6 @@ class ConditionalProductDiscountsORM(Base):
         condpdis = ConditionalProductDiscount(self.start_date, self.end_date, (self.percent*100), self.min_amount, self.num_products_to_apply, self.store_id, self)
         condpdis.set_id(self.discount_id)
         prods = {}
-        Base.metadata.create_all(engine, [Base.metadata.tables['Discount_products']], checkfirst=True)
         res = proxy.get_session().query(ProductsInDiscountsORM).filter(
             ProductsInDiscountsORM.discount_id == self.discount_id).filter(
             ProductsInDiscountsORM.store_id == self.store_id)

@@ -24,7 +24,6 @@ class StorePolicyORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            session.rollback()
             error = str(type(e))
             return error
 
@@ -42,7 +41,6 @@ class StorePolicyORM(Base):
         real = PurchaseStorePolicy(self.min_amount, self.max_amount, self.policy_id, self.store_id, self)
         prods={}
         from project.data_access_layer.ProductsInPoliciesORM import ProductsInPoliciesORM
-        Base.metadata.create_all(engine, [Base.metadata.tables['Policy_products']], checkfirst=True)
         res = proxy.get_session().query(ProductsInPoliciesORM).filter(ProductsInPoliciesORM.policy_id==self.policy_id).filter(ProductsInPoliciesORM.store_id==self.store_id)
         for piporm in res:
             prods[piporm.product_name] = True
