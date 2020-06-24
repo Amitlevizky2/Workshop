@@ -18,16 +18,16 @@ class ExternalServiceAPI:
             ,"month": month, 'year':year, 'holder': holder
             ,'ccv': ccv, 'id': id}
         rpay = requests.post("https://cs-bgu-wsep.herokuapp.com/",data = paydtls,timeout=5)
-        if rpay == -1:
+        if int(rpay.content) == -1:
             return "The transaction was declined"
         return rpay
 
     def cancelpay(self,r):
         canceldtl = {'action_type': 'cancel_pay','transaction_id':r}
-        rcancle = requests.post(self.url,data= canceldtl)
-        if rcancle == -1:
+        rcancle = requests.post("https://cs-bgu-wsep.herokuapp.com/",data= canceldtl)
+        if int(rcancle.content) == -1:
             return "The transaction was declined"
-        elif rcancle ==1:
+        elif int(rcancle.content) == 1:
             return rcancle
 
     def supply(self,name,address,city,country,zip):
@@ -35,13 +35,13 @@ class ExternalServiceAPI:
                       ,'address':address,'city':city
                       ,'country':country,'zip':zip}
         rsupply = requests.post(self.url,data= supplydtls)
-        if rsupply == -1:
+        if int(rsupply.content) == -1:
             return "The shipment was declined"
         return rsupply
 
     def cancelsupply(self,rsupply):
         cancelsupplydtl = {'action_type': 'cancel_supply','transaction_id':rsupply}
-        rcanclesupply = requests.post(self.url,data= cancelsupplydtl)
+        rcanclesupply = requests.post(self.url,data= cancelsupplydtl).content
         if rcanclesupply == -1:
             return "The shipment was declined"
         return rcanclesupply
