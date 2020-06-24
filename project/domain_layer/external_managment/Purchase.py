@@ -13,6 +13,8 @@ class Purchase:
         self.products = products #{}
         self.purchase_id = purchase_id
         self.date = datetime.now()
+        self.order_number = 0
+        self.supply_number = 0
         if orm is None:
             from project.data_access_layer.PurchaseORM import PurchaseORM
             self.orm = PurchaseORM()
@@ -25,3 +27,8 @@ class Purchase:
         else:
             self.orm = orm
 
+    def set_order_number(self, number: int):
+        self.order_number = number
+
+    def set_supply_number(self, number: int):
+        self.supply_number = number
