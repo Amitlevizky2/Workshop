@@ -62,9 +62,10 @@ class TestVisibleORM(TestCase):
         self.assertTrue(res == 0)
 
     def test_add_products_success(self):
+        self.orm.add()
         num = proxy.get_session().query(ProductsInPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
         self.orm.add_product("stuff")
-        res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
+        res = proxy.get_session().query(ProductsInPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
         self.assertEqual(num + 1, res)
 
 
