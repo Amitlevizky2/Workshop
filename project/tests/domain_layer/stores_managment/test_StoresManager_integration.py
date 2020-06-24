@@ -1,23 +1,22 @@
 import datetime
+import os
 import unittest
 
 import jsonpickle
 import jsons
-import os
 
 from project.data_access_layer import Base, engine
 from project.domain_layer.external_managment.Purchase import Purchase
 from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import VisibleProductDiscount
 from project.domain_layer.stores_managment.Product import Product
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
+from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy import PurchaseStorePolicy
 from project.domain_layer.stores_managment.Store import Store
 from project.domain_layer.stores_managment.StoresManager import StoresManager
 from project.domain_layer.users_managment.Basket import Basket
 from project.domain_layer.users_managment.Cart import Cart
-from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseProductPolicy import PurchaseProductPolicy
-from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseStorePolicy import PurchaseStorePolicy
 from project.domain_layer.users_managment.User import User
 from project.domain_layer.users_managment.UsersManager import UsersManager
-from project.tests.domain_layer.stores_managment.Stubs.UsersManagerStub import UsersManagerStub
 
 
 class test_StoresManager(unittest.TestCase):

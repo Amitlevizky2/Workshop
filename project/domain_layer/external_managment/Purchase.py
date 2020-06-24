@@ -23,12 +23,16 @@ class Purchase:
             self.orm.store_id = store_id
             self.orm.date = self.date
             self.orm.products = jsons.dumps(products)
+            self.orm.order_number = 0
+            self.orm.supply_number = 0
             self.orm.add()
         else:
             self.orm = orm
 
     def set_order_number(self, number: int):
         self.order_number = number
+        self.orm.set_order_number(number)
 
     def set_supply_number(self, number: int):
         self.supply_number = number
+        self.orm.set_supply_number(number)

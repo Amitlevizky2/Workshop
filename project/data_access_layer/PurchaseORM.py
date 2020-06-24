@@ -14,6 +14,8 @@ class PurchaseORM(Base):
     store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
     date = Column(DateTime, primary_key=True)
     id = Column(Integer)
+    order_number = Column(Integer)
+    supply_number = Column(Integer)
     products = Column(Text)
 
 
@@ -30,4 +32,14 @@ class PurchaseORM(Base):
 
 
     def createObject(self):
-        return Purchase(jsons.loads(self.products), self.username, self.store_id, self.id, self)
+        purchase = Purchase(jsons.loads(self.products), self.username, self.store_id, self.id, self)
+        purchase.set_order_number(self.order_number)
+        purchase.set_supply_number(self.supply_number)
+
+    def set_order_number(self, number):
+        self.order_number = number
+        proxy.get_session().commit()
+
+    def set_supply_number(self, number):
+        self.supply_number = number
+        proxy.get_session().commit()
