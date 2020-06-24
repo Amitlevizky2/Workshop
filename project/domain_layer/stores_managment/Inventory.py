@@ -72,7 +72,7 @@ class Inventory:
         product = self.get_product(product_name)
         valid_amount = -1
         if product is not None:
-            valid_amount = product.amount - quantity
+            valid_amount = product.amount - int(quantity)
         return {
             'error': not (valid_amount >= 0),
             'error_msg': 'Sorry, we have only {} pieces of the product {}.'.format(str(product.amount), product_name),

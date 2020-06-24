@@ -173,7 +173,6 @@ class StoresManager:
         #  if user dont have enough money according to 'price' will return false
 
         #  user will also get a description for his purchase
-
         for store_id in cart.baskets.keys():
             basket = cart.get_basket(store_id)
             for product in basket.products.keys():
@@ -527,5 +526,6 @@ class StoresManager:
         stores = self.data_handler.get_all_stores()
         for store in stores:
             self.stores[store.store_id] = store
+
 
 

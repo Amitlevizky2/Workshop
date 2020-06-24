@@ -15,7 +15,7 @@ def add(id, store_id):
         proxy.get_session().add(poli)
         proxy.get_session().commit()
     except SQLAlchemyError as e:
-        error = str(e.__dict__['orig'])
+        error = str(type(e))
         return error
 
 

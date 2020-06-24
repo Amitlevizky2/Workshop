@@ -42,7 +42,7 @@ class StoreORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(type(e))
             return error
 
 
@@ -147,4 +147,11 @@ class StoreORM(Base):
         for policy in self.policies:
             policies[policy.policy_id] = policy.createObject()
         store.purchase_policies = policies
+        Base.metadata.create_all(engine, [Base.metadata.tables['purchases']], checkfirst=True)
+        orms = proxy.get_handler_session().query(PurchaseORM).filter_by(store_id=self.id)
+        purchases = []
+        for p in orms:
+            purchase = p.createObject()
+            purchases.append(purchase)
+        store.sales = purchases
         return store

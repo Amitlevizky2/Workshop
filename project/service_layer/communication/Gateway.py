@@ -313,8 +313,8 @@ def edit_conditional_product_discount():
 @app.route('/edit_visible_product_discount', methods=['POST', 'GET'])
 def edit_visible_product_discount():
     message = request.get_json()
-    answer = stores_manager.edit_visible_discount_to_products(message['store_id'], message['discount_id'],
-                                                              message['username'], message['start_date'],
+    answer = stores_manager.edit_visible_discount_to_products(message['store_id'],
+                                                              message['username'], message['discount_id'], message['start_date'],
                                                               message['end_date'], message['percent'],
                                                               message['products'])
     return answer

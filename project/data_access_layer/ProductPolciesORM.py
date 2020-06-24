@@ -1,6 +1,7 @@
 import datetime
 from flask import Flask
 from sqlalchemy import Table, Column, Integer, ForeignKey, String, update
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from project.data_access_layer import Base, session, engine, proxy
 from project.data_access_layer.PolicyORM import PolicyORM
@@ -30,7 +31,7 @@ class ProductPoliciesORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(type(e))
             return error
 
 
