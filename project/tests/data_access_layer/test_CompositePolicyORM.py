@@ -65,7 +65,6 @@ class CompositePolicyORM(Base):
         from project.domain_layer.stores_managment.PurchasesPolicies.PurchaseCompositePolicy import \
             PurchaseCompositePolicy
         to_apply = []
-        Base.metadata.create_all(engine, [Base.metadata.tables['Policy_in_composite']], checkfirst=True)
         res = proxy.get_session().query(PoliciesInCompositeORM).filter(PoliciesInCompositeORM.policy_id==self.policy_id).filter(PoliciesInCompositeORM.store_id==self.store_id)
         for poli in res:
             pol = poli.createObject()

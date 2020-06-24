@@ -67,31 +67,23 @@ class DiscountORM(Base):
     def createObject(self):
         dis = None
         from project.data_access_layer.VisibleProductDiscountORM import VisibleProductDiscountORM
-        Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscount']], checkfirst=True)
         res = proxy.get_session().query(VisibleProductDiscountORM).filter_by(discount_id=self.discount_id).filter_by(store_id=self.store_id).count()
         if res == 1:
             dis = proxy.get_session().query(VisibleProductDiscountORM).filter_by(discount_id=self.discount_id).filter_by(store_id=self.store_id).first()
         else:
             from project.data_access_layer.ConditionalProductDiscountORM import ConditionalProductDiscountsORM
-            Base.metadata.create_all(engine, [Base.metadata.tables['conditionalproductdiscounts']], checkfirst=True)
             res = proxy.get_session().query(ConditionalProductDiscountsORM).filter_by(discount_id=self.discount_id).filter_by(store_id=self.store_id).count()
             if res == 1:
                 dis = proxy.get_session().query(ConditionalProductDiscountsORM).filter_by(discount_id = self.discount_id).filter_by(store_id=self.store_id).first()
             else:
                 from project.data_access_layer.ConditionalStoreDiscountORM import ConditionalStoreDiscountORM
-                Base.metadata.create_all(engine, [Base.metadata.tables['conditionalstorediscounts']], checkfirst=True)
                 res = proxy.get_session().query(ConditionalStoreDiscountORM).filter_by(discount_id=self.discount_id).filter_by(store_id=self.store_id).count()
                 if res == 1:
                     dis = proxy.get_session().query(ConditionalStoreDiscountORM).filter_by(discount_id =self.discount_id).filter_by(store_id=self.store_id).first()
                 else:
                     from project.data_access_layer.CompositeDiscountORM import CompositeDiscountORM
-                    Base.metadata.create_all(engine, [Base.metadata.tables['CompositeDiscounts']], checkfirst=True)
                     res = proxy.get_session().query(CompositeDiscountORM).filter_by(discount_id=self.discount_id).filter_by(store_id=self.store_id).count()
                     if res == 1:
                         dis = proxy.get_session().query(CompositeDiscountORM).filter_by(
                             discount_id= self.discount_id).filter_by(store_id=self.store_id).first()
         return dis.createObject()
-
-
-
-

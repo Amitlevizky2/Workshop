@@ -104,7 +104,6 @@ class StoreORM(Base):
         store.purchases_idx = self.purchases_idx
         owners = []
         appointed_by = {}
-        Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
         for owner in self.owned_by:
             owners.append(owner.username)
             if owner.username not in appointed_by.keys():
@@ -115,12 +114,10 @@ class StoreORM(Base):
             else:
                 appointed_by[owner.appointed_by].append(owner.username)
         store.store_owners = owners
-        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
         managers = {}
         for manager in self.managed_by:
             name = manager.username
             appointed_by[manager.appointed_by].append(name)
-            Base.metadata.create_all(engine, [Base.metadata.tables['managerpermissions']], checkfirst=True)
             permissions = proxy.get_session().query(ManagerPermissionORM).filter_by(username=name)
             managers[name] = []
             for permission in permissions:
@@ -129,30 +126,24 @@ class StoreORM(Base):
         store.appointed_by =appointed_by
         discounts = {}
         # print(dis)
-        Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscount']], checkfirst=True)
         for discount in self.vis:
             discounts[discount.discount_id] = discount.createObject()
-        Base.metadata.create_all(engine, [Base.metadata.tables['conditionalproductdiscounts']], checkfirst=True)
         for discount in self.condprod:
             discounts[discount.discount_id] = discount.createObject()
-        Base.metadata.create_all(engine, [Base.metadata.tables['conditionalstorediscounts']], checkfirst=True)
         for discount in self.condstore:
             discounts[discount.discount_id] = discount.createObject()
-        Base.metadata.create_all(engine, [Base.metadata.tables['CompositeDiscounts']], checkfirst=True)
         for discount in self.comp:
             discounts[discount.discount_id] = discount.createObject()
         store.discounts = discounts
         ## inventory
         from project.data_access_layer.ProductORM import ProductORM
         inventory = {}
-        Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
         products = proxy.get_session().query(ProductORM).filter_by(store_id=self.id)
         for product in products:
             prod = product.createObject()
             inventory[product.name] = prod
         store.inventory.products = inventory
         policies = {}
-        Base.metadata.create_all(engine, [Base.metadata.tables['policies']], checkfirst=True)
         for policy in self.policies:
             policies[policy.policy_id] = policy.createObject()
         store.purchase_policies = policies

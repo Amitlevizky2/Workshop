@@ -12,7 +12,7 @@ engeny_path = 'sqlite:///C:\\Users\\Owner\\Desktop\\Sadna_project\\Workshop\\dal
 
 Base = declarative_base()
 # session = sessionmaker()
-engine = create_engine('sqlite:///tradeSystem.db', echo = True)
+engine = create_engine(lielle_path, echo = True)
 # session.configure(bind=engine)
 Session = sessionmaker(bind=engine)
 # Session is a class

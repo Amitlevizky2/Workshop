@@ -29,14 +29,17 @@ class RegisteredUserORM(Base):
 
 
     def add(self):
-        try:
-            Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
-            proxy.get_session().add(self)
-            proxy.get_session().commit()
-        except SQLAlchemyError as e:
-            error = str(e.__dict__)
-            print(error)
-            return error
+        # try:
+        #     Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
+        #     proxy.get_session().add(self)
+        #     proxy.get_session().commit()
+        # except SQLAlchemyError as e:
+        #     error = str(e.__dict__)
+        #     print(error)
+        #     return error
+        Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def make_admin(self):
         self.admin = 1
@@ -52,20 +55,16 @@ class RegisteredUserORM(Base):
         from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
         user = RegisteredUser(self.username, self)
         managed_stores = []
-        Base.metadata.create_all(engine, [Base.metadata.tables['owners']], checkfirst=True)
         for owner in self.owns:
             managed_stores.append(owner.store_id)
-        Base.metadata.create_all(engine, [Base.metadata.tables['managers']], checkfirst=True)
         for manager in self.manages:
             managed_stores.append(manager.store_id)
         user.managed_stores = managed_stores
         notifies =[]
-        Base.metadata.create_all(engine, [Base.metadata.tables['notifications']], checkfirst=True)
         for noti in self.notifications:
             notifies.append(noti.notification)
         user.notifications = notifies
         basks = {}
-        Base.metadata.create_all(engine, [Base.metadata.tables['baskets']], checkfirst=True)
         for basket in self.baskets:
             basks[basket.store_id] = basket.createObject()
         user.cart.baskets = basks

@@ -10,7 +10,7 @@ class Proxy:
             # Try to get the underlying session connection, If you can get it, its up
             connection = self.session.connection()
             return self.session
-        except SQLAlchemyError as e:
+        except Exception as e:
             error = str(e.__dict__)
             print(error)
             return False

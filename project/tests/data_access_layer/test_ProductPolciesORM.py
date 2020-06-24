@@ -51,7 +51,6 @@ class ProductPoliciesORM(Base):
         poli = PurchaseProductPolicy(self.min_amount, self.max_amount, self.policy_id, self.store_id, self)
         prods = {}
         from project.data_access_layer.ProductsInPoliciesORM import ProductsInPoliciesORM
-        Base.metadata.create_all(engine, [Base.metadata.tables['Policy_products']], checkfirst=True)
         res = proxy.get_session().query(ProductsInPoliciesORM).filter(
             ProductsInPoliciesORM.policy_id == self.policy_id).filter(
             ProductsInPoliciesORM.store_id == self.store_id)

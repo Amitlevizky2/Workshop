@@ -27,20 +27,17 @@ class PolicyORM(Base):
     def createObject(self):
         poli = None
         from project.data_access_layer.ProductPolciesORM import ProductPoliciesORM
-        Base.metadata.create_all(engine, [Base.metadata.tables['productpolicies']], checkfirst=True)
         res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).count()
         if res == 1:
             from project.data_access_layer.ProductPolciesORM import ProductPoliciesORM
             poli = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).first()
         else:
             from project.data_access_layer.StorePolicyORM import StorePolicyORM
-            Base.metadata.create_all(engine, [Base.metadata.tables['storepolicies']], checkfirst=True)
             res = proxy.get_session().query(StorePolicyORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).count()
             if res == 1:
                 poli = proxy.get_session().query(StorePolicyORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).first()
             else:
                 from project.data_access_layer.CompositePolicyORM import CompositePolicyORM
-                Base.metadata.create_all(engine, [Base.metadata.tables['CompositePolicies']], checkfirst=True)
                 res = proxy.get_session().query(CompositePolicyORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).count()
                 if res == 1:
                     poli = proxy.get_session().query(CompositePolicyORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).first()
