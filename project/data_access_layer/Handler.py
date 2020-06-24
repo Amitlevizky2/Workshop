@@ -17,6 +17,8 @@ from sqlalchemy.orm import sessionmaker
 from project.data_access_layer.Proxy import Proxy
 
 class Handler:
+    def __init__(self, publisher):
+        self.publisher = publisher
 
     def init_db(self):
         path = 'sqlite:///C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db'
@@ -128,4 +130,6 @@ class Handler:
                                 'owners': stat.owners}
         today = str(date.today())
         orm_today = proxy.get_session().query(StatsORM).filter_by(date=today).first()
-        return Statistics(orm_today)
+        stat = Statistics(orm_today)
+        stat.set_publisher(self.publisher)
+        return stat

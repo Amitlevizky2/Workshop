@@ -11,11 +11,11 @@ from project.data_access_layer import engine
 
 class Initializer:
     def __init__(self, sio):
-        self.data_handler = Handler()
+        self.publisher = Publisher(sio)
+        self.data_handler = Handler(self.publisher)
         self.users_manager = UsersManagerInterface(self.data_handler)
         self.stores_manager = StoresManagerInterface(self.users_manager, self.data_handler)
         self.purchase_manager = PurchaseManager(self.users_manager, self.stores_manager)
-        self.publisher = Publisher(sio)
         self.users_manager.set_stores_manager(self.stores_manager)
         self.stores_manager.bound_publisher(self.publisher)
         self.bound_managers()
