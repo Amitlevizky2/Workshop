@@ -34,7 +34,7 @@ class PurchaseManager:
 
     # user = username
     def buy(self, user, cc_number, cc_month, cc_year, cc_holder, cc_ccv, cc_id, address, city, country, zip):
-        try:
+        # try:
             answer, data = self.user_manager.get_cart(user)
             if answer is False:
                 return {'error': not answer,
@@ -103,9 +103,9 @@ class PurchaseManager:
                 return {'error': True,
                         'error_msg': 'Undefined - get_cart_description'}
             transaction.commit()
-        except:
-            print('AFTER PAYYYYYYYYYYY')
-            transaction.abort()
+        # except:
+        #     print('AFTER PAYYYYYYYYYYY')
+        #     transaction.abort()
 
     def connect(self):
         return True
@@ -137,10 +137,10 @@ class PurchaseManager:
             }
 
     def add_purchases_to_stores(self, purchases):
-        for store_id in purchases:
-            store = self.store_manager.stores_manager.add_purchase_to_store(store_id, purchases[store_id])
+        for store_id in purchases.keys():
+            self.store_manager.stores_manager.add_purchase_to_store(store_id, purchases[store_id])
 
     def update_purchase_number(self, purchases, order_number: int, supply_number: int):
-        for purchase in purchases:
+        for purchase in purchases.values():
             purchase.set_order_number(order_number)
             purchase.set_supply_number(supply_number)

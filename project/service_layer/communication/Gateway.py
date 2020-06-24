@@ -1,4 +1,7 @@
 import eventlet
+
+
+print(eventlet.version_info)
 import os
 import json
 import jsonpickle
@@ -9,7 +12,6 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask_cors import CORS
 
 from project.service_layer.Initializer import Initializer
-
 eventlet.monkey_patch()
 app = Flask(__name__)
 CORS(app)
@@ -143,6 +145,11 @@ def buy():
                                 message['country'], message['zip'])
     print('buy result: ')
     print(data)
+    if data is None:
+        data = {
+            'error':True,
+            'error_msg':'payment was declined'
+        }
     return jsonify(data)
 
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import jsons
-from spellchecker import SpellChecker
+# from spellchecker import SpellChecker
 
 from project import logger
 from project.domain_layer.communication_managment import Publisher
@@ -15,7 +15,7 @@ class StoresManagerInterface:
     def __init__(self, users_manager, data_handler):
         self.stores_manager = StoresManager(data_handler)
         self.stores_getters = StoresGetters(self.stores_manager)
-        self.spell_checker = SpellChecker()
+        # self.spell_checker = SpellChecker()
         self.users_manager = users_manager
         self.publisher = None
 
@@ -31,9 +31,13 @@ class StoresManagerInterface:
 
         """
         logger.log("called search with search term:%s, categories:%s, key words:%s", search_term, categories, key_words)
-        return self.stores_manager.search(self.spell_checker.correction(search_term),
-                                          [self.spell_checker.correction(word) for word in categories],
-                                          [self.spell_checker.correction(word) for word in key_words])
+        return self.stores_manager.search(search_term,
+                                          [word for word in categories],
+                                          [word for word in key_words])
+
+        # return self.stores_manager.search(self.spell_checker.correction(search_term),
+        #                                   [self.spell_checker.correction(word) for word in categories],
+        #                                   [self.spell_checker.correction(word) for word in key_words])
 
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
         store_id = int(store_id)
