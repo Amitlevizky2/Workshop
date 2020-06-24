@@ -20,8 +20,7 @@ class TestVisibleORM(TestCase):
 
     @classmethod
     def setUpClass(self) -> None:
-        if path.exists(lielle_path):
-            os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
+        os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
 
     def setUp(self) -> None:
         self.store = StoreORM(id = 3456, name = "test_me", discount_idx = 0, purchases_idx = 0)
@@ -40,7 +39,7 @@ class TestVisibleORM(TestCase):
         res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
         proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).delete()
         proxy.get_session().commit()
-        self.assertEqual(num+1, res)
+        self.assertEqual(num, res)
 
     def test_add_fail(self):
         self.orm.add()

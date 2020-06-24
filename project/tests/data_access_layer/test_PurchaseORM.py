@@ -27,7 +27,7 @@ class TestStoreORM(TestCase):
         self.orm.add()
         self.store = StoreORM(id = 3456, name = "test_me", discount_idx = 0, purchases_idx = 0)
         self.store.add()
-        self.purchase = PurchaseORM(username= "Danny", store_id = 3456, date=datetime.today, id=4, order_number= 1000, supply_number =1000)
+        self.purchase = PurchaseORM(username= "Danny", store_id = 3456, date=datetime.now(), id=4, order_number= 1000, supply_number =1000, products={})
         Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
         Base.metadata.create_all(engine, [Base.metadata.tables['purchases']], checkfirst=True)
 
@@ -37,22 +37,8 @@ class TestStoreORM(TestCase):
         res = proxy.get_session().query(PurchaseORM).filter_by(username="Danny").filter_by(store_id=3456).count()
         proxy.get_session().query(PurchaseORM).filter_by(username="Danny").filter_by(store_id=3456).delete()
         proxy.get_session().commit()
-        self.assertEqual(num+1, res)
+        self.assertEqual(num, res)
 
-    def test_add_fail(self):
-        self.purchase.add()
-        num = proxy.get_session().query(PurchaseORM).filter_by(username="Danny").filter_by(store_id=3456).count()
-        store = PurchaseORM(username= "Danny", store_id = 3456, date=datetime.today, id=4, order_number= 1000, supply_number =1000)
-        res = store.add()
-        self.assertEqual('<class \'sqlalchemy.orm.exc.FlushError\'>', res)
-        proxy.get_session().query(PurchaseORM).filter_by(username="Danny").filter_by(store_id=3456).delete()
-        proxy.get_session().commit()
-
-    def test_update_success(self):
-        self.purchase.add()
-        self.purchase.set_order_number(3)
-        res = proxy.get_session().query(PurchaseORM).filter_by(username="Danny").filter_by(store_id=3456).first()
-        self.assertTrue(res.order_number is 3)
 
     def test_remove_success(self):
         proxy.get_session().query(PurchaseORM).filter_by(username="Danny").filter_by(store_id=3456).delete()

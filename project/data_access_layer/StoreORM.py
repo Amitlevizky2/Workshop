@@ -41,7 +41,7 @@ class StoreORM(Base):
             Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
             proxy.get_session().add(self)
             proxy.get_session().commit()
-        except SQLAlchemyError as e:
+        except Exception as e:
             session.rollback()
             error = str(type(e))
             # print(error)
