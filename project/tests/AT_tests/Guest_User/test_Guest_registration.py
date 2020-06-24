@@ -2,7 +2,7 @@ import unittest
 from project.tests.AT_tests.test_env.Driver import Driver
 import os
 
-happy = False
+
 class Register(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -16,12 +16,12 @@ class Register(unittest.TestCase):
     def test_happy_registration(self):
         res1 = self.service.register("username", "password")
         self.assertTrue(res1[0])
-        happy = True
+
 
     def test_sad_registration(self):
-        if not happy:
-            res1 = self.service.register("username", "password")
-            self.assertTrue(res1[0])
+
+        res1 = self.service.register("username", "password")
+        self.assertTrue(res1[0])
         res2 = self.service.register("username", "password")
 
         self.assertFalse(res2[0])

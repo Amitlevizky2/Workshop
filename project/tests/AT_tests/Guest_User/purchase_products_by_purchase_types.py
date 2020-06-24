@@ -18,18 +18,18 @@ class purchase_products_by_purchase_types(unittest.TestCase):
 
     def test_buy_by_type_purchase_happy(self):
         result = self.service.get_purchase_history()
-
-        self.assertEqual(list(jsons.loads(result[1][0]['products']).keys())[0], "Banana")
+        self.assertIn("Banana",result[1][0].products.keys())
 
     def test_buy_by_type_purchase_sad(self):
         res = self.service.searchProduct("Apple")
         res = jsons.loads(res)
-        first_store_id = list(res)[0]
-        self.service.add_product(res.get(first_store_id)['store_id'], res.get(first_store_id)['search_res'][0]['name'],
+        x=5
+        first_store_id = res['avishop']['store_id']
+        self.service.add_product(first_store_id, res['avishop']['search_res'][0]['name'],
                                  2)
         self.service.buy(654651, 1, 2025, "ani", 545, 31684321, "my house", "atlantis", "ocean", 987654)
         result = self.service.get_purchase_history()
-        self.assertNotIn("apple", list(jsons.loads(result[1][0]['products']).keys()))
+        self.assertNotIn("apple", result[1][0].products.keys())
 
     def test_buy_by_type_purchase_bad(self):
         res = self.service.searchProduct("Banana")

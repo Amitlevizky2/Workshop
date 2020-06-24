@@ -31,14 +31,14 @@ class purchase_products_by_discount_types(unittest.TestCase):
     def test_buy_by_type_purchase_happy(self):
         dis1 = self.service.add_discount_to_product(self.first_store_id,"avi","2018-11-12", "2021-11-12", 30,["Banana"])
         self.service.buy(458053299887,12,2022,"amit levizky",448,2957474,"rager","beersheva","israel",283443)
-        result0,result2 = self.service.get_purchase_history()
-        x=5
+        result0, result2 = self.service.get_purchase_history()
+
         self.assertNotEqual(self.result1[0].products["Banana"]["original_price"], result2[0].products["Banana"]["price_after_disc"])
         self.happy = True
     def test_buy_by_type_purchase_sad(self):
 
-        dis = self.service.add_discount_to_product(self.first_store_id, "Banana", "avi", datetime.datetime(2018, 6, 1),
-                                                   datetime.datetime(2020, 5, 17), 0)
+        dis = self.service.add_discount_to_product(self.first_store_id, "Banana", "avi","2018-11-12",
+                                                   "2021-11-12", 0)
         self.service.buy(458053299887,12,2022,"amit levizky",448,2957474,"rager","beersheva","israel",283443)
         result2 = self.service.get_purchase_history()
         self.assertEqual(self.result1[0].products["Banana"][0].get_price(), result2[0].products["Banana"][0].get_price())

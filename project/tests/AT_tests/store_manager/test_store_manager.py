@@ -19,10 +19,9 @@ class StoreManagerTest(unittest.TestCase):
         self.service.logout()
         self.service.login("new manager", "new pass")
 
-    @classmethod
-    def tearDownClass(cls):
-
-        os.remove("C:\\Users\\Owner\\Desktop\\Sadna_project\\Workshop\\daldal.db")
+    # @classmethod
+    # def tearDown(self):
+    #     os.remove("C:\\Users\\Owner\\Desktop\\Sadna_project\\Workshop\\daldal.db")
 
     def test_manager_action_success(self):
 
