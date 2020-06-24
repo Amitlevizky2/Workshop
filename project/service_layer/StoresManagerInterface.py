@@ -36,7 +36,7 @@ class StoresManagerInterface:
                                           [self.spell_checker.correction(word) for word in key_words])
 
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
-
+        store_id = int(store_id)
         return self.stores_manager.add_purchase_to_store(store_id, purchase)
 
     def search(self, search_term: str = "", categories: [str] = [], key_words: [str] = []):
@@ -45,6 +45,7 @@ class StoresManagerInterface:
     def add_product_to_store(self, store_id: int, user_name: str, product_name: str, product_price: int,
                              product_categories: [str],
                              key_words: [str], amount):
+        store_id = int(store_id)
         logger.log(
             "user %s called add product to store no.%s. product name:%s"
             " product price:%s product categories:%s,key words:%s, amount:%s",
@@ -59,6 +60,7 @@ class StoresManagerInterface:
         }
 
     def appoint_manager_to_store(self, store_id, owner, to_appoint):
+        store_id = int(store_id)
         logger.log("user %s call appoint manager %s to store no.%d", owner, to_appoint, store_id)
         if store_id in self.users_manager.get_managed_stores(owner) and self.users_manager.check_if_registered(
                 to_appoint):
@@ -72,6 +74,7 @@ class StoresManagerInterface:
         }
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
+        store_id = int(store_id)
         logger.log("user %s call appoint owner %s to store no.%d", owner, to_appoint, store_id)
         stores = self.users_manager.get_managed_stores(owner)
         if store_id in stores and self.users_manager.check_if_registered(to_appoint):
@@ -85,6 +88,7 @@ class StoresManagerInterface:
         }
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
+        store_id = int(store_id)
         logger.log("user %s add %s permission to %s in store no.%d", owner, permission, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(
                 owner) and store_id in self.users_manager.get_managed_stores(manager):
@@ -95,6 +99,7 @@ class StoresManagerInterface:
         }
 
     def edit_store_manager_permissions(self, store_id, owner, manager, permissions):
+        store_id = int(store_id)
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permissions, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(
                 owner) and store_id in self.users_manager.get_managed_stores(manager):
@@ -106,6 +111,7 @@ class StoresManagerInterface:
 
     # TODO: DOSE NOT RETURN A VALUE.
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
+        store_id = int(store_id)
         logger.log("user %s remove %s permission to %s in store no.%d", owner, permission, manager, store_id)
         if store_id in self.users_manager.get_managed_stores(
                 owner) and store_id in self.users_manager.get_managed_stores(manager):
@@ -127,6 +133,7 @@ class StoresManagerInterface:
         return self.stores_manager.buy(cart)
 
     def get_sales_history(self, store_id, user) -> [Purchase]:
+        store_id = int(store_id)
         logger.log("user %s get sales history of store no.%d", user, store_id)
         if self.users_manager.check_if_registered(user) and (
                 store_id in self.users_manager.get_managed_stores(user) or self.users_manager.is_admin(user)['data']):
@@ -134,6 +141,7 @@ class StoresManagerInterface:
         return []
 
     def remove_product(self, store_id, product_name, username):
+        store_id = int(store_id)
         return self.stores_manager.remove_product_from_store(store_id, product_name, username)
 
     # def add_discount_to_product(self, store_id, product_name, username, start_date, end_date, percent):
@@ -148,54 +156,71 @@ class StoresManagerInterface:
         :param new_amount: new value
         :return: True if succeed
         """
+        store_id = int(store_id)
+        new_price = int(new_price)
+        new_amount = int(new_amount)
         return self.stores_manager.update_product(store_id, username, product_name, new_price, new_amount)
 
     # TODO: CHANGE RETURN VALS.
     def remove_manager(self, store_id, owner, to_remove):
+        store_id = int(store_id)
         if self.stores_manager.remove_manager(store_id, owner, to_remove):
             self.users_manager.remove_managed_store(to_remove, store_id)
             return True
         return False
 
     def remove_owner(self, store_id, owner, to_remove):
+        store_id = int(store_id)
         return self.stores_manager.remove_owner(store_id, owner, to_remove)
 
     def add_purchase_store_policy(self, store_id: int = None, permitted_user: str = None,
                                   min_amount_products: int = None, max_amount_products: int = None):
         _min_amount_products = int(min_amount_products)
         _max_amount_products = int(max_amount_products)
+        store_id = int(store_id)
         return self.stores_manager.add_purchase_store_policy(store_id, permitted_user, _min_amount_products,
                                                              _max_amount_products)
 
     def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None,
                                     min_amount_products: int = None,
                                     max_amount_products: int = None, products: list = []):
+        store_id = int(store_id)
+
         return self.stores_manager.add_purchase_product_policy(store_id, permitted_user, min_amount_products,
                                                                max_amount_products, products)
 
     def add_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
                                       purchase_policies_id=None,
                                       logic_operator: str = None):
+        store_id = int(store_id)
         return self.stores_manager.add_purchase_composite_policy(store_id, permitted_user, purchase_policies_id, logic_operator)
 
     def add_policy_to_purchase_composite_policy(self, store_id: int = None, permitted_user: str = None,
                                                 composite_id: int = None,
                                                 policy_id: int = None):
+        store_id = int(store_id)
+        policy_id = int(policy_id)
         return self.stores_manager.add_policy_to_purchase_composite_policy(store_id, permitted_user, composite_id,
                                                                            policy_id)
 
     def add_product_to_purchase_product_policy(self, store_id: int = None, policy_id: int = None,
                                                permitted_user: str = None,
                                                product_name: str = None):
+        store_id = int(store_id)
+        policy_id = int(policy_id)
         return self.stores_manager.add_product_to_purchase_product_policy(store_id, policy_id, permitted_user,
                                                                           product_name)
 
     def remove_purchase_policy(self, store_id: int = None, permitted_user: str = None, policy_id: int = None):
+        store_id = int(store_id)
+        policy_id = int(policy_id)
         return self.stores_manager.remove_purchase_policy(store_id, permitted_user, policy_id)
 
     def remove_product_from_purchase_product_policy(self, store_id: int = None, policy_id: int = None,
                                                     permitted_user: str = None,
                                                     product_name: str = None):
+        store_id = int(store_id)
+        policy_id = int(policy_id)
         return self.stores_manager.remove_product_from_purchase_product_policy(store_id, policy_id, permitted_user,
                                                                                product_name)
 
@@ -227,7 +252,8 @@ class StoresManagerInterface:
                                         end_date=None, percent: int = None, products: [str] = None):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = float(percent)
+        _percent = int(percent)
+        store_id = int(store_id)
         return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent,
                                                                 products)
 
@@ -237,11 +263,13 @@ class StoresManagerInterface:
                                             products: list = []):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = float(percent)
+        _percent = int(percent)
         if min_amount:
             min_amount = int(min_amount)
         if num_prods_to_apply:
             num_prods_to_apply = int(num_prods_to_apply)
+        store_id = int(store_id)
+
         return self.stores_manager.add_conditional_discount_to_product(store_id, username, _start_date, _end_date,
                                                                        _percent, min_amount, num_prods_to_apply,
                                                                        products)
@@ -251,17 +279,23 @@ class StoresManagerInterface:
                                           min_price: int = None):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = float(percent)
+        _percent = int(percent)
         _min_price = int(min_price)
+        store_id = int(store_id)
+
         return self.stores_manager.add_conditional_discount_to_store(store_id, username, _start_date, _end_date,
                                                                      _percent, _min_price)
 
     def add_product_to_discount(self, store_id: int = None, permitted_user: str = None, discount_id: int = None,
                                 product_name: str = None):
+        store_id = int(store_id)
+        discount_id = int(discount_id)
         return self.stores_manager.add_product_to_discount(store_id, permitted_user, discount_id, product_name)
 
     def remove_product_from_discount(self, store_id: int = None, permitted_user: str = None,
                                      discount_id: int = None, product_name: str = None):
+        store_id = int(store_id)
+        discount_id = int(discount_id)
         return self.stores_manager.remove_product_from_discount(store_id, permitted_user, discount_id, product_name)
 
     def add_composite_discount(self, store_id: int = None, username: str = None, start_date=None,
@@ -270,6 +304,7 @@ class StoresManagerInterface:
                                discounts_to_apply_id: list = None):  # discounts_products_dict = {discount_id, [products_names]}
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        store_id = int(store_id)
         return self.stores_manager.add_composite_discount(store_id, username, _start_date, _end_date, logic_operator,
                                                           discounts_products_dict, discounts_to_apply_id)
 
@@ -278,6 +313,8 @@ class StoresManagerInterface:
                                           percent: int = None, products=[]):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _percent = int(percent)
+        store_id = int(store_id)
         return self.stores_manager.edit_visible_discount_to_products(store_id, username, discount_id, _start_date,
                                                                      _end_date, percent, products)
 
@@ -287,6 +324,10 @@ class StoresManagerInterface:
                                              products=[]):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        percent = int(percent)
+        nums_to_apply = int(nums_to_apply)
+        min_amount = int(min_amount)
+        store_id = int(store_id)
         return self.stores_manager.edit_conditional_discount_to_product(store_id, discount_id, username, _start_date,
                                                                         _end_date, percent, min_amount, nums_to_apply,
                                                                         products)
@@ -298,8 +339,9 @@ class StoresManagerInterface:
                                            min_price: int = None):
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        _percent = float(percent)
+        _percent = int(percent)
         _min_price = int(min_price)
+        store_id = int(store_id)
         return self.stores_manager.edit_conditional_discount_to_store(store_id, discount_id, username, _start_date,
                                                                       _end_date, _percent,
                                                                       _min_price)

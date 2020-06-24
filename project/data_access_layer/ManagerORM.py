@@ -20,7 +20,7 @@ class ManagerORM(Base):
             proxy.get_session().add(manager)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(type(e))
             return error
 
     def remove(self):

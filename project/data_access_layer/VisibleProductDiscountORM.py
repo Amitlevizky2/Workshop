@@ -33,14 +33,14 @@ class VisibleProductDiscountORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(type(e))
             return error
 
 
     def createObject(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.VisibleProductDiscount import \
             VisibleProductDiscount
-        visdis = VisibleProductDiscount(self.start_date, self.end_date, self.percent, self.store_id, self)
+        visdis = VisibleProductDiscount(self.start_date, self.end_date, (self.percent*100), self.store_id, self)
         visdis.set_id(self.discount_id)
         prods = {}
         res = proxy.get_session().query(ProductsInDiscountsORM).filter(ProductsInDiscountsORM.discount_id==self.discount_id).filter(ProductsInDiscountsORM.store_id==self.store_id)

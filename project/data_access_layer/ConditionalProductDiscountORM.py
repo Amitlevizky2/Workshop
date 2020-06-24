@@ -39,7 +39,7 @@ class ConditionalProductDiscountsORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(type(e))
             return error
 
 
@@ -54,7 +54,7 @@ class ConditionalProductDiscountsORM(Base):
     def createObject(self):
         from project.domain_layer.stores_managment.DiscountsPolicies.ConditionalProductDiscount import \
             ConditionalProductDiscount
-        condpdis = ConditionalProductDiscount(self.start_date, self.end_date, self.percent, self.min_amount, self.num_products_to_apply, self.store_id, self)
+        condpdis = ConditionalProductDiscount(self.start_date, self.end_date, (self.percent*100), self.min_amount, self.num_products_to_apply, self.store_id, self)
         condpdis.set_id(self.discount_id)
         prods = {}
         res = proxy.get_session().query(ProductsInDiscountsORM).filter(

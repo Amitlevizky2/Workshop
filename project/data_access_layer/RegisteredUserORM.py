@@ -7,7 +7,7 @@ from project.data_access_layer import Base, session, engine, proxy
 
 
 #from project.data_access_layer.OwnerORM import OwnerORM
-
+from project.data_access_layer.PurchaseORM import PurchaseORM
 
 
 def find_by_username(username):
@@ -29,14 +29,17 @@ class RegisteredUserORM(Base):
 
 
     def add(self):
-        try:
-            Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
-            proxy.get_session().add(self)
-            proxy.get_session().commit()
-        except SQLAlchemyError as e:
-            error = str(e.__dict__)
-            print(error)
-            return error
+        # try:
+        #     Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
+        #     proxy.get_session().add(self)
+        #     proxy.get_session().commit()
+        # except SQLAlchemyError as e:
+        #     error = str(e.__dict__)
+        #     print(error)
+        #     return error
+        Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
+        proxy.get_session().add(self)
+        proxy.get_session().commit()
 
     def make_admin(self):
         self.admin = 1
@@ -65,5 +68,13 @@ class RegisteredUserORM(Base):
         for basket in self.baskets:
             basks[basket.store_id] = basket.createObject()
         user.cart.baskets = basks
-        ##ADD PURCHASE LIST?
+        if self.admin is 1:
+            user.is_admin = True
+        Base.metadata.create_all(engine, [Base.metadata.tables['purchases']], checkfirst=True)
+        orms = proxy.get_handler_session().query(PurchaseORM).filter_by(username=self.username)
+        purchases = []
+        for p in orms:
+            purchase = p.createObject()
+            purchases.append(purchase)
+        user.purchase_history = purchases
         return user

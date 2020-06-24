@@ -68,10 +68,10 @@ class Discount(ABC):
         return self.products_in_discount.keys()
 
     def is_valid_start_date(self, _date):
-        return _date > date.today()
+        return _date > datetime.today()
 
     def is_valid_end_date(self, end_date):
-        return end_date > self.start and end_date > date.today()
+        return end_date > self.start and end_date > datetime.today()
 
     def is_valid_percent(self, percent):
         return 0 <= percent <= 100

@@ -48,7 +48,7 @@ class CompositeDiscountORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
+            error = str(type(e))
             return error
 
     def get_logic_operator(self, logic_operator_str:str):
