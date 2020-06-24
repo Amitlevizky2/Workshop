@@ -1,80 +1,59 @@
-from flask import Flask
-from sqlalchemy import Table, Column, Integer, ForeignKey, String, exc
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import relationship
+import os
+from unittest import TestCase
 
-from project.data_access_layer import Base, session, engine, proxy
+from project.data_access_layer import *
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
+from project.data_access_layer.BasketORM import BasketORM
 
-#from project.data_access_layer.OwnerORM import OwnerORM
-from project.data_access_layer.PurchaseORM import PurchaseORM
-
-
-def find_by_username(username):
-    return proxy.get_session().query(RegisteredUserORM).filter_by(username=username).first()
+from project.data_access_layer.OwnerORM import OwnerORM
+from project.data_access_layer.ManagerORM import ManagerORM
+from project.data_access_layer.StoreORM import StoreORM
+from project.data_access_layer.PolicyORM import PolicyORM
 
 
 
-class RegisteredUserORM(Base):
-    from project.data_access_layer.UserNotificationsORM import UserNotificationORM
 
-    from project.data_access_layer.StoreORM import StoreORM
-    __tablename__ = 'regusers'
-    username = Column(String, primary_key=True)
-    admin = Column(Integer)
-    baskets = relationship('BasketORM', back_populates="user")
-    notifications = relationship('UserNotificationORM')
-    owns = relationship('OwnerORM', foreign_keys="OwnerORM.username")
-    manages = relationship("ManagerORM", foreign_keys="ManagerORM.username")
+class TestRegORM(TestCase):
 
+    @classmethod
+    def setUpClass(self) -> None:
+        os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
 
-    def add(self):
-        # try:
-        #     Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
-        #     proxy.get_session().add(self)
-        #     proxy.get_session().commit()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__)
-        #     print(error)
-        #     return error
+    def setUp(self) -> None:
+        self.orm = RegisteredUserORM(username="Danny", admin=0)
         Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
-        proxy.get_session().add(self)
+
+
+    def test_add_success(self):
+        num = proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").count()
+        self.orm.add()
+        res = proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").count()
+        proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").delete()
+        proxy.get_session().commit()
+        self.assertEqual(num+1, res)
+
+    def test_add_fail(self):
+        self.orm.add()
+        num = proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").count()
+        user = RegisteredUserORM(username='Danny')
+        res = user.add()
+        self.assertEqual('<class \'sqlalchemy.orm.exc.FlushError\'>', res)
+        proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").delete()
         proxy.get_session().commit()
 
-    def make_admin(self):
-        self.admin = 1
-        proxy.get_session().commit()
+    def test_update_success(self):
+        self.orm.add()
+        self.orm.make_admin()
+        res = proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").first()
+        self.assertTrue(res.admin is 1)
 
-    def add_notification(self, username, message):
-        from project.data_access_layer.UserNotificationsORM import UserNotificationORM
-        notif = UserNotificationORM(username=username, notification=message)
-        proxy.get_session().add(notif)
+    def test_remove_success(self):
+        proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").delete()
         proxy.get_session().commit()
+        res = proxy.get_session().query(RegisteredUserORM).filter_by(username="Danny").count()
+        self.assertTrue(res == 0)
 
-    def createObject(self):
-        from project.domain_layer.users_managment.RegisteredUser import RegisteredUser
-        user = RegisteredUser(self.username, self)
-        managed_stores = []
-        for owner in self.owns:
-            managed_stores.append(owner.store_id)
-        for manager in self.manages:
-            managed_stores.append(manager.store_id)
-        user.managed_stores = managed_stores
-        notifies =[]
-        for noti in self.notifications:
-            notifies.append(noti.notification)
-        user.notifications = notifies
-        basks = {}
-        for basket in self.baskets:
-            basks[basket.store_id] = basket.createObject()
-        user.cart.baskets = basks
-        if self.admin is 1:
-            user.is_admin = True
-        Base.metadata.create_all(engine, [Base.metadata.tables['purchases']], checkfirst=True)
-        orms = proxy.get_handler_session().query(PurchaseORM).filter_by(username=self.username)
-        purchases = []
-        for p in orms:
-            purchase = p.createObject()
-            purchases.append(purchase)
-        user.purchase_history = purchases
-        return user
+
+
+

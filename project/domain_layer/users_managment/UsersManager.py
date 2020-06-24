@@ -263,6 +263,7 @@ class UsersManager:
         users = self.data_handler.get_all_regusers()
         for user in users:
             self.reg_user_list[user.username] = user
+        self.admins = self.get_admins()
 
     def get_today_stats(self):
         return jsons.dumps({
@@ -288,5 +289,5 @@ class UsersManager:
             return jsons.dumps({'error': False, 'data': list(self.reg_user_list.keys())})
         return jsons.dumps({'error': True, 'error_msg': 'User {} is not admin!'.format(admin)})
 
-    def get_admin(self):
-        return self.data_handler.get_admin()
+    def get_admins(self):
+        return self.data_handler.get_admins()

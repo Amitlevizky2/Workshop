@@ -42,8 +42,11 @@ class StoreORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
+            session.rollback()
             error = str(type(e))
+            # print(error)
             return error
+
 
 
     def appoint_owner(self, appointed_by, owner):
@@ -129,7 +132,7 @@ class StoreORM(Base):
         store.appointed_by =appointed_by
         discounts = {}
         # print(dis)
-        Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscount']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['visibleProductDiscounts']], checkfirst=True)
         for discount in self.vis:
             discounts[discount.discount_id] = discount.createObject()
         Base.metadata.create_all(engine, [Base.metadata.tables['conditionalproductdiscounts']], checkfirst=True)

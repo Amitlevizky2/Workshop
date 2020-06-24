@@ -5,7 +5,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from project.data_access_layer import Base, session, engine, proxy
-from project.data_access_layer.ProductsInPurchasesORM import ProductsInPurchasesORM
 from project.domain_layer.external_managment.Purchase import Purchase
 
 
@@ -25,6 +24,7 @@ class PurchaseORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
+            session.rollback()
             error = str(type(e))
             return error
 

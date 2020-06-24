@@ -15,6 +15,7 @@ def add(id, store_id):
         proxy.get_session().add(poli)
         proxy.get_session().commit()
     except SQLAlchemyError as e:
+        session.rollback()
         error = str(type(e))
         return error
 
@@ -27,7 +28,7 @@ class PolicyORM(Base):
     def createObject(self):
         poli = None
         from project.data_access_layer.ProductPolciesORM import ProductPoliciesORM
-        Base.metadata.create_all(engine, [Base.metadata.tables['productpolicies']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['productspolicies']], checkfirst=True)
         res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id=self.policy_id).filter_by(store_id=self.store_id).count()
         if res == 1:
             from project.data_access_layer.ProductPolciesORM import ProductPoliciesORM

@@ -24,5 +24,6 @@ class ProductsInDiscountsORM(Base):
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
+            session.rollback()
             error = str(type(e))
             return error

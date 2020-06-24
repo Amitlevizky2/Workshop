@@ -211,4 +211,4 @@ class UsersManagerInterface:
         return self.user_manager.get_all_users(admin)
 
     def get_admin(self):
-        self.user_manager.get_admin()
+        self.user_manager.get_admins()

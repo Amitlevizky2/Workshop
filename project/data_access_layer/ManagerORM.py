@@ -20,6 +20,7 @@ class ManagerORM(Base):
             proxy.get_session().add(manager)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
+            session.rollback()
             error = str(type(e))
             return error
 

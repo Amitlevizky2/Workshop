@@ -1,60 +1,56 @@
-from flask import Flask
-from sqlalchemy import Table, Column, Integer, String, update, ForeignKey
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import relationship
+import os
+from unittest import TestCase
 
-from project.data_access_layer import Base, session, engine, proxy
-from project.domain_layer.stores_managment.Product import Product
+from project.data_access_layer import *
+from project.data_access_layer.ProductORM import ProductORM
+from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
 
+from project.data_access_layer.BasketORM import BasketORM
 
-def find_product(name, store_id):
-    return proxy.get_session().query(ProductORM).filter_by(name=name, store_id=store_id).first()
-
-
-def find_product_store_id(name, store_id):
-    return proxy.get_session().query(ProductORM).filter_by(store_id=store_id).first()
-
-class ProductORM(Base):
-    __tablename__ = 'products'
-    name = Column(String, primary_key=True)
-    store_id = Column(Integer, ForeignKey('stores.id'), primary_key=True)
-    categories = Column(String)
-    key_words = Column(String)
-    price = Column(Integer)
-    quantity = Column(Integer)
+from project.data_access_layer.OwnerORM import OwnerORM
+from project.data_access_layer.ManagerORM import ManagerORM
+from project.data_access_layer.StoreORM import StoreORM
+from project.data_access_layer.PolicyORM import PolicyORM
 
 
-    def add(self):
-        try:
-            Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
-            proxy.get_session().add(self)
-            proxy.get_session().commit()
-        except SQLAlchemyError as e:
-            error = str(type(e))
-            return error
+class TestStoreORM(TestCase):
 
+    @classmethod
+    def setUpClass(self) -> None:
+        os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
 
-    def find_product(self, name, store_id):
-        return proxy.get_session().query(ProductORM).filter_by(name=name, store_id=store_id).first()
+    def setUp(self) -> None:
+        self.store = StoreORM(id = 3456, name = "test_me", discount_idx = 0, purchases_idx = 0)
+        self.store.add()
+        self.orm = ProductORM(name= "stuff", store_id= 3456, categories = "", key_words = "", price = 10, quantity = 5)
+        Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)
+        Base.metadata.create_all(engine, [Base.metadata.tables['products']], checkfirst=True)
 
-    def update_product_amount(self, amount):
-        self.quantity = amount
+    def test_add_success(self):
+        num = proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).count()
+        self.orm.add()
+        res = proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).count()
+        proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).delete()
+        proxy.get_session().commit()
+        self.assertEqual(num+1, res)
+
+    def test_add_fail(self):
+        self.orm.add()
+        num = proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).count()
+        store = ProductORM(name= "stuff", store_id= 3456, categories = "", key_words = "", price = 10, quantity = 5)
+        res = store.add()
+        self.assertEqual('<class \'sqlalchemy.orm.exc.FlushError\'>', res)
+        proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).delete()
         proxy.get_session().commit()
 
-    def update_product(self, attribute, updated):
-        if attribute == "categories":
-            self.categories = updated
-        if attribute == "key_words":
-            self.key_words = updated
-        if attribute == "original_price":
-            self.price = updated
-        if attribute == "amount":
-            self.quantity = updated
-        proxy.get_session().commit()
+    def test_update_success(self):
+        self.orm.add()
+        self.orm.update_product_amount(3)
+        res = proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).first()
+        self.assertTrue(res.quantity is 3)
 
-    def delete(self):
-        proxy.get_session().delete(self)
+    def test_remove_success(self):
+        proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).delete()
         proxy.get_session().commit()
-
-    def createObject(self):
-        return Product(self.name, self.price, self.categories, self.key_words, self.quantity, self.store_id, self)
+        res = proxy.get_session().query(ProductORM).filter_by(name="stuff").filter_by(store_id=3456).count()
+        self.assertTrue(res == 0)

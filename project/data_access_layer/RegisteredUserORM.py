@@ -17,8 +17,6 @@ def find_by_username(username):
 
 class RegisteredUserORM(Base):
     from project.data_access_layer.UserNotificationsORM import UserNotificationORM
-
-    from project.data_access_layer.StoreORM import StoreORM
     __tablename__ = 'regusers'
     username = Column(String, primary_key=True)
     admin = Column(Integer)
@@ -27,15 +25,15 @@ class RegisteredUserORM(Base):
     owns = relationship('OwnerORM', foreign_keys="OwnerORM.username")
     manages = relationship("ManagerORM", foreign_keys="ManagerORM.username")
 
-
     def add(self):
         try:
             Base.metadata.create_all(engine, [Base.metadata.tables['regusers']], checkfirst=True)
             proxy.get_session().add(self)
             proxy.get_session().commit()
         except SQLAlchemyError as e:
-            error = str(e.__dict__)
-            print(error)
+            session.rollback()
+            error = str(type(e))
+            #print(error)
             return error
 
     def make_admin(self):

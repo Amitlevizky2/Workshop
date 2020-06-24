@@ -11,6 +11,7 @@ class Proxy:
             connection = self.session.connection()
             return self.session
         except Exception as e:
+            self.session.rollback()
             error = str(e.__dict__)
             print(error)
             return False
@@ -21,4 +22,5 @@ class Proxy:
             connection = self.session.connection()
             return self.session
         except:
+            self.session.rollback()
             return False
