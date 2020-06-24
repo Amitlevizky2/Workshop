@@ -264,6 +264,7 @@ class UsersManager:
         for user in users:
             self.reg_user_list[user.username] = user
         self.admins = self.get_admins()
+        self.stats = self.data_handler.get_stats()
 
     def get_today_stats(self):
         return jsons.dumps({
