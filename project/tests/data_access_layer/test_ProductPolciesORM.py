@@ -1,4 +1,5 @@
 import os
+from os import path
 from unittest import TestCase
 
 from project.data_access_layer import *
@@ -19,7 +20,8 @@ class TestVisibleORM(TestCase):
 
     @classmethod
     def setUpClass(self) -> None:
-        os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
+        if path.exists(lielle_path):
+            os.remove('C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db')
 
     def setUp(self) -> None:
         self.store = StoreORM(id = 3456, name = "test_me", discount_idx = 0, purchases_idx = 0)
