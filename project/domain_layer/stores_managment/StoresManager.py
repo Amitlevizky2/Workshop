@@ -188,9 +188,9 @@ class StoresManager:
     def get_sales_history(self, store_id, user, is_admin):
         history = self.get_store(store_id).get_sales_history(user, is_admin)
         if history['error'] is False:
-            if history['data'][0] is None:
+            if history['data'].__len__() == 0:
                 purcs = self.data_handler.find_store_purchases(store_id)
-                if purcs[0] is None:
+                if purcs == 0:
                     history['data'] = []
                     return history
                 history['data'] = purcs

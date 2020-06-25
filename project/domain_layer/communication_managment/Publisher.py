@@ -68,7 +68,7 @@ class Publisher:
         :return:
         """
         appointment_message = 'Dear {}, ' \
-                              'you are appointed as a store owner, of store: {}.'
+                              'you are appointed as a store owner of store: {}.'
         message = 'Dear {}, ' \
                   'your store owner appointment of store: {} was removed and is no longer valid.'
         if update_type == 'appoint':
@@ -88,9 +88,9 @@ class Publisher:
         :return:
         """
         appointment_message = 'Dear {}, ' \
-                              'you are appointed as a store manager, of store: {}.'
+                              'you are appointed as a store manager of store: {}.'
         changed_message = 'Dear {}, ' \
-                          'your permissions as store manager of store: {}, where changed.'
+                          'your permissions as store manager of store: {} where changed.'
         message = 'Dear {}, ' \
                   'your store manager appointment of store: {} was removed and is no longer valid.'
         if update_type == 'appoint':
