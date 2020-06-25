@@ -67,7 +67,9 @@ class UsersManager:
         if ans is True:
             if data.loggedin is True:
                 return False, {'error_msg': 'user ' + data.username + ' is already logged in.'}
-            data.loggedin = True
+            data.login()
+            print('user logged is??')
+            print(data.loggedin)
             res, guest_user = self.find_user(username)
             if res is True:
                 # self.merge_carts(data, guest_user.cart)
@@ -117,7 +119,7 @@ class UsersManager:
             if user.loggedin is True:
                 user.logout()
                 return jsons.dumps({'error': False, 'data': self.add_guest_user()})
-            return jsons.dumps({'error': True, 'error_msg': 'User ' + username + ' is not logged in.'})
+            return jsons.dumps({'error': False, 'data': self.add_guest_user()})
         return jsons.dumps({'error': True, 'error_msg': user['error_msg']})
 
     def view_purchases(self, username):

@@ -259,9 +259,9 @@ class StoresManagerInterface:
 
     def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date=None,
                                         end_date=None, percent: int = None, products: [str] = None):
-        print(start_date)
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        print(start_date[0:10])
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         _percent = int(percent)
         store_id = int(store_id)
         return self.stores_manager.add_visible_product_discount(store_id, username, _start_date, _end_date, _percent,
@@ -271,8 +271,8 @@ class StoresManagerInterface:
                                             end_date=None, percent: int = None,
                                             min_amount: int = None, num_prods_to_apply: int = None,
                                             products: list = []):
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         _percent = int(percent)
         if min_amount:
             min_amount = int(min_amount)
@@ -287,8 +287,8 @@ class StoresManagerInterface:
     def add_conditional_discount_to_store(self, store_id: int = None, username: str = None, start_date=None,
                                           end_date=None, percent: int = None,
                                           min_price: int = None):
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         _percent = int(percent)
         _min_price = int(min_price)
         store_id = int(store_id)
@@ -312,8 +312,8 @@ class StoresManagerInterface:
                                end_date=None, logic_operator: str = None,
                                discounts_products_dict: dict = None,
                                discounts_to_apply_id: list = None):  # discounts_products_dict = {discount_id, [products_names]}
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         store_id = int(store_id)
         return self.stores_manager.add_composite_discount(store_id, username, _start_date, _end_date, logic_operator,
                                                           discounts_products_dict, discounts_to_apply_id)
@@ -321,8 +321,8 @@ class StoresManagerInterface:
     def edit_visible_discount_to_products(self, store_id: int = None, username: str = None,
                                           discount_id: int = None, start_date=None, end_date=None,
                                           percent: int = None, products=[]):
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         _percent = int(percent)
         store_id = int(store_id)
         return self.stores_manager.edit_visible_discount_to_products(store_id, username, discount_id, _start_date,
@@ -332,8 +332,8 @@ class StoresManagerInterface:
                                              start_date=None, end_date=None,
                                              percent: int = None, min_amount: int = None, nums_to_apply: int = None,
                                              products=[]):
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         percent = int(percent)
         nums_to_apply = int(nums_to_apply)
         min_amount = int(min_amount)
@@ -347,8 +347,8 @@ class StoresManagerInterface:
                                            start_date=None, end_date=None,
                                            percent: int = None,
                                            min_price: int = None):
-        _start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        _end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        _start_date = datetime.strptime(start_date[0:10], '%Y-%m-%d')
+        _end_date = datetime.strptime(end_date[0:10], '%Y-%m-%d')
         _percent = int(percent)
         _min_price = int(min_price)
         store_id = int(store_id)

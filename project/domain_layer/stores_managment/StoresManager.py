@@ -186,7 +186,16 @@ class StoresManager:
                             'data': 'confirmed'})
 
     def get_sales_history(self, store_id, user, is_admin):
-        return jsons.dump(self.get_store(store_id).get_sales_history(user, is_admin))
+        history = self.get_store(store_id).get_sales_history(user, is_admin)
+        if history['error'] is False:
+            if history['data'][0] is None:
+                purcs = self.data_handler.find_store_purchases(store_id)
+                if purcs[0] is None:
+                    history['data'] = []
+                    return history
+                history['data'] = purcs
+            history['data'] = []
+        return jsons.dump(history)
 
     def get_store_products(self, store_id):
         return jsons.dumps(self.get_store(store_id).get_store_products())
