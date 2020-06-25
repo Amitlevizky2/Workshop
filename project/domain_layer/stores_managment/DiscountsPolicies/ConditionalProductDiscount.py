@@ -42,6 +42,8 @@ class ConditionalProductDiscount(Discount):
         amount_to_buy = self.get_product_amount(product_tup)
         amount_to_commit_discount = self.get_amount_to_commit(amount_to_buy)
         original_product_price = self.get_product_object(product_tup).original_price
+        print(original_product_price)
+        print(self.discount)
         one_product_discount = original_product_price * self.discount
         return one_product_discount * amount_to_commit_discount
 

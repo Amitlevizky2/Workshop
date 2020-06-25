@@ -85,7 +85,7 @@ def add_product():
     message = request.get_json()
     print(message)
     data = users_manager.add_product(message['username'], message['store_id'], message['product_name'],
-                                     message['quantity'])
+                                     int(message['quantity']))
     return jsonify(data)
 
 

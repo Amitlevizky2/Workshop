@@ -234,8 +234,10 @@ class StoresManagerInterface:
     def get_discounts(self, store_id: int = None):
         answer = jsons.loads(self.stores_getters.get_store_discounts("", store_id))
         discounts = answer['desc']
+        print(discounts)
 
         for discount in discounts.keys():
+            print(discounts[discount].keys())
             discounts[discount]['products_in_discount'] = [*discounts[discount]['products_in_discount'].keys()]
         answer['desc'] = discounts
         return jsons.dumps(answer)
