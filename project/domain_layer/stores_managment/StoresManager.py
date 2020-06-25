@@ -35,7 +35,6 @@ def get_logic_operator(logic_operator_str: str):
         return None
 
 
-
 class StoresManager:
     def __init__(self, data_handler):
         self.publisher = None
@@ -120,7 +119,7 @@ class StoresManager:
             to_appoint:
         """
         return jsons.dumps(
-            self.get_store(store_id).appoint_manager(owner, to_appoint, self.users_manager))
+            self.get_store(store_id).appoint_manager(owner, to_appoint, self.users_manager, self.publisher))
 
     def appoint_owner_to_store(self, store_id, owner, to_appoint):
         """
@@ -131,15 +130,15 @@ class StoresManager:
             to_appoint:
         """
         return jsons.dumps(
-            self.get_store(store_id).appoint_owner(owner, to_appoint, self.users_manager))
+            self.get_store(store_id).appoint_owner(owner, to_appoint, self.users_manager, self.publisher))
 
     def add_permission_to_manager_in_store(self, store_id, owner, manager, permission: str):
         return jsons.dumps(
-            self.get_store(store_id).add_permission_to_manager(owner, manager, permission))
+            self.get_store(store_id).add_permission_to_manager(owner, manager, permission, self.publisher))
 
     def remove_permission_from_manager_in_store(self, store_id, owner, manager, permission: str):
         return jsons.dumps(
-            self.get_store(store_id).remove_permission_from_manager(owner, manager, permission))
+            self.get_store(store_id).remove_permission_from_manager(owner, manager, permission, self.publisher))
 
     # TODO: add Publisher
     def add_purchase_to_store(self, store_id: int, purchase: Purchase):
@@ -230,7 +229,7 @@ class StoresManager:
 
     def add_product_to_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
         store = self.get_store(store_id)
-        x=6
+        x = 6
         return store.add_product_to_discount(permitted_user, discount_id, product_name)
 
     def remove_product_from_discount(self, store_id: int, permitted_user: str, discount_id: int, product_name):
@@ -519,13 +518,14 @@ class StoresManager:
 
     def edit_store_manager_permissions(self, store_id, owner, manager, permissions):
         store = self.get_store(store_id)
-        answer = store.edit_store_manager_permissions(owner, manager, permissions)
+        answer = store.edit_store_manager_permissions(owner, manager, permissions, self.publisher)
         print(answer)
         return jsons.dumps(answer)
 
-# {product_name, (Product, amount, updated_price, original_price)}
+    # {product_name, (Product, amount, updated_price, original_price)}
 
     def init_data(self):
+        self.stores_idx = self.data_handler.get_store_index()
         stores = self.data_handler.get_all_stores()
         for store in stores:
             self.stores[store.store_id] = store

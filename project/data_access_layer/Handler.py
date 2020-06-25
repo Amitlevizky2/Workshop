@@ -133,3 +133,7 @@ class Handler:
         stat = Statistics(orm_today)
         stat.set_publisher(self.publisher)
         return stat
+
+    def get_store_index(self):
+        index = proxy.get_session().query(StoreORM).count()
+        return index

@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship, with_polymorphic, polymorphic_union
 
 from project.data_access_layer import Base, session, engine, proxy
+from project.data_access_layer.DBException import DBException
 from project.data_access_layer.ManagerORM import ManagerORM
 from project.data_access_layer.ManagerPermissionORM import ManagerPermissionORM
 from project.data_access_layer.OwnerORM import OwnerORM
@@ -44,10 +45,9 @@ class StoreORM(Base):
         except SQLAlchemyError as e:
             session.rollback()
             error = str(type(e))
-            # print(error)
+            print(error)
             return error
-
-
+            # raise DBException
 
     def appoint_owner(self, appointed_by, owner):
         Base.metadata.create_all(engine, [Base.metadata.tables['stores']], checkfirst=True)

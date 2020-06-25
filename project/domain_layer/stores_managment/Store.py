@@ -41,7 +41,7 @@ class Store:
             self.orm = orm
         self.publisher = None
 
-    def appoint_owner(self, owner, to_appoint, users_manager):
+    def appoint_owner(self, owner, to_appoint, users_manager, publisher):
         """
 
         Args:
@@ -53,7 +53,7 @@ class Store:
         """
         if owner in self.store_owners and \
                 to_appoint not in self.store_owners:
-            ans = self.appoint_owner_helper(owner, to_appoint, users_manager)
+            ans = self.appoint_owner_helper(owner, to_appoint, users_manager, publisher)
             if ans is False:
                 return {'error': True,
                         'error_msg': 'User ' + to_appoint + ' does not exist.'}
@@ -64,7 +64,7 @@ class Store:
             return {'error': True,
                     'error_msg': owner + "is not a store owner or " + to_appoint + " is already owner"}
 
-    def appoint_owner_helper(self, owner, to_appoint, users_manager):
+    def appoint_owner_helper(self, owner, to_appoint, users_manager, publisher):
         self.store_owners.append(to_appoint)
         if users_manager is not None:
             ans, message = users_manager.add_managed_store(to_appoint, self.store_id)
@@ -77,6 +77,7 @@ class Store:
             if to_appoint in self.store_managers:
                 self.store_managers.pop(to_appoint)
             self.appointed_by[owner].append(to_appoint)
+            publisher.store_ownership_update(self.store_id, self.name, [to_appoint], "appoint")
             return True
         return False
 
@@ -135,7 +136,7 @@ class Store:
                     self.appointed_by[owner].remove(to_remove)
                     self.store_managers.pop(to_remove)
                     users_manager.remove_managed_store(to_remove, self.store_id)
-
+                    self.publisher.store_management_update(self.store_id, self.name, [to_remove])
                     return {'error': False,
                             'data': to_remove + ' is not a manager by ' + owner}
 
@@ -166,9 +167,9 @@ class Store:
         if to_remove in self.store_managers.keys():
             self.store_managers.pop(to_remove)
             users_manager.remove_managed_store(to_remove, self.store_id)
-        # publisher.store_ownership_update(self.store_id, self.name, [to_remove])
+            publisher.store_ownership_update(self.store_id, self.name, [to_remove])
 
-    def add_permission_to_manager(self, owner, manager, permission):
+    def add_permission_to_manager(self, owner, manager, permission, publisher):
         """
 
         Args:
@@ -186,6 +187,7 @@ class Store:
                     if permission not in self.store_managers.get(manager):
                         self.store_managers[manager].append(permission)
                         self.orm.add_permission(manager, permission)
+                        publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
                         return {'error': False,
                                 'data': permission + ' has been added to ' + manager}
                     else:
@@ -205,7 +207,7 @@ class Store:
             return {'error': True,
                     'error_msg': owner + ' is not an owner of this store'}
 
-    def remove_permission_from_manager(self, owner, manager, permission):
+    def remove_permission_from_manager(self, owner, manager, permission, publisher):
         """
 
         Args:
@@ -224,6 +226,7 @@ class Store:
                     if permission in self.store_managers.get(manager):
                         self.store_managers[manager].remove(permission)
                         self.orm.remove_permission(manager, permission)
+                        publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
                         return {'error': False,
                                 'data': permission + ' has been removed from ' + manager}
 
@@ -243,7 +246,7 @@ class Store:
             return {'error': True,
                     'error_msg': owner + 'is not an owner of this store'}
 
-    def appoint_manager(self, owner, to_appoint, users_manager):
+    def appoint_manager(self, owner, to_appoint, users_manager, publisher):
         """
 
         Args:
@@ -263,6 +266,7 @@ class Store:
                             'error_msg': 'User ' + to_appoint + ' does not exist.'}
                 self.orm.appoint_manager(owner, to_appoint)
                 self.orm.add_permission(to_appoint, "get_sales_history")
+                publisher.store_management_update(self.store_id, self.name, [to_appoint], 'appoint')
                 return {'error': False,
                         'data': to_appoint + ' has become a manager'}
             else:
@@ -708,7 +712,7 @@ class Store:
     def is_valid_amount(self, product_name, quantity):
         return self.inventory.is_valid_amount(product_name, quantity)
 
-    def edit_store_manager_permissions(self, owner, manager, new_permissions):
+    def edit_store_manager_permissions(self, owner, manager, new_permissions, publisher):
         manager_permissions = self.get_user_permissions(manager)
         if manager_permissions['error'] is True:
             return manager_permissions
@@ -725,11 +729,11 @@ class Store:
         print('remove_permissions: ')
         print(remove_permissions)
         for new_permission in add_permissions:
-            res = self.add_permission_to_manager(owner, manager, new_permission)
+            res = self.add_permission_to_manager(owner, manager, new_permission, publisher)
             if res['error'] is True:
                 return res
         for remove_permission in remove_permissions:
-            res = self.remove_permission_from_manager(owner, manager, remove_permission)
+            res = self.remove_permission_from_manager(owner, manager, remove_permission, publisher)
             if res['error'] is True:
                 return res
         return {
