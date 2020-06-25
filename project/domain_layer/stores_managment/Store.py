@@ -187,7 +187,7 @@ class Store:
                     if permission not in self.store_managers.get(manager):
                         self.store_managers[manager].append(permission)
                         self.orm.add_permission(manager, permission)
-                        publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
+                        # publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
                         return {'error': False,
                                 'data': permission + ' has been added to ' + manager}
                     else:
@@ -226,7 +226,7 @@ class Store:
                     if permission in self.store_managers.get(manager):
                         self.store_managers[manager].remove(permission)
                         self.orm.remove_permission(manager, permission)
-                        publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
+                        # publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
                         return {'error': False,
                                 'data': permission + ' has been removed from ' + manager}
 
@@ -741,6 +741,7 @@ class Store:
             res = self.remove_permission_from_manager(owner, manager, remove_permission, publisher)
             if res['error'] is True:
                 return res
+        publisher.store_management_update(self.store_id, self.name, [manager], 'changed')
         return {
             'error': False,
             'data': 'Permissions have been updated.'

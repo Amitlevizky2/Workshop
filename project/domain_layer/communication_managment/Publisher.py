@@ -19,13 +19,14 @@ class Publisher:
 
     def notify(self, message, user):
         print('publisher message: ' + message)
+        msg = {
+            'messages': [message]
+        }
         if self.users_manager.check_if_loggedin(user):
-            msg = {
-                'messages': [message]
-            }
             self.send_notification(user, msg, 'send')
         else:
             self.users_manager.add_notification(user, message)
+            self.send_notification(user, msg, 'send')
 
     def send_notification(self, username, message, event):
         if event == 'send':
