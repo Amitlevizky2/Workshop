@@ -305,7 +305,7 @@ class StoresManager:
 
     def remove_manager(self, store_id, owner, to_remove):
         store = self.get_store(store_id)
-        return jsons.dumps(store.remove_manager(owner, to_remove, self.users_manager))
+        return jsons.dumps(store.remove_manager(owner, to_remove, self.users_manager, self.publisher))
 
     def remove_owner(self, store_id, owner, to_remove):
         store = self.get_store(store_id)

@@ -5,17 +5,20 @@ from project.service_layer.StoresManagerInterface import StoresManagerInterface
 from project.service_layer.UsersManagerInterface import UsersManagerInterface
 from project.tests.external_systems.test_PaymentSystem import external_paymentstub
 from project.tests.external_systems.test_ShipmentSystemInterface import external_shipmentstub
-
+from project.tests.domain_layer.stores_managment.Stubs.PublisherStub import PublisherStub
 
 class Adapter:
     def __init__(self):
         self.users_manager_interface = UsersManagerInterface(None)
         self.store_manager_interface = StoresManagerInterface(self.users_manager_interface,None)
+        self.store_manager_interface.bound_publisher(PublisherStub(None))
+        self.users_manager_interface.user_manager.bound_publisher_and_stats(PublisherStub(None))
         self.users_manager_interface.set_stores_manager(self.store_manager_interface)
         self.purchase_manager = PurchaseManager(self.users_manager_interface, self.store_manager_interface)
         self.purchase_manager.set_external_payment(external_paymentstub())
         self.purchase_manager.set_external_shipment(external_shipmentstub())
         self.username = self.users_manager_interface.add_guest_user()
+
         print(self.username)
 
     def register(self, username, password):

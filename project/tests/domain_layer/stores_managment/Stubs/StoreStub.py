@@ -16,7 +16,7 @@ class StoreStub(Store):
         # self.init_purchase_policy()
         # self.init_inventory()
 
-    def appoint_owner(self, owner, to_appoint, user_manager):
+    def appoint_owner(self, owner, to_appoint, user_manager,publisher):
         if owner is 'store_owner11' and to_appoint is 'owner':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -25,8 +25,8 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def appoint_owner_helper(self, owner, to_appoint):
-        return super().appoint_owner_helper(owner, to_appoint)
+    def appoint_owner_helper(self, owner, to_appoint,publisher):
+        return super().appoint_owner_helper(owner, to_appoint,publisher)
 
     def remove_owner(self, owner, to_remove, publisher: Publisher, user_manager):
         if owner is 'store_owner11' and to_remove is 'to_remove':
@@ -46,7 +46,7 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def add_permission_to_manager(self, owner, manager, permission):
+    def add_permission_to_manager(self, owner, manager, permission,publisher):
         if owner is 'store_owner11' and manager is 'manager' and permission is 'add_product':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -55,7 +55,7 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def remove_permission_from_manager(self, owner, manager, permission):
+    def remove_permission_from_manager(self, owner, manager, permission,publisher):
         if owner is 'store_owner11' and manager is 'manager' and permission is 'add_product':
             return {'error': False,
                     'error_msg': 'succesfully added'}
@@ -64,7 +64,7 @@ class StoreStub(Store):
             return {'error': True,
                     'error_msg': 'wrong'}
 
-    def appoint_manager(self, owner, to_appoint, user_manager):
+    def appoint_manager(self, owner, to_appoint, user_manager,publisher):
         if owner is 'store_owner11' and to_appoint is 'manager':
             return {'error': False,
                     'error_msg': 'succesfully added'}

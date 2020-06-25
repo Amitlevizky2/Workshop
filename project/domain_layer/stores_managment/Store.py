@@ -117,7 +117,7 @@ class Store:
             return {'error': True,
                     'error_msg': to_remove + ' is not owner of this store'}
 
-    def remove_manager(self, owner, to_remove, users_manager):
+    def remove_manager(self, owner, to_remove, users_manager, publisher):
 
         """
 
@@ -136,7 +136,7 @@ class Store:
                     self.appointed_by[owner].remove(to_remove)
                     self.store_managers.pop(to_remove)
                     users_manager.remove_managed_store(to_remove, self.store_id)
-                    self.publisher.store_management_update(self.store_id, self.name, [to_remove])
+                    publisher.store_management_update(self.store_id, self.name, [to_remove])
                     return {'error': False,
                             'data': to_remove + ' is not a manager by ' + owner}
 
