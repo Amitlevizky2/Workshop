@@ -1,4 +1,5 @@
 import os
+from os import path
 from unittest import TestCase
 
 from project.data_access_layer import *
@@ -38,7 +39,7 @@ class TestVisibleORM(TestCase):
         res = proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).count()
         proxy.get_session().query(ProductPoliciesORM).filter_by(policy_id = 1).filter_by(store_id=3456).delete()
         proxy.get_session().commit()
-        self.assertEqual(num+1, res)
+        self.assertEqual(num, res)
 
     def test_add_fail(self):
         self.orm.add()

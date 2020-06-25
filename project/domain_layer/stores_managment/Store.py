@@ -359,7 +359,7 @@ class Store:
         return {'error': True,
                 'error_msg': user + " don't have this permission"}
 
-    def add_new_sale(self, purchase: Purchase, publisher: Publisher):
+    def add_new_sale(self, purchase: Purchase, publisher):
         """
 
          Args:
@@ -524,6 +524,9 @@ class Store:
             return {'ans': False, 'desc': "The parameters are not valid \n"}
         if not self.check_permission(permitted_user, 'update_policy'):
             return {'ans': False, 'desc': "User dont have permission\n"}
+        if min_amount_products > max_amount_products:
+            return {'error': True, 'error_msg': "Invalid min and max amount\n"}
+
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products
@@ -543,6 +546,8 @@ class Store:
             return {'error': True, 'error_msg': "The parameters are not valid \n"}
         if not self.check_permission(permitted_user, 'update_policy'):
             return {'error': True, 'error_msg': "User dont have permission\n"}
+        if min_amount_products > max_amount_products:
+            return {'error': True, 'error_msg': "Invalid min and max amount\n"}
 
         min_amount = MIN_SIZE if min_amount_products is None else min_amount_products
         max_amount = MAX_SIZE if max_amount_products is None else max_amount_products

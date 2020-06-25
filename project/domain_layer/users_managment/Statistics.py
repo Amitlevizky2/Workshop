@@ -12,7 +12,22 @@ class Statistics:
         self.reg_users = 0
         self.managers = 0
         self.owners = 0
-        self.orm = orm
+        if orm is None:
+            self.orm = StatsORM()
+            self.orm.guests = self.guests
+            self.orm.reg_users = self.reg_users
+            self.orm.managers = self.managers
+            self.orm.owners = self.owners
+            self.orm.add()
+        else:
+            self.orm = orm
+            orm.add()
+        self.stat_by_day[str(date.today())] = {
+            'guests': self.guests,
+            'registered_users': self.reg_users,
+            'managers': self.managers,
+            'owners': self.owners,
+        }
 
 
     def get_today_statistics(self):
@@ -126,7 +141,7 @@ class Statistics:
             self.orm = StatsORM()
             self.orm.date = today
             self.orm.guests = self.guests
-            self.orm.reg_user = self.reg_users
+            self.orm.reg_users = self.reg_users
             self.orm.managers = self.managers
             self.orm.owners = self.owners
             self.orm.add()
