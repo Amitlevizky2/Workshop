@@ -18,13 +18,9 @@ class purchase_History(unittest.TestCase):
         # product = res_dec
         first_store_id = res_dec['avishop']["store_id"]
         x=5
-        self.service.add_product(first_store_id, "Banana", 2)#TODO
+        self.service.add_product(first_store_id, "Banana", 2)
         self.service.buy(458053299887,12,2022,"amit levizky",448,2957474,"rager","beersheva","israel",283443)
 
-    @classmethod
-    def tearDownClass(cls):
-
-        os.remove("C:\\Users\\Owner\\Desktop\\Sadna_project\\Workshop\\daldal.db")
 
     def tearDown(self) -> None:
         self.drop_table('stores')
@@ -60,20 +56,20 @@ class purchase_History(unittest.TestCase):
             Base.metadata.drop_all(engine, [Base.metadata.tables[table_name]])
 
     def test_purchase_happy(self):
-        result0,result1 = self.service.get_purchase_history()
-
-        self.assertEqual(list(result1[0][0].products)[0], "Banana")
+        result1 = self.service.get_purchase_history()
+        result1 = jsons.loads(result1)
+        self.assertTrue(result1)
 
     def test_purchase_bad(self):
         self.service.logout()
-        result0,result1 = self.service.get_purchase_history()
+        result0 = self.service.get_purchase_history()
+        result0 = jsons.loads(result0)
         self.assertTrue(result0)
 
     def test_purchase_sad(self):
-        result0,result1 = self.service.get_purchase_history()
-        self.assertNotEqual(list(result1[0][0].products)[0], "marshmelo")
-
-
+        result1 = self.service.get_purchase_history()
+        result1 = jsons.loads(result1)
+        self.assertFalse(result1['error'])
 
 if __name__ == '__main__':
     unittest.main()

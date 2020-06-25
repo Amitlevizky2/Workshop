@@ -81,7 +81,6 @@ class StoresManager:
 
     def get_store(self, store_id: int) -> Store:
         if store_id in self.stores.keys():
-            print('ytdityetdndidify')
             return self.stores.get(store_id)
         else:
             if store_id is None:

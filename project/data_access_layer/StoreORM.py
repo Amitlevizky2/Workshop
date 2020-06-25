@@ -4,7 +4,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship, with_polymorphic, polymorphic_union
 
 from project.data_access_layer import Base, session, engine, proxy
-from project.data_access_layer.DBException import DBException
 from project.data_access_layer.ManagerORM import ManagerORM
 from project.data_access_layer.ManagerPermissionORM import ManagerPermissionORM
 from project.data_access_layer.OwnerORM import OwnerORM

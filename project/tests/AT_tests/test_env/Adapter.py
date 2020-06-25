@@ -40,7 +40,7 @@ class Adapter:
                                                                  product_categories, key_words, amount)
 
     def searchProduct(self, product="", category=[], key_words=[]):
-        return self.store_manager_interface.search_product(product, category, key_words)
+        return self.store_manager_interface.search(product, category, key_words)
 
     def Open_store(self, store_name):
         return self.store_manager_interface.open_store(self.username, store_name)

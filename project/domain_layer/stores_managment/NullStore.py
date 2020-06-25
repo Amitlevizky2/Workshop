@@ -10,7 +10,7 @@ class NullStore(Store):
     def __init__(self):
         pass
 
-    def appoint_owner(self, owner, to_appoint, store_manager):
+    def appoint_owner(self, owner, to_appoint, store_manager, publisher):
         return {'error': True,
                 'desc': "The store id is not exist"}
 
@@ -18,19 +18,19 @@ class NullStore(Store):
         return {'error': True,
                 'desc': "The store id is not exist"}
 
-    def remove_manager(self, owner, to_remove, user_manager):
+    def remove_manager(self, owner, to_remove, user_manager, publisher):
         return {'error': True,
                 'desc': "The store id is not exist"}
 
-    def add_permission_to_manager(self, owner, manager, permission):
+    def add_permission_to_manager(self, owner, manager, permission, publisher):
         return {'error': True,
                 'desc': "The store id is not exist"}
 
-    def remove_permission_from_manager(self, owner, manager, permission):
+    def remove_permission_from_manager(self, owner, manager, permission, publisher):
         return {'error': True,
                 'desc': "The store id is not exist"}
 
-    def appoint_manager(self, owner, to_appoint, store_manager):
+    def appoint_manager(self, owner, to_appoint, store_manager, publisher):
         return {'error': True,
                 'desc': "The store id is not exist"}
 
@@ -63,7 +63,7 @@ class NullStore(Store):
                 return {'error': True,
                 'desc': "The store id is not exist"}
 
-    def appoint_owner_helper(self, owner, to_appoint, user_manager):
+    def appoint_owner_helper(self, owner, to_appoint, user_manager, publisher):
                 return {'error': True,
                 'desc': "The store id is not exist"}, "Store id not exist"
 
