@@ -6,6 +6,7 @@ from project.data_access_layer.StatsORM import StatsORM
 class Statistics:
     def __init__(self, orm=None):
         self.publisher = None
+        # today = str(date.today())
         self.stat_by_day = {}
         self.guests = 0
         self.reg_users = 0

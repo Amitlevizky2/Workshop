@@ -9,8 +9,7 @@ class PublisherStub(Publisher):
     def set_users_manager(self, users_manager: UsersManager):
         return True
 
-    def notify(self, message, user):
-        return True
+
 
     def send_notification(self, username, message, event):
         return True
@@ -28,4 +27,10 @@ class PublisherStub(Publisher):
         return True
 
     def bound_publisher_and_stats(self):
+        return True
+    def store_management_update(self,store_id, store_name, users: [str], update_type=''):
+        pass
+
+
+    def notify(self,message,user):
         return True

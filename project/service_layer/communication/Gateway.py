@@ -11,6 +11,7 @@ from flask import Flask, jsonify, request, current_app
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask_cors import CORS
 
+from project.data_access_layer import DBException
 from project.service_layer.Initializer import Initializer
 eventlet.monkey_patch()
 app = Flask(__name__)
@@ -97,7 +98,7 @@ def remove_product():
     """
     message = request.get_json()
     data = users_manager.remove_product(message['username'], message['store_id'], message['product_name'],
-                                                message['quantity'])
+                                        message['quantity'])
     return data
 
 
@@ -324,7 +325,8 @@ def edit_conditional_product_discount():
 def edit_visible_product_discount():
     message = request.get_json()
     answer = stores_manager.edit_visible_discount_to_products(message['store_id'],
-                                                              message['username'], message['discount_id'], message['start_date'],
+                                                              message['username'], message['discount_id'],
+                                                              message['start_date'],
                                                               message['end_date'], message['percent'],
                                                               message['products'])
     return answer

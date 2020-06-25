@@ -56,17 +56,46 @@ class Publisher:
             self.notify(notification, owner)
 
     # store owner get notification when their appointment as store owner was removed
-    def store_ownership_update(self, store_id, store_name, users: [str]):
+    def store_ownership_update(self, store_id, store_name, users: [str], update_type=''):
         """
         send "store owner appointment" event notification message
+        :param update_type:
         :param status: add permissions or removed permissions
         :param store_id:
         :param store_name:
         :param users: list of recipients (user names)
         :return:
         """
+        appointment_message = 'Dear {}, ' \
+                              'you are appointed as a store owner, of store: {}.'
         message = 'Dear {}, ' \
                   'your store owner appointment of store: {} was removed and is no longer valid.'
+        if update_type == 'appoint':
+            message = appointment_message
+        for owner in users:
+            notification = message.format(owner, store_name)
+            self.notify(notification, owner)
+
+    def store_management_update(self, store_id, store_name, users: [str], update_type=''):
+        """
+        send "store owner appointment" event notification message
+        :param update_type:
+        :param status: add permissions or removed permissions
+        :param store_id:
+        :param store_name:
+        :param users: list of recipients (user names)
+        :return:
+        """
+        appointment_message = 'Dear {}, ' \
+                              'you are appointed as a store manager, of store: {}.'
+        changed_message = 'Dear {}, ' \
+                          'your permissions as store manager of store: {}, where changed.'
+        message = 'Dear {}, ' \
+                  'your store manager appointment of store: {} was removed and is no longer valid.'
+        if update_type == 'appoint':
+            message = appointment_message
+        if update_type == 'changed':
+            message = changed_message
         for owner in users:
             notification = message.format(owner, store_name)
             self.notify(notification, owner)

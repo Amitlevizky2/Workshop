@@ -39,7 +39,9 @@ class Cart:
         basket = self.get_basket(store_id)
         if basket is None:
             basket = self.add_basket(username, store_id)
+            print(basket.products)
         basket.add_product(product, quantity)
+        print(basket.products)
         return True
 
     def clear_cart(self):
