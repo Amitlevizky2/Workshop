@@ -526,6 +526,9 @@ class StoresManager:
 # {product_name, (Product, amount, updated_price, original_price)}
 
     def init_data(self):
+        self.stores_idx = self.data_handler().get_store_index()
         stores = self.data_handler.get_all_stores()
         for store in stores:
             self.stores[store.store_id] = store
+
+

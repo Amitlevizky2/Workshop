@@ -1,14 +1,33 @@
 from datetime import datetime, date
 
+from project.data_access_layer.StatsORM import StatsORM
+
 
 class Statistics:
-    def __init__(self):
+    def __init__(self, orm=None):
         self.publisher = None
         self.stat_by_day = {}
         self.guests = 0
         self.reg_users = 0
         self.managers = 0
         self.owners = 0
+        if orm is None:
+            self.orm = StatsORM()
+            self.orm.guests = self.guests
+            self.orm.reg_users = self.reg_users
+            self.orm.managers = self.managers
+            self.orm.owners = self.owners
+            self.orm.add()
+        else:
+            self.orm = orm
+            orm.add()
+        self.stat_by_day[str(date.today())] = {
+            'guests': self.guests,
+            'registered_users': self.reg_users,
+            'managers': self.managers,
+            'owners': self.owners,
+        }
+
 
     def get_today_statistics(self):
         """
@@ -22,6 +41,13 @@ class Statistics:
                 'managers': self.managers,
                 'owners': self.owners,
             }
+            self.orm = StatsORM()
+            self.orm.date = today
+            self.orm.guests=self.guests
+            self.orm.reg_users=self.reg_users
+            self.orm.managers=self.managers
+            self.orm.owners= self.owners
+            self.orm.add()
         else:
             # today_stats = self.stat_by_day[date.today()]
             self.stat_by_day[today]['guests'] = self.guests
@@ -74,24 +100,34 @@ class Statistics:
     def add_guests_stats(self):
         self.is_new_day()
         self.guests += 1
+        if self.orm is not None:
+            self.orm.update_guest()
         self.notify_admins()
 
     def remove_guests_stats(self):
         self.guests = self.guests - 1
+        if self.orm is not None:
+            self.orm.reduce_guest()
 
     def add_reg_users(self):
         self.is_new_day()
         self.reg_users += 1
+        if self.orm is not None:
+            self.orm.update_reg_users()
         self.notify_admins()
 
     def add_managers(self):
         self.is_new_day()
         self.managers += 1
+        if self.orm is not None:
+            self.orm.update_managers()
         self.notify_admins()
 
     def add_owners(self):
         self.is_new_day()
         self.owners += 1
+        if self.orm is not None:
+            self.orm.update_owner()
         self.notify_admins()
 
     def is_new_day(self):
@@ -101,6 +137,13 @@ class Statistics:
             self.reg_users = 0
             self.managers = 0
             self.owners = 0
+            self.orm = StatsORM()
+            self.orm.date = today
+            self.orm.guests = self.guests
+            self.orm.reg_users = self.reg_users
+            self.orm.managers = self.managers
+            self.orm.owners = self.owners
+            self.orm.add()
 
     def set_publisher(self, publisher):
         self.publisher = publisher

@@ -1,4 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 
 
 class Proxy:
@@ -14,7 +15,7 @@ class Proxy:
             self.session.rollback()
             error = str(e.__dict__)
             print(error)
-            return False
+            return 404
 
     def get_handler_session(self):
         try:
@@ -23,4 +24,3 @@ class Proxy:
             return self.session
         except:
             self.session.rollback()
-            return False

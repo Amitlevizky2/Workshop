@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy import Table, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
@@ -6,6 +8,7 @@ from project.data_access_layer.ProductORM import ProductORM
 from project.data_access_layer.ProductsInDiscountsORM import ProductsInDiscountsORM
 from project.data_access_layer.PurchaseORM import PurchaseORM
 from project.data_access_layer.RegisteredUserORM import RegisteredUserORM
+from project.data_access_layer.StatsORM import StatsORM
 from project.data_access_layer.StoreORM import StoreORM
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,6 +17,8 @@ from sqlalchemy.orm import sessionmaker
 from project.data_access_layer.Proxy import Proxy
 
 class Handler:
+    def __init__(self, publisher):
+        self.publisher = publisher
 
     def init_db(self):
         path = 'sqlite:///C:\\Users\\Lielle Ravid\\Desktop\\sixth semster\\sadna\\version 1\\project\\tradeSystem.db'
@@ -112,3 +117,23 @@ class Handler:
         for ad in admin:
             admins.append(ad.username)
         return admins
+
+    def get_stats(self):
+        from project.domain_layer.users_managment.Statistics import Statistics
+        Base.metadata.create_all(engine, [Base.metadata.tables['stats']], checkfirst=True)
+        stats = {}
+        res = proxy.get_session().query(StatsORM)
+        for stat in res:
+            stats[stat.date] = {'guests': stat.guests,
+                                'registered_users': stat.reg_users,
+                                'managers': stat.managers,
+                                'owners': stat.owners}
+        today = str(date.today())
+        orm_today = proxy.get_session().query(StatsORM).filter_by(date=today).first()
+        stat = Statistics(orm_today)
+        stat.set_publisher(self.publisher)
+        return stat
+
+    def get_store_index(self):
+        index = proxy.get_session().query(StoreORM).count()
+        return index
