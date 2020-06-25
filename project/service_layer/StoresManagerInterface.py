@@ -257,6 +257,7 @@ class StoresManagerInterface:
 
     def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date=None,
                                         end_date=None, percent: int = None, products: [str] = None):
+        print(start_date)
         _start_date = datetime.strptime(start_date, '%Y-%m-%d')
         _end_date = datetime.strptime(end_date, '%Y-%m-%d')
         _percent = int(percent)
