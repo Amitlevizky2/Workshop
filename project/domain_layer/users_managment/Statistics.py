@@ -102,10 +102,10 @@ class Statistics:
             self.managers = 0
             self.owners = 0
 
-    def set_publisher(self, publisher):
-        self.publisher = publisher
+    # def set_publisher(self, publisher):
+    #     self.publisher = publisher
 
     def notify_admins(self):
         st = self.get_all_data()
         print(st)
-        self.publisher.notify_admins(st)
+        # self.publisher.notify_admins(st)

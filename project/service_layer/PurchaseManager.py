@@ -137,10 +137,10 @@ class PurchaseManager:
             }
 
     def add_purchases_to_stores(self, purchases):
-        for store_id in purchases:
-            store = self.store_manager.stores_manager.add_purchase_to_store(store_id, purchases[store_id])
+        for store_id in purchases.keys():
+            self.store_manager.stores_manager.add_purchase_to_store(store_id, purchases[store_id])
 
     def update_purchase_number(self, purchases, order_number: int, supply_number: int):
-        for purchase in purchases:
+        for purchase in purchases.values():
             purchase.set_order_number(order_number)
             purchase.set_supply_number(supply_number)

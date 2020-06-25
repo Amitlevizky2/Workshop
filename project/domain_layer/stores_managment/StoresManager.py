@@ -203,6 +203,11 @@ class StoresManager:
         store = self.get_store(store_id)
         answer = store.add_visible_product_discount(username,
                                                     VisibleProductDiscount(start_date, end_date, percent, store_id))
+        if start_date > end_date:
+            return jsons.dumps({
+                'error': True,
+                'error_msg': 'Invalid Dates'
+            })
         if answer['error'] is False:
             for product_name in products:
                 self.add_product_to_discount(store_id, username, answer['data']['discount_id'], product_name)
@@ -210,6 +215,11 @@ class StoresManager:
 
     def add_conditional_discount_to_product(self, store_id: int, username: str, start_date, end_date, percent: int,
                                             min_amount: int, num_prods_to_apply: int, products: list):
+        if start_date > end_date:
+            return jsons.dumps({
+                'error': True,
+                'error_msg': 'Invalid Dates'
+            })
         store = self.get_store(store_id)
         answer = store.add_conditional_discount_to_product(username, ConditionalProductDiscount(start_date, end_date,
                                                                                                 percent, min_amount,
@@ -222,6 +232,11 @@ class StoresManager:
 
     def add_conditional_discount_to_store(self, store_id: int, username: str, start_date, end_date, percent: int,
                                           min_price: int):
+        if start_date > end_date:
+            return jsons.dumps({
+                'error': True,
+                'error_msg': 'Invalid Dates'
+            })
         store = self.get_store(store_id)
         return jsons.dumps(store.add_conditional_discount_to_store(username,
                                                                    ConditionalStoreDiscount(start_date, end_date,
@@ -240,6 +255,11 @@ class StoresManager:
 
     def add_composite_discount(self, store_id: int, username: str, start_date, end_date, logic_operator_str: str,
                                discounts_products_dict: dict, discounts_to_apply_id: list):
+        if start_date > end_date:
+            return jsons.dumps({
+                'error': True,
+                'error_msg': 'Invalid Dates'
+            })
         store = self.get_store(store_id)  # {dicount_id, [product_names]}
         tup_list = []
         discounts_to_apply_list = []

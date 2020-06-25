@@ -17,7 +17,7 @@ class ConditionalStoreDiscount(Discount):
         if self.start < datetime.today() < self.end and total_basket_price >= self.min_price:
             to_add_discount = "Store Discount" + str(self.id)
             price = self.calculate_conditional_discount(total_basket_price)
-            discount_as_product = Product(to_add_discount, (-price), "none", "none", 1)
+            discount_as_product = Product(to_add_discount, (-price), "none", "none", 1, self.store_id)
             new_product_tup = (discount_as_product, 1,
                                price, price)
 

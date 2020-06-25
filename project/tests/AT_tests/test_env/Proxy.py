@@ -252,3 +252,31 @@ class Proxy:
             pur.products = [p]
             pur.store_id = store_id
             return pur
+
+    def add_purchase_product_policy(self, store_id: int = None, permitted_user: str = None,
+                                    min_amount_products: int = None,
+                                    max_amount_products: int = None, products: list = []):
+        return self.real.add_purchase_product_policy(store_id, permitted_user,
+                                    min_amount_products,
+                                    max_amount_products, products)
+
+    def bound_publisher(self, publisher):
+        return self.real.bound_publisher(publisher)
+
+    def add_purchase_store_policy(self,store_id, permitted_user, min_amount_products, max_amount_products):
+        return self.real.add_purchase_store_policy(store_id ,permitted_user, min_amount_products, max_amount_products)
+
+    def add_visible_discount_to_product(self, store_id: int = None, username: str = None, start_date=None,
+                                        end_date=None, percent: int = None, products: [str] = None):
+        return self.real.add_visible_discount_to_product(store_id,username,start_date,end_date,percent,products)
+
+    def add_conditional_discount_to_store(self, store_id: int = None, username: str = None, start_date=None,
+                                          end_date=None, percent: int = None,
+                                          min_price: int = None):
+        return self.real.add_conditional_discount_to_store(store_id,username,start_date,end_date,percent,min_price)
+
+    def add_composite_discount(self, store_id: int = None, username: str = None, start_date=None,
+                               end_date=None, logic_operator: str = None,
+                               discounts_products_dict: dict = None,
+                               discounts_to_apply_id: list = None):
+        return self.real.add_composite_discount(store_id,username,start_date,end_date,logic_operator,discounts_products_dict,discounts_to_apply_id)
