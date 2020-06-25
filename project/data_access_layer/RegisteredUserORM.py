@@ -43,6 +43,7 @@ class RegisteredUserORM(Base):
     def add_notification(self, username, message):
         from project.data_access_layer.UserNotificationsORM import UserNotificationORM
         notif = UserNotificationORM(username=username, notification=message)
+        Base.metadata.create_all(engine, [Base.metadata.tables['notifications']], checkfirst=True)
         proxy.get_session().add(notif)
         proxy.get_session().commit()
 
